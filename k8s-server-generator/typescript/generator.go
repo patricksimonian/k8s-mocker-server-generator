@@ -2,15 +2,15 @@ package typescript
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
-	"text/template"
-	"io/ioutil"
-	"strings"
 	"runtime"
-	
-	"github.com/patricksimonian/k8s-mock-server-generator/openapi-ir-processor/v2/ir"
+	"strings"
+	"text/template"
+
 	"github.com/patricksimonian/k8s-mock-server-generator/k8s-server-generator/v2/generator/config"
+	"github.com/patricksimonian/k8s-mock-server-generator/openapi-ir-processor/v2/ir"
 )
 
 // Generator handles the generation of TypeScript code from IR.
@@ -113,46 +113,46 @@ func (g *Generator) loadTemplates() error {
 	if !ok {
 		return fmt.Errorf("failed to get current file path")
 	}
-	
+
 	templatesDir := filepath.Join(filepath.Dir(filename), "templates")
-	
+
 	// Walk through the templates directory
 	return filepath.Walk(templatesDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
-		
+
 		// Skip directories
 		if info.IsDir() {
 			return nil
 		}
-		
+
 		// Skip non-template files
 		if !strings.HasSuffix(path, ".tmpl") {
 			return nil
 		}
-		
+
 		// Read template file
 		content, err := ioutil.ReadFile(path)
 		if err != nil {
 			return fmt.Errorf("failed to read template file %s: %w", path, err)
 		}
-		
+
 		// Get relative path from templates directory
 		relPath, err := filepath.Rel(templatesDir, path)
 		if err != nil {
 			return fmt.Errorf("failed to get relative path for template %s: %w", path, err)
 		}
-		
+
 		// Create template
 		tmpl, err := template.New(relPath).Parse(string(content))
 		if err != nil {
 			return fmt.Errorf("failed to parse template %s: %w", relPath, err)
 		}
-		
+
 		// Store template
 		g.templates[relPath] = tmpl
-		
+
 		return nil
 	})
 }
@@ -167,13 +167,13 @@ func (g *Generator) createDirectoryStructure() error {
 		filepath.Join(g.OutputDir, "src", "storage"),
 		filepath.Join(g.OutputDir, "src", "middleware"),
 	}
-	
+
 	for _, dir := range dirs {
 		if err := os.MkdirAll(dir, 0755); err != nil {
 			return fmt.Errorf("failed to create directory %s: %w", dir, err)
 		}
 	}
-	
+
 	return nil
 }
 
@@ -183,17 +183,17 @@ func (g *Generator) executeTemplate(templateName, outputPath string, data interf
 	if !ok {
 		return fmt.Errorf("template %s not found", templateName)
 	}
-	
+
 	file, err := os.Create(outputPath)
 	if err != nil {
 		return fmt.Errorf("failed to create file %s: %w", outputPath, err)
 	}
 	defer file.Close()
-	
+
 	if err := tmpl.Execute(file, data); err != nil {
 		return fmt.Errorf("failed to execute template %s: %w", templateName, err)
 	}
-	
+
 	return nil
 }
 
@@ -227,7 +227,7 @@ func (g *Generator) generateConfig() error {
 		StorageType:      g.Config.Storage.Type,
 		InitialStateType: g.Config.InitialStateConfig.Type,
 	}
-	
+
 	// Add storage-specific config
 	if g.Config.Storage.Type == "file" {
 		tsConfig.FilePath = g.Config.Storage.FilePath
@@ -235,7 +235,7 @@ func (g *Generator) generateConfig() error {
 		tsConfig.FirestoreProject = g.Config.Storage.FirestoreProject
 		tsConfig.FirestoreEmulator = g.Config.Storage.FirestoreEmulator
 	}
-	
+
 	// Execute template
 	return g.executeTemplate("config.ts.tmpl", filepath.Join(g.OutputDir, "src", "config.ts"), tsConfig)
 }
@@ -251,12 +251,12 @@ func (g *Generator) generateStorage() error {
 	if err := g.executeTemplate("storage/Storage.ts.tmpl", filepath.Join(g.OutputDir, "src", "storage", "Storage.ts"), g.IR); err != nil {
 		return err
 	}
-	
+
 	// Generate StorageError (always needed)
 	if err := g.executeTemplate("storage/StorageError.ts.tmpl", filepath.Join(g.OutputDir, "src", "storage", "StorageError.ts"), nil); err != nil {
 		return err
 	}
-	
+
 	// Generate storage implementations based on configuration
 	switch g.Config.Storage.Type {
 	case "memory":
@@ -272,7 +272,7 @@ func (g *Generator) generateStorage() error {
 			return err
 		}
 	}
-	
+
 	// Generate storage index
 	return g.executeTemplate("storage/index.ts.tmpl", filepath.Join(g.OutputDir, "src", "storage", "index.ts"), g.Config)
 }
@@ -283,18 +283,18 @@ func (g *Generator) generateModels() error {
 	for _, definition := range g.IR.Definitions {
 		data := struct {
 			Definition *ir.Definition
-			IR        *ir.IR
+			IR         *ir.IR
 		}{
 			Definition: definition,
-			IR:        g.IR,
+			IR:         g.IR,
 		}
-		
+
 		filename := fmt.Sprintf("%s.ts", definition.Name)
 		if err := g.executeTemplate("models/model.ts.tmpl", filepath.Join(g.OutputDir, "src", "models", filename), data); err != nil {
 			return err
 		}
 	}
-	
+
 	// Generate models index
 	return g.executeTemplate("models/index.ts.tmpl", filepath.Join(g.OutputDir, "src", "models", "index.ts"), g.IR)
 }
@@ -307,7 +307,7 @@ func (g *Generator) generateRoutes() error {
 		resource := path.Resource
 		resourcePaths[resource] = append(resourcePaths[resource], path)
 	}
-	
+
 	// Generate route files for each resource
 	for resource, paths := range resourcePaths {
 		data := struct {
@@ -319,13 +319,13 @@ func (g *Generator) generateRoutes() error {
 			Paths:    paths,
 			IR:       g.IR,
 		}
-		
+
 		filename := fmt.Sprintf("%sRoutes.ts", resource)
 		if err := g.executeTemplate("routes/resource-routes.ts.tmpl", filepath.Join(g.OutputDir, "src", "routes", filename), data); err != nil {
 			return err
 		}
 	}
-	
+
 	// Generate routes index
 	return g.executeTemplate("routes/index.ts.tmpl", filepath.Join(g.OutputDir, "src", "routes", "index.ts"), g.IR)
 }
@@ -336,12 +336,12 @@ func (g *Generator) generateMiddleware() error {
 	if err := g.executeTemplate("middleware/auth.ts.tmpl", filepath.Join(g.OutputDir, "src", "middleware", "auth.ts"), nil); err != nil {
 		return err
 	}
-	
+
 	// Generate error handling middleware
 	if err := g.executeTemplate("middleware/errorHandler.ts.tmpl", filepath.Join(g.OutputDir, "src", "middleware", "errorHandler.ts"), nil); err != nil {
 		return err
 	}
-	
+
 	// Generate middleware index
 	return g.executeTemplate("middleware/index.ts.tmpl", filepath.Join(g.OutputDir, "src", "middleware", "index.ts"), nil)
 }
@@ -365,4 +365,3 @@ func (g *Generator) generateInitScript() error {
 func (g *Generator) generateIndex() error {
 	return g.executeTemplate("index.ts.tmpl", filepath.Join(g.OutputDir, "src", "index.ts"), nil)
 }
-

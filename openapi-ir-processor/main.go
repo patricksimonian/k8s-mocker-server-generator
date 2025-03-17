@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/patricksimonian/k8s-mock-server-generator/openapi-ir-processor/v2/ir"
+	"github.com/patricksimonian/k8s-mock-server-generator/openapi-ir-processor/ir"
 )
 
 func main() {

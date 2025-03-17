@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"main/ir"
 	"os"
 	"strings"
+
+	"github.com/patricksimonian/k8s-mock-server-generator/openapi-ir-processor/v2/ir"
 )
 
 func main() {

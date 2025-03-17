@@ -1,0 +1,81 @@
+/**
+ * Configuration for the Kubernetes mock server
+ */
+export interface ServerConfig {
+  /**
+   * Port to run the server on
+   */
+  port: number;
+}
+
+/**
+ * Storage configuration
+ */
+export interface StorageConfig {
+  /**
+   * Type of storage to use
+   */
+  type: 'memory' | 'file' | 'firestore';
+  
+  /**
+   * Path to the file for file storage
+   */
+  filePath?: string;
+  
+  /**
+   * Firestore project ID
+   */
+  firestoreProject?: string;
+  
+  /**
+   * Whether to use the Firestore emulator
+   */
+  firestoreEmulator?: boolean;
+}
+
+/**
+ * Initial state configuration
+ */
+export interface InitialStateConfig {
+  /**
+   * Type of initial state
+   */
+  type: 'empty' | 'default' | 'custom';
+  
+  /**
+   * Path to custom state file (only used when type is 'custom')
+   */
+  customStatePath?: string;
+}
+
+/**
+ * Server configuration
+ */
+const config = {
+  server: {
+    port: {{ .Port }}
+  },
+  
+  storage: {
+    type: "{{ .StorageType }}",
+    {{- if eq .StorageType "file" }}
+    filePath: "{{ .FilePath }}"
+    {{- end }}
+    {{- if eq .StorageType "firestore" }}
+    firestoreProject: "{{ .FirestoreProject }}",
+    firestoreEmulator: {{ .FirestoreEmulator }}
+    {{- end }}
+  },
+  
+  initialState: {
+    type: "{{ .InitialStateType }}"
+    {{- if eq .InitialStateType "custom" }}
+    {{- if .CustomStatePath }}
+    ,customStatePath: "{{ .CustomStatePath }}"
+    {{- end }}
+    {{- end }}
+  }
+};
+
+export default config;
+

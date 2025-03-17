@@ -1,0 +1,237 @@
+import { Storage } from './Storage';
+import { StorageError } from './StorageError';
+import { logger } from '../logger';
+import config from '../config';
+import { v4 as uuidv4 } from 'uuid';
+
+// Import firebase-admin dynamically to avoid issues when not using Firestore
+let admin: any;
+try {
+  admin = require('firebase-admin');
+} catch (error) {
+  logger.warn('firebase-admin package not found. FirestoreStorage will not be available.');
+}
+
+/**
+ * Firestore implementation of the Storage interface
+ */
+export class FirestoreStorage implements Storage {
+  private db: any;
+  private initialized: boolean = false;
+  private readonly collectionPrefix: string;
+
+  /**
+   * Create a new FirestoreStorage instance
+   * 
+   * @param projectId Firestore project ID
+   * @param collectionPrefix Prefix for Firestore collections (default: 'k8s')
+   */
+  constructor(projectId: string, collectionPrefix: string = 'k8s') {
+    if (!admin) {
+      throw new Error('firebase-admin package is required for Firestore storage');
+    }
+
+    // Initialize Firebase
+    try {
+      admin.initializeApp({
+        projectId: projectId,
+        credential: admin.credential.applicationDefault()
+      });
+      
+      this.db = admin.firestore();
+      this.collectionPrefix = collectionPrefix || 'k8s';
+      
+      logger.info(`Firestore storage initialized with project ID ${projectId} and collection prefix ${this.collectionPrefix}`);
+    } catch (error) {
+      logger.error('Failed to initialize Firestore:', error);
+      throw new Error('Failed to initialize Firestore: ' + (error as Error).message);
+    }
+  }
+
+  /**
+   * Check if the storage has been initialized
+   */
+  async isInitialized(): Promise<boolean> {
+    try {
+      const doc = await this.db.collection(`${this.collectionPrefix}_internal`).doc('initialization').get();
+      return doc.exists && doc.data()?.initialized === true;
+    } catch (error) {
+      logger.error('Error checking initialization status:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Mark the storage as initialized
+   */
+  async markInitialized(): Promise<void> {
+    try {
+      await this.db.collection(`${this.collectionPrefix}_internal`).doc('initialization').set({
+        initialized: true,
+        timestamp: admin.firestore.FieldValue.serverTimestamp()
+      });
+      this.initialized = true;
+    } catch (error) {
+      logger.error('Error marking storage as initialized:', error);
+      throw StorageError.internal('Failed to mark storage as initialized', error as Error);
+    }
+  }
+
+  {{- range $name, $model := .Models }}
+  /**
+   * Get a {{ $name }} by name
+   */
+  async get{{ $name }}(name: string, namespace: string = 'default'): Promise<any> {
+    try {
+      const doc = await this.db
+        .collection(`${this.collectionPrefix}_namespaces`)
+        .doc(namespace)
+        .collection('{{ $name | lower }}s')
+        .doc(name)
+        .get();
+        
+      if (!doc.exists) {
+        throw StorageError.notFound('{{ $name }}', name, namespace);
+      }
+      
+      return doc.data();
+    } catch (error) {
+      if (error instanceof StorageError) {
+        throw error;
+      }
+      logger.error(`Error getting {{ $name }}:`, error);
+      throw StorageError.internal(`Failed to get {{ $name }} "${name}"`, error as Error);
+    }
+  }
+  
+  /**
+   * List all {{ $name }}s in a namespace
+   */
+  async list{{ $name }}s(namespace: string = 'default'): Promise<any[]> {
+    try {
+      const snapshot = await this.db
+        .collection(`${this.collectionPrefix}_namespaces`)
+        .doc(namespace)
+        .collection('{{ $name | lower }}s')
+        .get();
+        
+      return snapshot.docs.map((doc: any) => doc.data());
+    } catch (error) {
+      logger.error(`Error listing {{ $name }}s:`, error);
+      throw StorageError.internal(`Failed to list {{ $name }}s in namespace "${namespace}"`, error as Error);
+    }
+  }
+  
+  /**
+   * Create a {{ $name }}
+   */
+  async create{{ $name }}(resource: any, namespace: string = 'default'): Promise<any> {
+    try {
+      const name = resource.metadata?.name;
+      if (!name) {
+        throw StorageError.missingField('metadata.name');
+      }
+      
+      // Check if resource already exists
+      const docRef = this.db
+        .collection(`${this.collectionPrefix}_namespaces`)
+        .doc(namespace)
+        .collection('{{ $name | lower }}s')
+        .doc(name);
+        
+      const doc = await docRef.get();
+      if (doc.exists) {
+        throw StorageError.alreadyExists('{{ $name }}', name, namespace);
+      }
+      
+      // Add resource metadata
+      const now = new Date().toISOString();
+      resource.metadata = {
+        ...resource.metadata,
+        creationTimestamp: now,
+        resourceVersion: uuidv4(),
+        namespace: namespace
+      };
+      
+      // Create resource
+      await docRef.set(resource);
+      
+      return resource;
+    } catch (error) {
+      if (error instanceof StorageError) {
+        throw error;
+      }
+      logger.error(`Error creating {{ $name }}:`, error);
+      throw StorageError.internal(`Failed to create {{ $name }}`, error as Error);
+    }
+  }
+  
+  /**
+   * Update a {{ $name }}
+   */
+  async update{{ $name }}(name: string, resource: any, namespace: string = 'default'): Promise<any> {
+    try {
+      // Check if resource exists
+      const docRef = this.db
+        .collection(`${this.collectionPrefix}_namespaces`)
+        .doc(namespace)
+        .collection('{{ $name | lower }}s')
+        .doc(name);
+        
+      const doc = await docRef.get();
+      if (!doc.exists) {
+        throw StorageError.notFound('{{ $name }}', name, namespace);
+      }
+      
+      // Update resource metadata
+      const existing = doc.data();
+      resource.metadata = {
+        ...resource.metadata,
+        creationTimestamp: existing.metadata.creationTimestamp,
+        resourceVersion: uuidv4(),
+        namespace: namespace
+      };
+      
+      // Update resource
+      await docRef.set(resource);
+      
+      return resource;
+    } catch (error) {
+      if (error instanceof StorageError) {
+        throw error;
+      }
+      logger.error(`Error updating {{ $name }}:`, error);
+      throw StorageError.internal(`Failed to update {{ $name }} "${name}"`, error as Error);
+    }
+  }
+  
+  /**
+   * Delete a {{ $name }}
+   */
+  async delete{{ $name }}(name: string, namespace: string = 'default'): Promise<void> {
+    try {
+      // Check if resource exists
+      const docRef = this.db
+        .collection(`${this.collectionPrefix}_namespaces`)
+        .doc(namespace)
+        .collection('{{ $name | lower }}s')
+        .doc(name);
+        
+      const doc = await docRef.get();
+      if (!doc.exists) {
+        throw StorageError.notFound('{{ $name }}', name, namespace);
+      }
+      
+      // Delete resource
+      await docRef.delete();
+    } catch (error) {
+      if (error instanceof StorageError) {
+        throw error;
+      }
+      logger.error(`Error deleting {{ $name }}:`, error);
+      throw StorageError.internal(`Failed to delete {{ $name }} "${name}"`, error as Error);
+    }
+  }
+  {{- end }}
+}
+

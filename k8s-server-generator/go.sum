@@ -1,4 +1,0 @@
-github.com/patricksimonian/k8s-mock-server-generator/openapi-ir-processor/v2 v2.0.0-20250317211539-c97c20b99f81 h1:WQH82KPGd5p6/UOmabZHbJeWWRJ7VNQXkLQ7g6W9uZE=
-github.com/patricksimonian/k8s-mock-server-generator/openapi-ir-processor/v2 v2.0.0-20250317211539-c97c20b99f81/go.mod h1:VVkAtIEy+bZHR7EGit8Uq837DWhcSp5iy6Ba3tLtC5k=
-gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
-gopkg.in/yaml.v2 v2.4.0/go.mod h1:RDklbk79AGWmwhnvt/jBztapEOGDOx6ZbXqjP6csGnQ=

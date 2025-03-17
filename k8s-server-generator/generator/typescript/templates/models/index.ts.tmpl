@@ -1,0 +1,5 @@
+// Export all models
+{{- range $name, $model := .Models }}
+export * from './{{ $name }}';
+{{- end }}
+

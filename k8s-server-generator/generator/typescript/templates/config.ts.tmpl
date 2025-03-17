@@ -1,12 +1,6 @@
 /**
  * Configuration for the Kubernetes mock server
  */
-export interface ServerConfig {
-  /**
-   * Port to run the server on
-   */
-  port: number;
-}
 
 /**
  * Storage configuration
@@ -18,19 +12,19 @@ export interface StorageConfig {
   type: 'memory' | 'file' | 'firestore';
   
   /**
-   * Path to the file for file storage
+   * Path to the file for file storage (only used when type is 'file')
    */
   filePath?: string;
   
   /**
-   * Firestore project ID
+   * Firestore project ID (only used when type is 'firestore')
    */
   firestoreProject?: string;
   
   /**
-   * Whether to use the Firestore emulator
+   * Firestore collection prefix (only used when type is 'firestore')
    */
-  firestoreEmulator?: boolean;
+  firestoreCollectionPrefix?: string;
 }
 
 /**
@@ -53,7 +47,8 @@ export interface InitialStateConfig {
  */
 const config = {
   server: {
-    port: {{ .Port }}
+    // Use environment variable PORT or default to 9091
+    port: process.env.PORT ? parseInt(process.env.PORT, 10) : 9091
   },
   
   storage: {
@@ -63,7 +58,7 @@ const config = {
     {{- end }}
     {{- if eq .StorageType "firestore" }}
     firestoreProject: "{{ .FirestoreProject }}",
-    firestoreEmulator: {{ .FirestoreEmulator }}
+    firestoreCollectionPrefix: "{{ .FirestoreCollectionPrefix }}"
     {{- end }}
   },
   

@@ -1,0 +1,162 @@
+import { Storage } from './Storage';
+import { StorageError } from './StorageError';
+import { logger } from '../logger';
+import { v4 as uuidv4 } from 'uuid';
+
+/**
+ * In-memory implementation of the Storage interface
+ */
+export class InMemoryStorage implements Storage {
+  private data: Record<string, Record<string, Record<string, any>>> = {};
+  private initialized: boolean = false;
+
+  constructor() {
+    // Initialize data structure
+    this.data = {
+      namespaces: {}
+    };
+    
+    // Create default namespace
+    this.data.namespaces['default'] = {};
+    
+    logger.info('In-memory storage initialized');
+  }
+
+  /**
+   * Check if the storage has been initialized
+   */
+  async isInitialized(): Promise<boolean> {
+    return this.initialized;
+  }
+
+  /**
+   * Mark the storage as initialized
+   */
+  async markInitialized(): Promise<void> {
+    this.initialized = true;
+  }
+
+  /**
+   * Get a namespace or create it if it doesn't exist
+   */
+  private getOrCreateNamespace(namespace: string): Record<string, Record<string, any>> {
+    if (!this.data.namespaces[namespace]) {
+      this.data.namespaces[namespace] = {};
+    }
+    return this.data.namespaces[namespace];
+  }
+
+  /**
+   * Get or create a collection in a namespace
+   */
+  private getOrCreateCollection(namespace: string, collection: string): Record<string, any> {
+    const ns = this.getOrCreateNamespace(namespace);
+    if (!ns[collection]) {
+      ns[collection] = {};
+    }
+    return ns[collection];
+  }
+
+  {{- range $name, $model := .Models }}
+  /**
+   * Get a {{ $name }} by name
+   */
+  async get{{ $name }}(name: string, namespace: string = 'default'): Promise<any> {
+    const collection = this.getOrCreateCollection(namespace, '{{ $name | lower }}s');
+    const resource = collection[name];
+    
+    if (!resource) {
+      throw StorageError.notFound('{{ $name }}', name, namespace);
+    }
+    
+    return { ...resource };
+  }
+  
+  /**
+   * List all {{ $name }}s in a namespace
+   */
+  async list{{ $name }}s(namespace: string = 'default'): Promise<any[]> {
+    const collection = this.getOrCreateCollection(namespace, '{{ $name | lower }}s');
+    return Object.values(collection).map(resource => ({ ...resource }));
+  }
+  
+  /**
+   * Create a {{ $name }}
+   */
+  async create{{ $name }}(resource: any, namespace: string = 'default'): Promise<any> {
+    const name = resource.metadata?.name;
+    if (!name) {
+      throw StorageError.missingField('metadata.name');
+    }
+    
+    const collection = this.getOrCreateCollection(namespace, '{{ $name | lower }}s');
+    
+    // Check if resource already exists
+    if (collection[name]) {
+      throw StorageError.alreadyExists('{{ $name }}', name, namespace);
+    }
+    
+    // Add resource metadata
+    const now = new Date().toISOString();
+    const newResource = {
+      ...resource,
+      metadata: {
+        ...resource.metadata,
+        creationTimestamp: now,
+        resourceVersion: uuidv4(),
+        namespace: namespace
+      }
+    };
+    
+    // Store resource
+    collection[name] = newResource;
+    
+    return { ...newResource };
+  }
+  
+  /**
+   * Update a {{ $name }}
+   */
+  async update{{ $name }}(name: string, resource: any, namespace: string = 'default'): Promise<any> {
+    const collection = this.getOrCreateCollection(namespace, '{{ $name | lower }}s');
+    
+    // Check if resource exists
+    if (!collection[name]) {
+      throw StorageError.notFound('{{ $name }}', name, namespace);
+    }
+    
+    // Update resource metadata
+    const existing = collection[name];
+    const updatedResource = {
+      ...resource,
+      metadata: {
+        ...resource.metadata,
+        creationTimestamp: existing.metadata.creationTimestamp,
+        resourceVersion: uuidv4(),
+        namespace: namespace
+      }
+    };
+    
+    // Store updated resource
+    collection[name] = updatedResource;
+    
+    return { ...updatedResource };
+  }
+  
+  /**
+   * Delete a {{ $name }}
+   */
+  async delete{{ $name }}(name: string, namespace: string = 'default'): Promise<void> {
+    const collection = this.getOrCreateCollection(namespace, '{{ $name | lower }}s');
+    
+    // Check if resource exists
+    if (!collection[name]) {
+      throw StorageError.notFound('{{ $name }}', name, namespace);
+    }
+    
+    // Delete resource
+    delete collection[name];
+  }
+  {{- end }}
+}
+

@@ -27,8 +27,8 @@ func (h *StorageErrorHandler) Generate() error {
 		return fmt.Errorf("failed to create storage directory: %w", err)
 	}
 
-	// Template for StorageError.ts
-	tmpl, err := template.New("StorageError").Parse(`/**
+	// Template for StorageError.ts using string concatenation to avoid dollar sign issues
+	templateContent := `/**
  * Custom error class for storage operations
  */
 export class StorageError extends Error {
@@ -113,8 +113,8 @@ export class StorageError extends Error {
    */
   static notFound(kind: string, name: string, namespace?: string): StorageError {
     const message = namespace 
-      ? \`\${kind} "\${name}" not found in namespace "\${namespace}"\`
-      : \`\${kind} "\${name}" not found\`;
+      ? ` + "`${kind} \"${name}\" not found in namespace \"${namespace}\"`" + `
+      : ` + "`${kind} \"${name}\" not found`" + `;
       
     return new StorageError('NOT_FOUND', message, undefined, {
       kind,
@@ -128,8 +128,8 @@ export class StorageError extends Error {
    */
   static alreadyExists(kind: string, name: string, namespace?: string): StorageError {
     const message = namespace 
-      ? \`\${kind} "\${name}" already exists in namespace "\${namespace}"\`
-      : \`\${kind} "\${name}" already exists\`;
+      ? ` + "`${kind} \"${name}\" already exists in namespace \"${namespace}\"`" + `
+      : ` + "`${kind} \"${name}\" already exists`" + `;
       
     return new StorageError('ALREADY_EXISTS', message, undefined, {
       kind,
@@ -149,7 +149,7 @@ export class StorageError extends Error {
    * Create a MISSING_FIELD error
    */
   static missingField(field: string): StorageError {
-    return new StorageError('MISSING_FIELD', \`Required field "\${field}" is missing\`, undefined, {
+    return new StorageError('MISSING_FIELD', ` + "`Required field \"${field}\" is missing`" + `, undefined, {
       field
     });
   }
@@ -160,8 +160,10 @@ export class StorageError extends Error {
   static internal(message: string, cause?: Error): StorageError {
     return new StorageError('INTERNAL_ERROR', message, cause);
   }
-}
-`)
+}`
+
+	// Parse the template
+	tmpl, err := template.New("StorageError").Parse(templateContent)
 	if err != nil {
 		return fmt.Errorf("failed to parse StorageError template: %w", err)
 	}

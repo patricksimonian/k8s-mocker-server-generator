@@ -1,0 +1,19 @@
+import { Router } from 'express';
+
+{{- range $name, $model := .Models }}
+import { create{{ $name }}Routes } from './{{ $name }}Routes';
+{{- end }}
+
+/**
+ * Create all API routes
+ */
+export function createRoutes(): Router {
+  const router = Router();
+  
+  {{- range $name, $model := .Models }}
+  router.use('/api/v1/{{ $name | lower }}s', create{{ $name }}Routes());
+  {{- end }}
+  
+  return router;
+}
+

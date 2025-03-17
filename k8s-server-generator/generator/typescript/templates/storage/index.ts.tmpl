@@ -56,7 +56,7 @@ export function createStorage(): Storage {
       }
       return new FirestoreStorage(
         config.storage.firestoreProject,
-        config.storage.firestoreEmulator || false
+        config.storage.firestoreCollectionPrefix || 'k8s'
       );
       {{- else }}
       throw new Error('Firestore storage is not available. Please regenerate the server with Firestore support.');

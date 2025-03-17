@@ -1,0 +1,23 @@
+/**
+ * {{ .ModelName }} model
+ */
+export interface {{ .ModelName }} {
+  {{- range $propName, $prop := .Model.Schema.Properties }}
+  /**
+   * {{ $prop.Description }}
+   */
+  {{ $propName }}{{ if not (contains $.Model.Schema.Required $propName) }}?{{ end }}: {{ getTypeScriptType $prop }};
+  {{- end }}
+}
+
+/**
+ * Create a new {{ .ModelName }} with default values
+ */
+export function create{{ .ModelName }}(data?: Partial<{{ .ModelName }}>): {{ .ModelName }} {
+  return {
+    {{- range $propName, $prop := .Model.Schema.Properties }}
+    {{ $propName }}: data?.{{ $propName }} ?? {{ getDefaultValue $prop }},
+    {{- end }}
+  };
+}
+

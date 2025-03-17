@@ -5,11 +5,10 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 
-	"github.com/patricksimonian/k8s-mock-server-generator/k8s-server-generator/v2/generator/config"
-	"github.com/patricksimonian/k8s-mock-server-generator/k8s-server-generator/v2/generator/typescript"
-	"github.com/patricksimonian/k8s-mock-server-generator/openapi-ir-processor/v2/ir"
+	"github.com/patricksimonian/k8s-mock-server-generator/k8s-server-generator/generator/config"
+	"github.com/patricksimonian/k8s-mock-server-generator/k8s-server-generator/generator/typescript"
+	"github.com/patricksimonian/k8s-mock-server-generator/openapi-ir-processor/ir"
 	"gopkg.in/yaml.v2"
 )
 
@@ -50,10 +49,7 @@ func main() {
 	}
 
 	// Generate IR from the spec
-	irData, err := ir.GenerateIR(&spec)
-	if err != nil {
-		log.Fatalf("Failed to generate IR: %v", err)
-	}
+	irData := ir.GenerateIR(spec)
 
 	// Create output directory if it doesn't exist
 	if err := os.MkdirAll(cfg.OutputDir, 0755); err != nil {
@@ -61,7 +57,11 @@ func main() {
 	}
 
 	// Generate TypeScript code
-	generator := typescript.NewGenerator(irData, &cfg, cfg.OutputDir)
+	generator, err := typescript.NewGenerator(irData, &cfg, cfg.OutputDir)
+	if err != nil {
+		log.Fatalf("Failed to create generator: %v", err)
+	}
+
 	if err := generator.Generate(); err != nil {
 		log.Fatalf("Failed to generate TypeScript code: %v", err)
 	}
@@ -118,4 +118,3 @@ func validateConfig(cfg *config.Config) error {
 
 	return nil
 }
-

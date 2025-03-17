@@ -1,10 +1,9 @@
-module github.com/patricksimonian/k8s-mock-server-generator/k8s-server-generator/v2
+module github.com/patricksimonian/k8s-mock-server-generator
 
 go 1.16
 
 require (
-	// github.com/patricksimonian/k8s-mock-server-generator/openapi-ir-processor v1.0.0
-	// github.com/patricksimonian/k8s-mock-server-generator/openapi-ir-processor/v2 v1.0.0
+	github.com/getkin/kin-openapi v0.130.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )
 

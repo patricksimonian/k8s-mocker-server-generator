@@ -1,0 +1,57 @@
+/**
+ * Storage interface for Kubernetes resources
+ */
+export interface Storage {
+  /**
+   * Check if the storage has been initialized
+   */
+  isInitialized(): Promise<boolean>;
+  
+  /**
+   * Mark the storage as initialized
+   */
+  markInitialized(): Promise<void>;
+  
+  {{- range $name, $model := .Models }}
+  /**
+   * Get a {{ $name }} by name
+   * 
+   * @param name Name of the {{ $name }}
+   * @param namespace Namespace of the {{ $name }}
+   */
+  get{{ $name }}(name: string, namespace?: string): Promise<any>;
+  
+  /**
+   * List all {{ $name }}s in a namespace
+   * 
+   * @param namespace Namespace to list {{ $name }}s in
+   */
+  list{{ $name }}s(namespace?: string): Promise<any[]>;
+  
+  /**
+   * Create a {{ $name }}
+   * 
+   * @param resource {{ $name }} to create
+   * @param namespace Namespace to create the {{ $name }} in
+   */
+  create{{ $name }}(resource: any, namespace?: string): Promise<any>;
+  
+  /**
+   * Update a {{ $name }}
+   * 
+   * @param name Name of the {{ $name }} to update
+   * @param resource Updated {{ $name }}
+   * @param namespace Namespace of the {{ $name }}
+   */
+  update{{ $name }}(name: string, resource: any, namespace?: string): Promise<any>;
+  
+  /**
+   * Delete a {{ $name }}
+   * 
+   * @param name Name of the {{ $name }} to delete
+   * @param namespace Namespace of the {{ $name }}
+   */
+  delete{{ $name }}(name: string, namespace?: string): Promise<void>;
+  {{- end }}
+}
+

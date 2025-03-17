@@ -2,3 +2,5 @@
 **/venv
 **/dereferenced_spec.json
 **/cluster-config.yaml
+**/config.yaml
+**/admin-key.json

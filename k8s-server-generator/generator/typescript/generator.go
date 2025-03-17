@@ -69,7 +69,7 @@ func (g *Generator) loadTemplates() error {
 	for _, path := range templatePaths {
 		// Construct full path
 		fullPath := filepath.Join("templates", path)
-
+		fmt.Printf("Loading template: %s\n", fullPath)
 		// Parse template
 		tmpl, err := template.ParseFiles(fullPath)
 		if err != nil {

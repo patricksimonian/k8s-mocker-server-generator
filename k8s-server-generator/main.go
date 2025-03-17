@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -19,7 +20,7 @@ func main() {
 	}
 
 	configPath := os.Args[1]
-
+	fmt.Printf("Reading configuration from %s\n", configPath)
 	// Read and parse config file
 	configData, err := ioutil.ReadFile(configPath)
 	if err != nil {
@@ -44,7 +45,7 @@ func main() {
 
 	// Parse spec into SwaggerSpec structure
 	var spec ir.SwaggerSpec
-	if err := yaml.Unmarshal(specData, &spec); err != nil {
+	if err := json.Unmarshal(specData, &spec); err != nil {
 		log.Fatalf("Failed to parse OpenAPI spec: %v", err)
 	}
 

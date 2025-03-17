@@ -1,0 +1,297 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Realistic Pet API",
+    "version": "1.0"
+  },
+  "basePath": "/api/v1",
+  "paths": {
+    "/pets": {
+      "get": {
+        "operationId": "listPets",
+        "summary": "List all pets",
+        "description": "Returns a list of all pets in the store.",
+        "responses": {
+          "200": {
+            "description": "A list of pets.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Pet"
+              }
+            }
+          }
+        },
+        "tags": [
+          "Pet"
+        ]
+      },
+      "post": {
+        "operationId": "createPet",
+        "summary": "Create a pet",
+        "description": "Creates a new pet with the given details.",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NewPet"
+            },
+            "description": "The pet to create."
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Pet created successfully.",
+            "schema": {
+              "$ref": "#/definitions/Pet"
+            }
+          }
+        },
+        "tags": [
+          "Pet"
+        ]
+      }
+    },
+    "/pets/{petId}": {
+      "get": {
+        "operationId": "getPetById",
+        "summary": "Get a pet by ID",
+        "description": "Returns the pet corresponding to the provided petId.",
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID of the pet to return."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pet found.",
+            "schema": {
+              "$ref": "#/definitions/Pet"
+            }
+          },
+          "404": {
+            "description": "Pet not found."
+          }
+        },
+        "tags": [
+          "Pet"
+        ]
+      },
+      "put": {
+        "operationId": "updatePet",
+        "summary": "Update a pet",
+        "description": "Updates an existing pet.",
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID of the pet to update."
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Pet"
+            },
+            "description": "Updated pet object."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pet updated successfully.",
+            "schema": {
+              "$ref": "#/definitions/Pet"
+            }
+          },
+          "404": {
+            "description": "Pet not found."
+          }
+        },
+        "tags": [
+          "Pet"
+        ]
+      },
+      "delete": {
+        "operationId": "deletePet",
+        "summary": "Delete a pet",
+        "description": "Deletes a pet by its ID.",
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID of the pet to delete."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pet deleted successfully.",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          },
+          "404": {
+            "description": "Pet not found."
+          }
+        },
+        "tags": [
+          "Pet"
+        ]
+      }
+    },
+    "/pets/{petId}/status": {
+      "get": {
+        "operationId": "getPetStatus",
+        "summary": "Get pet status",
+        "description": "Returns the current status of a pet.",
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID of the pet."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current pet status.",
+            "schema": {
+              "$ref": "#/definitions/PetStatus"
+            }
+          },
+          "404": {
+            "description": "Pet not found."
+          }
+        },
+        "tags": [
+          "Pet"
+        ]
+      },
+      "patch": {
+        "operationId": "updatePetStatus",
+        "summary": "Update pet status",
+        "description": "Partially updates the pet's status.",
+        "parameters": [
+          {
+            "name": "petId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID of the pet."
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PetStatusUpdate"
+            },
+            "description": "Status update object."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pet status updated successfully.",
+            "schema": {
+              "$ref": "#/definitions/PetStatus"
+            }
+          },
+          "404": {
+            "description": "Pet not found."
+          }
+        },
+        "tags": [
+          "Pet"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "Pet": {
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the pet."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the pet."
+        },
+        "tag": {
+          "type": "string",
+          "description": "Optional tag for the pet."
+        },
+        "status": {
+          "$ref": "#/definitions/PetStatus"
+        }
+      }
+    },
+    "NewPet": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the pet."
+        },
+        "tag": {
+          "type": "string",
+          "description": "Optional tag for the pet."
+        }
+      }
+    },
+    "PetStatus": {
+      "type": "object",
+      "required": [
+        "availability"
+      ],
+      "properties": {
+        "availability": {
+          "type": "string",
+          "description": "Current availability status (e.g., available, pending, sold)."
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the last status update."
+        }
+      }
+    },
+    "PetStatusUpdate": {
+      "type": "object",
+      "properties": {
+        "availability": {
+          "type": "string",
+          "description": "New availability status."
+        }
+      }
+    },
+    "Status": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "Status message."
+        }
+      }
+    }
+  }
+}

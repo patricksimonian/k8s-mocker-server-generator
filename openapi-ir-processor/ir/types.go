@@ -14,13 +14,11 @@ type Parameter struct {
 	Description string  `json:"description"`
 }
 
-// Response represents an API response.
 type Response struct {
 	Description string  `json:"description"`
 	Schema      *Schema `json:"schema"`
 }
 
-// Schema represents a JSON schema for models and parameters.
 type Schema struct {
 	Type                 string            `json:"type"`
 	Format               string            `json:"format"`
@@ -33,7 +31,6 @@ type Schema struct {
 	Ref                  string            `json:"$ref"`
 }
 
-// Operation holds the details for an API operation.
 type Operation struct {
 	OperationID string              `json:"operationId"`
 	Summary     string              `json:"summary"`
@@ -43,7 +40,6 @@ type Operation struct {
 	Tags        []string            `json:"tags"`
 }
 
-// SwaggerSpec represents a simplified structure of the Swagger spec.
 type SwaggerSpec struct {
 	Swagger     string                     `json:"swagger"`
 	Info        map[string]interface{}     `json:"info"`
@@ -54,7 +50,6 @@ type SwaggerSpec struct {
 
 // --- IR Structures ---
 
-// IR is our top-level Intermediate Representation.
 type IR struct {
 	Title     string
 	Version   string
@@ -63,19 +58,18 @@ type IR struct {
 	Models    map[string]Model
 }
 
-// Endpoint represents an API endpoint with merged parameters.
 type Endpoint struct {
-	OperationID string
-	Method      string // "get", "post", etc.
-	Path        string // Express-style path (e.g. "/api/v1/pets/:id")
-	Summary     string
-	Description string
-	Tags        []string
-	Parameters  []IRParameter // merged global and operation-level parameters
-	Responses   map[string]IRResponse
+	OperationID  string
+	Method       string // e.g., "get", "post"
+	Path         string // Express-style path (e.g., "/api/v1/pods/:id")
+	Summary      string
+	Description  string
+	Tags         []string
+	ResourceType string // New: resource type derived from the path
+	Parameters   []IRParameter
+	Responses    map[string]IRResponse
 }
 
-// IRParameter is a simplified parameter for code generation.
 type IRParameter struct {
 	Name        string
 	In          string
@@ -85,17 +79,16 @@ type IRParameter struct {
 	Schema      *Schema
 }
 
-// IRResponse represents a response.
 type IRResponse struct {
 	StatusCode  string
 	Description string
 	Schema      *Schema
 }
 
-// Model represents a data model.
 type Model struct {
-	Name   string
-	Schema Schema
+	Name         string
+	Schema       Schema
+	ResourceType string // New: resource type derived from the model name
 }
 
 // --- Helper Functions ---

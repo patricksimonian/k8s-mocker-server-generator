@@ -1,23 +1,29 @@
 /**
- * {{ .ModelName }} model
- */
+* {{ .Model.Description | escapeComment }}
+*/
 export interface {{ .ModelName }} {
-  {{- range $propName, $prop := .Model.Schema.Properties }}
-  /**
-   * {{ $prop.Description }}
-   */
-  {{ $propName }}{{ if not (contains $.Model.Schema.Required $propName) }}?{{ end }}: {{ getTypeScriptType $prop }};
-  {{- end }}
+{{- range .Model.Properties }}
+/**
+* {{ .Description | escapeComment }}
+*/
+{{ .Name }}{{ if not .IsRequired }}?{{ end }}: {{ .Type }};
+{{- end }}
 }
 
 /**
- * Create a new {{ .ModelName }} with default values
- */
+* Create a new {{ .ModelName }} with default values
+*/
 export function create{{ .ModelName }}(data?: Partial<{{ .ModelName }}>): {{ .ModelName }} {
   return {
-    {{- range $propName, $prop := .Model.Schema.Properties }}
-    {{ $propName }}: data?.{{ $propName }} ?? {{ getDefaultValue $prop }},
-    {{- end }}
+{{- range .Model.Properties }}
+    {{ .Name }}: data?.{{ .Name }} !== undefined ? data.{{ .Name }} : {{ .DefaultValue }},
+{{- end }}
   };
 }
 
+{{- if gt (len .Model.Imports) 0 }}
+// Required imports
+{{- range $import, $_ := .Model.Imports }}
+import { {{ $import }}, create{{ $import }} } from './{{ $import }}';
+{{- end }}
+{{- end }}

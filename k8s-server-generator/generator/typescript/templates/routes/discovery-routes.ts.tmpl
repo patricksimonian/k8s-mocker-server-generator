@@ -1,0 +1,229 @@
+import express from 'express';
+import { Storage } from '../storage/Storage';
+import { logger } from '../logger';
+import { handleResourceError } from '../utils';
+
+export function createDiscoveryRoutes(storage: Storage): express.Router {
+  const router = express.Router();
+
+  // Root path handler
+  router.get('/', async (req, res, next) => {
+    try {
+      await handleRootPath(req, res, storage);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // API versions handler
+  router.get('/api', async (req, res, next) => {
+    try {
+      await handleApiVersions(req, res, storage);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // API groups handler
+  router.get('/apis', async (req, res, next) => {
+    try {
+      await handleApiGroups(req, res, storage);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // API resources handler
+  router.get('/api/v1', async (req, res, next) => {
+    try {
+      await handleApiResources(req, res, storage);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // API group resources handler
+  router.get('/apis/:group/:version', async (req, res, next) => {
+    try {
+      await handleApiGroupResources(req, res, storage);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  return router;
+}
+
+/**
+ * Handler for GET /
+ */
+async function handleRootPath(
+  req: express.Request,
+  res: express.Response,
+  storage: Storage
+): Promise<void> {
+  logger.info('Getting API discovery information');
+
+  const paths = {
+    paths: ['/api', '/apis']
+  };
+
+  res.json(paths);
+}
+
+/**
+ * Handler for GET /api
+ */
+async function handleApiVersions(
+  req: express.Request,
+  res: express.Response,
+  storage: Storage
+): Promise<void> {
+  logger.info('Getting API versions');
+
+  const apiVersions = {
+    kind: 'APIVersions',
+    versions: ['v1'],
+    serverAddressByClientCIDRs: [
+      {
+        clientCIDR: '0.0.0.0/0',
+        serverAddress: req.headers.host || 'localhost'
+      }
+    ]
+  };
+
+  res.json(apiVersions);
+}
+
+/**
+ * Handler for GET /apis
+ */
+async function handleApiGroups(
+  req: express.Request,
+  res: express.Response,
+  storage: Storage
+): Promise<void> {
+  logger.info('Getting API groups');
+
+  // Extract unique API groups from the IR
+  const groups = new Set<string>();
+  {{ range .IR.Endpoints }}
+  {{ if hasSubstring .Path "/apis/" }}
+  {{ $parts := split .Path "/" }}
+  {{ if gt (len $parts) 3 }}
+  groups.add('{{ index $parts 2 }}');
+  {{ end }}
+  {{ end }}
+  {{ end }}
+
+  const apiGroups = {
+    kind: 'APIGroupList',
+    apiVersion: 'v1',
+    groups: Array.from(groups).map(group => ({
+      name: group,
+      versions: [
+        {
+          groupVersion: `${group}/v1`,
+          version: 'v1'
+        }
+      ],
+      preferredVersion: {
+        groupVersion: `${group}/v1`,
+        version: 'v1'
+      }
+    }))
+  };
+
+  res.json(apiGroups);
+}
+
+/**
+ * Handler for GET /api/v1
+ */
+async function handleApiResources(
+  req: express.Request,
+  res: express.Response,
+  storage: Storage
+): Promise<void> {
+  logger.info('Getting API resources for core v1');
+
+  // Extract resources from the IR for core API
+  const resources = [];
+  {{ range .IR.Endpoints }}
+  {{ if hasSubstring .Path "/api/v1" }}
+  {{ if not (hasSubstring .Path "/api/v1/namespaces") }}
+  {{ $parts := split .Path "/" }}
+  {{ if gt (len $parts) 3 }}
+  {{ $resource := index $parts 3 }}
+  {{ if and (ne $resource "namespaces") (ne $resource "") }}
+  resources.push({
+    name: '{{ $resource }}',
+    singularName: '{{ $resource }}',
+    namespaced: {{ if hasSubstring .Path "/namespaces/" }}true{{ else }}false{{ end }},
+    kind: '{{ $resource | title }}',
+    verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+  });
+  {{ end }}
+  {{ end }}
+  {{ end }}
+  {{ end }}
+  {{ end }}
+
+  const apiResourceList = {
+    kind: 'APIResourceList',
+    apiVersion: 'v1',
+    groupVersion: 'v1',
+    resources: resources
+  };
+
+  res.json(apiResourceList);
+}
+
+/**
+ * Handler for GET /apis/:group/:version
+ */
+async function handleApiGroupResources(
+  req: express.Request,
+  res: express.Response,
+  storage: Storage
+): Promise<void> {
+  const group = req.params.group;
+  const version = req.params.version;
+  
+  logger.info(`Getting API resources for group ${group}/${version}`);
+
+  try {
+    // Extract resources from the IR for the specified API group
+    const resources = [];
+    {{ range .IR.Endpoints }}
+    {{ if hasSubstring .Path "/apis/" }}
+    {{ $parts := split .Path "/" }}
+    {{ if gt (len $parts) 4 }}
+    {{ $apiGroup := index $parts 2 }}
+    {{ $apiVersion := index $parts 3 }}
+    {{ $resource := index $parts 4 }}
+    if ('{{ $apiGroup }}' === group && '{{ $apiVersion }}' === version && '{{ $resource }}' !== '') {
+      resources.push({
+        name: '{{ $resource }}',
+        singularName: '{{ $resource }}',
+        namespaced: {{ if hasSubstring .Path "/namespaces/" }}true{{ else }}false{{ end }},
+        kind: '{{ $resource | title }}',
+        verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+      });
+    }
+    {{ end }}
+    {{ end }}
+    {{ end }}
+
+    const apiResourceList = {
+      kind: 'APIResourceList',
+      apiVersion: 'v1',
+      groupVersion: `${group}/${version}`,
+      resources: resources
+    };
+
+    res.json(apiResourceList);
+  } catch (error) {
+    handleResourceError(error, res);
+  }
+}

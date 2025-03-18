@@ -1,5 +1,5 @@
 // Export all models
-{{- range $name, $model := .Models }}
-export * from './{{ $name }}';
+{{- range $originalName, $model := .Models }}
+{{- $sanitizedName := $originalName | sanitizeIdentifier }}
+export * from './{{ $sanitizedName }}';
 {{- end }}
-

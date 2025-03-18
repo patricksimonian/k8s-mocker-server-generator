@@ -11,16 +11,18 @@ export function createAPIRoutes(): Router {
 
   // Add Kubernetes API service discovery endpoints
   
-  /**
-   * API version discovery endpoint
-   */
+  // Replace the hardcoded API service discovery endpoints with the dynamic ones based on IR data
+
+  // Replace the API version discovery endpoint
   router.get('/api', (req, res) => {
     logger.debug('GET /api called');
     
-    // Return API version information
+    // Return API version information dynamically based on IR
+    const versions = ["v1"];
+    
     res.json({
       kind: "APIVersions",
-      versions: ["v1"],
+      versions: versions,
       serverAddressByClientCIDRs: [
         {
           clientCIDR: "0.0.0.0/0",
@@ -30,50 +32,71 @@ export function createAPIRoutes(): Router {
     });
   });
 
-  /**
-   * API group discovery endpoint
-   */
+  // Replace the API group discovery endpoint
   router.get('/apis', (req, res) => {
     logger.debug('GET /apis called');
     
-    // Dynamically generate API groups from the IR data
+    // Extract API groups from IR data
     const groups = [];
+    const groupVersions = {};
     
-    {{- $apiGroups := dict }}
+    // Collect all group/versions from endpoints
     {{- range .Endpoints }}
-      {{- if hasSubstring .Path "/apis/" }}
-        {{- $parts := split .Path "/" }}
-        {{- if ge (len $parts) 4 }}
-          {{- $group := index $parts 3 }}
-          {{- $version := index $parts 4 }}
-          {{- if not (hasKey $apiGroups $group) }}
-            {{- $_ := set $apiGroups $group (list $version) }}
-          {{- else }}
-            {{- $versions := get $apiGroups $group }}
-            {{- if not (contains $versions $version) }}
-              {{- $_ := set $apiGroups $group (append $versions $version) }}
-            {{- end }}
-          {{- end }}
-        {{- end }}
-      {{- end }}
-    {{- end }}
-    
-    {{- range $group, $versions := $apiGroups }}
-    groups.push({
-      name: "{{ $group }}",
-      versions: [
-        {{- range $versions }}
-        {
-          groupVersion: "{{ $group }}/{{ . }}",
-          version: "{{ . }}"
-        },
-        {{- end }}
-      ],
-      preferredVersion: {
-        groupVersion: "{{ $group }}/{{ index $versions 0 }}",
-        version: "{{ index $versions 0 }}"
+    {{- if hasSubstring .Path "/apis/" }}
+    {{- $parts := split .Path "/" }}
+    {{- if ge (len $parts) 4 }}
+    {{- $group := index $parts 3 }}
+    {{- if ge (len $parts) 5 }}
+    {{- $version := index $parts 4 }}
+    // Add group/version if not already added
+    if (!groupVersions["{{ $group }}/{{ $version }}"]) {
+      groupVersions["{{ $group }}/{{ $version }}"] = true;
+      
+      // Check if group already exists in groups array
+      let groupExists = false;
+      for (const g of groups) {
+        if (g.name === "{{ $group }}") {
+          // Add version if not already in the group
+          let versionExists = false;
+          for (const v of g.versions) {
+            if (v.version === "{{ $version }}") {
+              versionExists = true;
+              break;
+            }
+          }
+          
+          if (!versionExists) {
+            g.versions.push({
+              groupVersion: "{{ $group }}/{{ $version }}",
+              version: "{{ $version }}"
+            });
+          }
+          
+          groupExists = true;
+          break;
+        }
       }
-    });
+      
+      // Add new group if it doesn't exist
+      if (!groupExists) {
+        groups.push({
+          name: "{{ $group }}",
+          versions: [
+            {
+              groupVersion: "{{ $group }}/{{ $version }}",
+              version: "{{ $version }}"
+            }
+          ],
+          preferredVersion: {
+            groupVersion: "{{ $group }}/{{ $version }}",
+            version: "{{ $version }}"
+          }
+        });
+      }
+    }
+    {{- end }}
+    {{- end }}
+    {{- end }}
     {{- end }}
     
     res.json({
@@ -83,50 +106,37 @@ export function createAPIRoutes(): Router {
     });
   });
 
-  /**
-   * Core API resources discovery endpoint
-   */
+  // Replace the Core API resources discovery endpoint
   router.get('/api/v1', (req, res) => {
     logger.debug('GET /api/v1 called');
     
-    // Dynamically generate core API resources from the IR data
+    // Extract core API resources from IR data
     const resources = [];
+    const resourceMap = {};
     
-    {{- $coreResources := dict }}
+    // Collect all resources from endpoints
     {{- range .Endpoints }}
-      {{- if hasSubstring .Path "/api/v1" }}
-        {{- if not (hasSubstring .Path "/apis/") }}
-          {{- $parts := split .Path "/" }}
-          {{- if ge (len $parts) 4 }}
-            {{- $resource := index $parts 3 }}
-            {{- if ne $resource "namespaces" }}
-              {{- if not (hasKey $coreResources $resource) }}
-                {{- $_ := set $coreResources $resource true }}
-              {{- end }}
-            {{- end }}
-          {{- end }}
-        {{- end }}
-      {{- end }}
+    {{- if hasSubstring .Path "/api/v1/" }}
+    {{- $parts := split .Path "/" }}
+    {{- if ge (len $parts) 4 }}
+    {{- $resourceType := index $parts 3 }}
+    {{- if and (ne $resourceType "") (ne $resourceType ":resourceType") }}
+    // Add resource if not already added
+    if (!resourceMap["{{ $resourceType }}"]) {
+      resourceMap["{{ $resourceType }}"] = true;
+      
+      resources.push({
+        name: "{{ $resourceType }}",
+        singularName: "{{ $resourceType }}",
+        namespaced: {{ if hasSubstring .Path "namespaces/:namespace" }}true{{ else }}false{{ end }},
+        kind: "{{ $resourceType | title }}",
+        verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+      });
+    }
     {{- end }}
-    
-    {{- range $resource, $_ := $coreResources }}
-    resources.push({
-      name: "{{ $resource }}s",
-      singularName: "{{ $resource }}",
-      namespaced: true,
-      kind: "{{ title $resource }}",
-      verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
-    });
     {{- end }}
-    
-    // Always include namespaces
-    resources.push({
-      name: "namespaces",
-      singularName: "namespace",
-      namespaced: false,
-      kind: "Namespace",
-      verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
-    });
+    {{- end }}
+    {{- end }}
     
     res.json({
       kind: "APIResourceList",
@@ -136,48 +146,56 @@ export function createAPIRoutes(): Router {
     });
   });
 
-  /**
-   * API group resources discovery endpoints
-   */
-  {{- range $group, $versions := $apiGroups }}
-    {{- range $versions }}
-  router.get('/apis/{{ $group }}/{{ . }}', (req, res) => {
-    logger.debug('GET /apis/{{ $group }}/{{ . }} called');
+  // Replace the group-specific API resources discovery endpoints with a dynamic handler
+  {{- range .Endpoints }}
+  {{- if hasSubstring .Path "/apis/" }}
+  {{- $parts := split .Path "/" }}
+  {{- if ge (len $parts) 5 }}
+  {{- $group := index $parts 3 }}
+  {{- $version := index $parts 4 }}
+  {{- if and (ne $group "") (ne $version "") }}
+  // Add group/version specific handler if not already added
+  router.get('/apis/{{ $group }}/{{ $version }}', (req, res) => {
+    logger.debug('GET /apis/{{ $group }}/{{ $version }} called');
     
-    // Dynamically generate API group resources from the IR data
+    // Extract resources for this API group/version from IR data
     const resources = [];
+    const resourceMap = {};
     
-    {{- $groupResources := dict }}
+    // Collect all resources from endpoints for this group/version
     {{- range $.Endpoints }}
-      {{- if hasSubstring .Path (printf "/apis/%s/%s" $group .) }}
-        {{- $parts := split .Path "/" }}
-        {{- if ge (len $parts) 6 }}
-          {{- $resource := index $parts 5 }}
-          {{- if not (hasKey $groupResources $resource) }}
-            {{- $_ := set $groupResources $resource true }}
-          {{- end }}
-        {{- end }}
-      {{- end }}
+    {{- if hasSubstring .Path (printf "/apis/%s/%s/" $group $version) }}
+    {{- $resourceParts := split .Path "/" }}
+    {{- if ge (len $resourceParts) 6 }}
+    {{- $resourceType := index $resourceParts 5 }}
+    {{- if and (ne $resourceType "") (ne $resourceType ":resourceType") }}
+    // Add resource if not already added
+    if (!resourceMap["{{ $resourceType }}"]) {
+      resourceMap["{{ $resourceType }}"] = true;
+      
+      resources.push({
+        name: "{{ $resourceType }}",
+        singularName: "{{ $resourceType }}",
+        namespaced: {{ if hasSubstring .Path "namespaces/:namespace" }}true{{ else }}false{{ end }},
+        kind: "{{ $resourceType | title }}",
+        verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+      });
+    }
     {{- end }}
-    
-    {{- range $resource, $_ := $groupResources }}
-    resources.push({
-      name: "{{ $resource }}s",
-      singularName: "{{ $resource }}",
-      namespaced: true,
-      kind: "{{ title $resource }}",
-      verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
-    });
+    {{- end }}
+    {{- end }}
     {{- end }}
     
     res.json({
       kind: "APIResourceList",
       apiVersion: "v1",
-      groupVersion: "{{ $group }}/{{ . }}",
+      groupVersion: "{{ $group }}/{{ $version }}",
       resources: resources
     });
   });
-    {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
   {{- end }}
 
   // Add dynamic routes from OpenAPI spec
@@ -204,7 +222,9 @@ export function createAPIRoutes(): Router {
       
       {{- if eq .Method "get" }}
       // Handle GET request
-      {{- if hasSubstring .Path ":name" }}
+      {{- $pathParts := split .Path "/" }}
+      {{- $lastPart := index $pathParts (add (len $pathParts) -1) }}
+      {{- if eq $lastPart ":name" }}
       // Get single resource
       const name = req.params.name;
       if (!name) {

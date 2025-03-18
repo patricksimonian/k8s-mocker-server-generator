@@ -1,30 +1,56 @@
-/**
-* Create all API routes
-*/
-import { Router } from 'express';
+import express from 'express';
+import { createDiscoveryRoutes } from './discovery-routes';
+import storage from '../storage';
 
-{{- if .SingleRouteFile }}
-import { createAPIRoutes } from './api-routes';
-{{- else }}
-{{- range $name, $model := .Models }}
-import { create{{ $name }}Routes } from './{{ $name | lower }}-routes';
-{{- end }}
-{{- end }}
+// Import all route handlers
+{{ $resourceTypes := dict }}
+{{ range .Endpoints }}
+{{ $resourceType := extractResourceTypeFromEndpoint . }}
+{{ $sanitizedResourceType := $resourceType | sanitizeResourceType }}
+{{ $resourceTypes = set $resourceTypes $sanitizedResourceType (list $resourceType) }}
+{{ end }}
+
+{{ range $sanitizedResourceType, $resourceType := $resourceTypes }}
+import { create{{ $sanitizedResourceType }}Routes } from './{{ $sanitizedResourceType }}-routes';
+{{ end }}
 
 /**
-* Create all API routes
-*/
-export function createRoutes(): Router {
- const router = Router();
- 
- {{- if .SingleRouteFile }}
- // Use the single API routes file
- router.use('/api/v1', createAPIRoutes());
- {{- else }}
- {{- range $name, $model := .Models }}
- router.use('/api/v1/{{ $name | lower }}s', create{{ $name }}Routes());
- {{- end }}
- {{- end }}
- 
- return router;
+ * Create all routes for the API server
+ */
+export function createRoutes(): express.Router {
+  const router = express.Router();
+  
+  // Add discovery routes
+  router.use('/', createDiscoveryRoutes(storage));
+  
+  // Add resource routes
+  {{ range $sanitizedResourceType, $resourceType := $resourceTypes }}
+  router.use('/', create{{ $sanitizedResourceType }}Routes(storage));
+  {{ end }}
+  
+  return router;
+}
+
+// Helper function to extract resource type from endpoint
+function extractResourceTypeFromEndpoint(endpoint) {
+  // First try to extract from path
+  const parts = endpoint.Path.split('/');
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
+    // Skip empty parts, path parameters, and common API path segments
+    if (part === '' || part.startsWith(':') || part === 'api' || part === 'apis' || part === 'v1' || part === 'namespaces') {
+      continue;
+    }
+    
+    // Found a potential resource type
+    return part;
+  }
+  
+  // If not found in path, try to use tags
+  if (endpoint.Tags && endpoint.Tags.length > 0) {
+    return endpoint.Tags[0];
+  }
+  
+  // Default fallback
+  return 'resource';
 }

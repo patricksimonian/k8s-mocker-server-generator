@@ -3,7 +3,10 @@ package ir
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strings"
+
+	"github.com/jinzhu/inflection"
 )
 
 func convertPath(swaggerPath string) string {
@@ -13,18 +16,15 @@ func convertPath(swaggerPath string) string {
 	return result
 }
 
-// generateOperationID creates a fallback operation ID.
 func generateOperationID(method, path string) string {
 	cleanPath := strings.ReplaceAll(path, "/", "_")
 	return strings.ToLower(method) + cleanPath
 }
 
-// mergeParameters merges global (path-level) parameters with operation-level parameters.
 func mergeParameters(global, operation []Parameter) []Parameter {
 	return append(global, operation...)
 }
 
-// convertToIRParameters converts a slice of Parameter to IRParameter.
 func convertToIRParameters(params []Parameter) []IRParameter {
 	var irParams []IRParameter
 	for _, p := range params {
@@ -40,32 +40,76 @@ func convertToIRParameters(params []Parameter) []IRParameter {
 	return irParams
 }
 
-// resolveSchema checks if a schema has a $ref and returns the resolved schema from models.
-func resolveSchema(s *Schema, models map[string]Model) *Schema {
-	if s == nil {
-		return nil
-	}
-	if s.Ref != "" {
-		parts := strings.Split(s.Ref, "/")
-		if len(parts) > 0 {
-			modelName := parts[len(parts)-1]
-			if model, ok := models[modelName]; ok {
-				return &model.Schema
-			}
-		}
-	}
-	return s
+// isVersion checks if a segment matches a version pattern like "v1" or "v1beta1".
+func isVersion(segment string) bool {
+	re := regexp.MustCompile(`^v\d+((alpha|beta)\d+)?$`)
+	return re.MatchString(segment)
 }
 
-// convertToIRResponses converts responses map and resolves any schema references.
+// deriveResourceTypeForEndpointFromPath derives the resource type from an endpoint path.
+// It uses a path-based heuristic: if the path appears to be a discovery endpoint, it returns "discovery".
+// Otherwise, it iterates backwards over the segments (skipping parameters) to find the resource name.
+// If the last segment is a version (and the path is very short), we treat it as discovery.
+func deriveResourceTypeForEndpointFromPath(path string) string {
+	trimmed := strings.Trim(path, "/")
+	segments := strings.Split(trimmed, "/")
+	if len(segments) == 0 {
+		return "discovery"
+	}
+
+	// If the entire path is very short, e.g. "/api" or "/apis", treat as discovery.
+	if len(segments) <= 2 {
+		return "discovery"
+	}
+
+	// If the last segment looks like a version and the path has few segments, treat as discovery.
+	last := segments[len(segments)-1]
+	if isVersion(last) && len(segments) <= 3 {
+		return "discovery"
+	}
+
+	// Iterate backwards, skipping parameters.
+	for i := len(segments) - 1; i >= 0; i-- {
+		seg := segments[i]
+		if strings.HasPrefix(seg, ":") {
+			continue
+		}
+		// Check if seg is a known subresource; if so, use the previous segment.
+		subresources := map[string]bool{
+			"status":   true,
+			"scale":    true,
+			"bind":     true,
+			"bindings": true,
+		}
+		if subresources[seg] && i > 0 {
+			prev := segments[i-1]
+			if !strings.HasPrefix(prev, ":") {
+				return inflection.Singular(prev)
+			}
+		}
+		return inflection.Singular(seg)
+	}
+	return "discovery"
+}
+
+// deriveResourceTypeForModel derives the resource type from the model name by splitting on ".".
+func deriveResourceTypeForModel(modelName string) string {
+	parts := strings.Split(modelName, ".")
+	if len(parts) > 0 {
+		// Normalize to singular form to match the endpoint.
+		return inflection.Singular(strings.ToLower(parts[len(parts)-1]))
+	}
+	return strings.ToLower(modelName)
+}
+
+// convertToIRResponses simply maps responses; you could add deep resolution here if needed.
 func convertToIRResponses(resps map[string]Response, models map[string]Model) map[string]IRResponse {
 	irResps := make(map[string]IRResponse)
 	for code, r := range resps {
-		resolved := resolveSchema(r.Schema, models)
 		irResps[code] = IRResponse{
 			StatusCode:  code,
 			Description: r.Description,
-			Schema:      resolved,
+			Schema:      r.Schema,
 		}
 	}
 	return irResps
@@ -89,22 +133,22 @@ func GenerateIR(spec SwaggerSpec) IR {
 			fmt.Printf("Error parsing definition %s: %v\n", name, err)
 			continue
 		}
-		ir.Models[name] = Model{
-			Name:   name,
-			Schema: schema,
+		model := Model{
+			Name:         name,
+			Schema:       schema,
+			ResourceType: deriveResourceTypeForModel(name),
 		}
+		ir.Models[name] = model
 	}
 
 	// Process each path.
 	for path, raw := range spec.Paths {
-		// Unmarshal the raw JSON for each path into a generic map.
 		var rawMap map[string]json.RawMessage
 		if err := json.Unmarshal(raw, &rawMap); err != nil {
 			fmt.Printf("Error unmarshalling path %q: %v\n", path, err)
 			continue
 		}
 
-		// Extract global parameters (if any).
 		var globalParams []Parameter
 		if rawParams, ok := rawMap["parameters"]; ok {
 			if err := json.Unmarshal(rawParams, &globalParams); err != nil {
@@ -112,7 +156,6 @@ func GenerateIR(spec SwaggerSpec) IR {
 			}
 		}
 
-		// Process each key that represents an HTTP method.
 		for key, opRaw := range rawMap {
 			if !ValidMethods[strings.ToLower(key)] {
 				continue
@@ -124,22 +167,28 @@ func GenerateIR(spec SwaggerSpec) IR {
 				continue
 			}
 
-			// Merge global parameters with operation-level parameters.
 			mergedParams := mergeParameters(globalParams, op.Parameters)
-			// Generate OperationID if missing.
 			if op.OperationID == "" {
 				op.OperationID = generateOperationID(key, path)
 			}
 
+			convertedPath := convertPath(path)
+			resourceType := deriveResourceTypeForEndpointFromPath(convertedPath)
+			// If the resourceType is empty or looks like a version, treat it as "discovery".
+			if resourceType == "" || isVersion(resourceType) {
+				resourceType = "discovery"
+			}
+
 			endpoint := Endpoint{
-				OperationID: op.OperationID,
-				Method:      strings.ToLower(key),
-				Path:        convertPath(path),
-				Summary:     op.Summary,
-				Description: op.Description,
-				Tags:        op.Tags,
-				Parameters:  convertToIRParameters(mergedParams),
-				Responses:   convertToIRResponses(op.Responses, ir.Models),
+				OperationID:  op.OperationID,
+				Method:       strings.ToLower(key),
+				Path:         convertedPath,
+				Summary:      op.Summary,
+				Description:  op.Description,
+				Tags:         op.Tags,
+				ResourceType: resourceType,
+				Parameters:   convertToIRParameters(mergedParams),
+				Responses:    convertToIRResponses(op.Responses, ir.Models),
 			}
 
 			ir.Endpoints = append(ir.Endpoints, endpoint)

@@ -1,19 +1,30 @@
+/**
+* Create all API routes
+*/
 import { Router } from 'express';
 
+{{- if .SingleRouteFile }}
+import { createAPIRoutes } from './api-routes';
+{{- else }}
 {{- range $name, $model := .Models }}
-import { create{{ $name }}Routes } from './{{ $name }}Routes';
+import { create{{ $name }}Routes } from './{{ $name | lower }}-routes';
+{{- end }}
 {{- end }}
 
 /**
- * Create all API routes
- */
+* Create all API routes
+*/
 export function createRoutes(): Router {
-  const router = Router();
-  
-  {{- range $name, $model := .Models }}
-  router.use('/api/v1/{{ $name | lower }}s', create{{ $name }}Routes());
-  {{- end }}
-  
-  return router;
+ const router = Router();
+ 
+ {{- if .SingleRouteFile }}
+ // Use the single API routes file
+ router.use('/api/v1', createAPIRoutes());
+ {{- else }}
+ {{- range $name, $model := .Models }}
+ router.use('/api/v1/{{ $name | lower }}s', create{{ $name }}Routes());
+ {{- end }}
+ {{- end }}
+ 
+ return router;
 }
-

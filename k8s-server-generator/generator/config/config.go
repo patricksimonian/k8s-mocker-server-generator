@@ -4,16 +4,16 @@ package config
 type Config struct {
 	// Path to the OpenAPI specification file
 	OpenAPISpecPath string `yaml:"openAPISpecPath"`
-	
+
 	// Output directory for the generated code
 	OutputDir string `yaml:"outputDir"`
-	
+
 	// Server configuration
 	Server ServerConfig `yaml:"server"`
-	
+
 	// Storage configuration
 	Storage StorageConfig `yaml:"storage"`
-	
+
 	// Initial state configuration
 	InitialStateConfig InitialStateConfig `yaml:"initialState"`
 }
@@ -28,13 +28,13 @@ type ServerConfig struct {
 type StorageConfig struct {
 	// Type of storage to use (memory, file, firestore)
 	Type string `yaml:"type"`
-	
+
 	// Path to the file for file storage
 	FilePath string `yaml:"filePath,omitempty"`
-	
+
 	// Firestore project ID
 	FirestoreProject string `yaml:"firestoreProject,omitempty"`
-	
+
 	// Firestore collection prefix
 	FirestoreCollectionPrefix string `yaml:"firestoreCollectionPrefix,omitempty"`
 }
@@ -43,8 +43,4 @@ type StorageConfig struct {
 type InitialStateConfig struct {
 	// Type of initial state (empty, default, custom)
 	Type string `yaml:"type"`
-	
-	// Path to custom state file (only used when type is 'custom')
-	Path string `yaml:"path,omitempty"`
 }
-

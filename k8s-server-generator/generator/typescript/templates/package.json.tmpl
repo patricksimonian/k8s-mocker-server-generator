@@ -17,10 +17,10 @@
     "winston": "^3.10.0",
     "uuid": "^9.0.0",
     "jsonwebtoken": "^9.0.1",
-    {{- if eq .StorageType "file" }}
+    {{- if eq .Storage.Type "file" }}
     "fs-extra": "^11.1.1",
     {{- end }}
-    {{- if eq .StorageType "firestore" }}
+    {{- if eq .Storage.Type "firestore" }}
     "firebase-admin": "^11.10.1",
     {{- end }}
     "dotenv": "^16.3.1"
@@ -33,7 +33,7 @@
     "@types/morgan": "^1.9.4",
     "@types/uuid": "^9.0.2",
     "@types/jsonwebtoken": "^9.0.2",
-    {{- if eq .StorageType "file" }}
+    {{- if eq .Storage.Type "file" }}
     "@types/fs-extra": "^11.0.1",
     {{- end }}
     "jest": "^29.6.2",
@@ -41,4 +41,3 @@
     "@types/jest": "^29.5.3"
   }
 }
-

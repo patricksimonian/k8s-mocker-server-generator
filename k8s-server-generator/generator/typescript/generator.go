@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"text/template"
 
@@ -37,8 +38,133 @@ func NewGenerator(irData ir.IR, cfg *config.Config, outputDir string) (*Generato
 	return g, nil
 }
 
+// getTemplatesDir returns the absolute path to the templates directory.
+func getTemplatesDir() (string, error) {
+	// Get the directory of the current file (generator.go)
+	_, filename, _, ok := runtime.Caller(0)
+	if !ok {
+		return "", fmt.Errorf("failed to get current file path")
+	}
+
+	// The templates directory is in the same directory as this file
+	return filepath.Join(filepath.Dir(filename), "templates"), nil
+}
+
+// createTemplateFuncMap creates a template function map with all the functions needed by the templates.
+func (g *Generator) createTemplateFuncMap() template.FuncMap {
+	return template.FuncMap{
+		"contains": func(slice []string, item string) bool {
+			for _, s := range slice {
+				if s == item {
+					return true
+				}
+			}
+			return false
+		},
+		"toString": func(v interface{}) string {
+			return fmt.Sprintf("%v", v)
+		},
+		"add": func(a, b int) int {
+			return a + b
+		},
+		"sanitizePath": func(path string) string {
+			sanitized := strings.ReplaceAll(strings.ReplaceAll(path, "/", "-"), ":", "_")
+			sanitized = strings.ReplaceAll(sanitized, "{", "")
+			sanitized = strings.ReplaceAll(sanitized, "}", "")
+			if sanitized == "" || sanitized == "-" {
+				sanitized = "root"
+			}
+			return sanitized
+		},
+		"getTypeScriptType": func(schema ir.Schema) string {
+			switch schema.Type {
+			case "string":
+				return "string"
+			case "integer", "number":
+				return "number"
+			case "boolean":
+				return "boolean"
+			case "array":
+				if schema.Items != nil {
+					return "Array<" + getTypeScriptType(*schema.Items) + ">"
+				}
+				return "any[]"
+			case "object":
+				if len(schema.Properties) > 0 {
+					return "{ [key: string]: any }"
+				}
+				return "Record<string, any>"
+			default:
+				if schema.Ref != "" {
+					parts := strings.Split(schema.Ref, "/")
+					return parts[len(parts)-1]
+				}
+				return "any"
+			}
+		},
+		"getDefaultValue": func(schema ir.Schema) string {
+			switch schema.Type {
+			case "string":
+				return "''"
+			case "integer", "number":
+				return "0"
+			case "boolean":
+				return "false"
+			case "array":
+				return "[]"
+			case "object":
+				return "{}"
+			default:
+				return "undefined"
+			}
+		},
+		"upper": strings.ToUpper,
+		"lower": strings.ToLower,
+		"title": strings.Title,
+		"first": func(slice []string) string {
+			if len(slice) > 0 {
+				return slice[0]
+			}
+			return ""
+		},
+		"hasSubstring": func(s, substr string) bool {
+			return strings.Contains(s, substr)
+		},
+		"split": strings.Split,
+		"hasKey": func(dict map[string]interface{}, key string) bool {
+			_, ok := dict[key]
+			return ok
+		},
+		"set": func(dict map[string]interface{}, key string, value interface{}) map[string]interface{} {
+			dict[key] = value
+			return dict
+		},
+		"get": func(dict map[string]interface{}, key string) interface{} {
+			return dict[key]
+		},
+		"dict": func() map[string]interface{} {
+			return make(map[string]interface{})
+		},
+		"list": func(items ...interface{}) []interface{} {
+			return items
+		},
+		"append": func(slice []interface{}, item interface{}) []interface{} {
+			return append(slice, item)
+		},
+	}
+}
+
 // loadTemplates loads all templates.
 func (g *Generator) loadTemplates() error {
+	// Get the templates directory
+	templatesDir, err := getTemplatesDir()
+	if err != nil {
+		return fmt.Errorf("failed to get templates directory: %w", err)
+	}
+
+	// Create template function map
+	funcMap := g.createTemplateFuncMap()
+
 	// Define template paths
 	templatePaths := []string{
 		"config.ts.tmpl",
@@ -50,7 +176,6 @@ func (g *Generator) loadTemplates() error {
 		"routes/resource-routes.ts.tmpl",
 		"routes/index.ts.tmpl",
 		"storage/Storage.ts.tmpl",
-		"storage/StorageError.ts.tmpl",
 		"storage/InMemoryStorage.ts.tmpl",
 		"storage/FileStorage.ts.tmpl",
 		"storage/FirestoreStorage.ts.tmpl",
@@ -68,10 +193,24 @@ func (g *Generator) loadTemplates() error {
 	// Load each template
 	for _, path := range templatePaths {
 		// Construct full path
-		fullPath := filepath.Join("templates", path)
-		fmt.Printf("Loading template: %s\n", fullPath)
+		fullPath := filepath.Join(templatesDir, path)
+
+		// Ensure the directory exists
+		dir := filepath.Dir(fullPath)
+		if _, err := os.Stat(dir); os.IsNotExist(err) {
+			return fmt.Errorf("template directory not found: %s", dir)
+		}
+
+		// Check if template file exists
+		if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+			return fmt.Errorf("template file not found: %s", fullPath)
+		}
+
+		// Create a new template with the function map
+		tmpl := template.New(filepath.Base(path)).Funcs(funcMap)
+
 		// Parse template
-		tmpl, err := template.ParseFiles(fullPath)
+		tmpl, err := tmpl.ParseFiles(fullPath)
 		if err != nil {
 			return fmt.Errorf("failed to parse template %s: %w", path, err)
 		}
@@ -182,74 +321,13 @@ func (g *Generator) createDirectoryStructure() error {
 
 // generateModels generates the model files.
 func (g *Generator) generateModels() error {
-	// Create a template function map
-	funcMap := template.FuncMap{
-		"contains": func(slice []string, item string) bool {
-			for _, s := range slice {
-				if s == item {
-					return true
-				}
-			}
-			return false
-		},
-		"getTypeScriptType": func(schema ir.Schema) string {
-			switch schema.Type {
-			case "string":
-				return "string"
-			case "integer", "number":
-				return "number"
-			case "boolean":
-				return "boolean"
-			case "array":
-				if schema.Items != nil {
-					return "Array<" + getTypeScriptType(*schema.Items) + ">"
-				}
-				return "any[]"
-			case "object":
-				if len(schema.Properties) > 0 {
-					return "{ [key: string]: any }"
-				}
-				return "Record<string, any>"
-			default:
-				if schema.Ref != "" {
-					parts := strings.Split(schema.Ref, "/")
-					return parts[len(parts)-1]
-				}
-				return "any"
-			}
-		},
-		"getDefaultValue": func(schema ir.Schema) string {
-			switch schema.Type {
-			case "string":
-				return "''"
-			case "integer", "number":
-				return "0"
-			case "boolean":
-				return "false"
-			case "array":
-				return "[]"
-			case "object":
-				return "{}"
-			default:
-				return "undefined"
-			}
-		},
-	}
-
 	// Generate model interfaces for each model in the IR
 	for name, model := range g.IR.Models {
-		// Create a new template with the function map
+		// Get the template
 		tmpl, ok := g.Templates["models/model.ts.tmpl"]
 		if !ok {
 			return fmt.Errorf("template models/model.ts.tmpl not found")
 		}
-
-		// Create a new template with the function map
-		tmplWithFuncs, err := tmpl.Clone()
-		if err != nil {
-			return fmt.Errorf("failed to clone template: %w", err)
-		}
-		tmplWithFuncs.Funcs(funcMap)
 
 		data := struct {
 			ModelName string
@@ -270,23 +348,16 @@ func (g *Generator) generateModels() error {
 		}
 		defer file.Close()
 
-		if err := tmplWithFuncs.Execute(file, data); err != nil {
+		if err := tmpl.Execute(file, data); err != nil {
 			return fmt.Errorf("failed to execute template for model %s: %w", name, err)
 		}
 	}
 
 	// Generate models index
-	// Create a new template with the function map
 	indexTmpl, ok := g.Templates["models/index.ts.tmpl"]
 	if !ok {
 		return fmt.Errorf("template models/index.ts.tmpl not found")
 	}
-
-	indexTmplWithFuncs, err := indexTmpl.Clone()
-	if err != nil {
-		return fmt.Errorf("failed to clone template: %w", err)
-	}
-	indexTmplWithFuncs.Funcs(funcMap)
 
 	indexPath := filepath.Join(g.OutputDir, "src", "models", "index.ts")
 	indexFile, err := os.Create(indexPath)
@@ -295,7 +366,7 @@ func (g *Generator) generateModels() error {
 	}
 	defer indexFile.Close()
 
-	if err := indexTmplWithFuncs.Execute(indexFile, g.IR); err != nil {
+	if err := indexTmpl.Execute(indexFile, g.IR); err != nil {
 		return fmt.Errorf("failed to execute template for models index: %w", err)
 	}
 
@@ -332,88 +403,40 @@ func getTypeScriptType(schema ir.Schema) string {
 
 // generateRoutes generates the route files.
 func (g *Generator) generateRoutes() error {
-	// Create a template function map
-	funcMap := template.FuncMap{
-		"contains": func(slice []string, item string) bool {
-			for _, s := range slice {
-				if s == item {
-					return true
-				}
-			}
-			return false
-		},
-		"upper": strings.ToUpper,
-		"lower": strings.ToLower,
-		"first": func(slice []string) string {
-			if len(slice) > 0 {
-				return slice[0]
-			}
-			return ""
-		},
+	// Create a single routes file with all endpoints
+	routesFilePath := filepath.Join(g.OutputDir, "src", "routes", "api-routes.ts")
+	file, err := os.Create(routesFilePath)
+	if err != nil {
+		return fmt.Errorf("failed to create file %s: %w", routesFilePath, err)
+	}
+	defer file.Close()
+
+	// Get the template
+	tmpl, ok := g.Templates["routes/resource-routes.ts.tmpl"]
+	if !ok {
+		return fmt.Errorf("template routes/resource-routes.ts.tmpl not found")
 	}
 
-	// Group endpoints by tags
-	taggedEndpoints := make(map[string][]ir.Endpoint)
-	for _, endpoint := range g.IR.Endpoints {
-		// Use the first tag as the resource name, or "default" if no tags
-		resourceName := "default"
-		if len(endpoint.Tags) > 0 {
-			resourceName = endpoint.Tags[0]
-		}
-		taggedEndpoints[resourceName] = append(taggedEndpoints[resourceName], endpoint)
+	// Execute template with all endpoints
+	data := struct {
+		Resource  string
+		Endpoints []ir.Endpoint
+		IR        ir.IR
+	}{
+		Resource:  "API", // Generic name since we're not grouping
+		Endpoints: g.IR.Endpoints,
+		IR:        g.IR,
 	}
 
-	// Generate route files for each resource
-	for resource, endpoints := range taggedEndpoints {
-		// Create a new template with the function map
-		tmpl, ok := g.Templates["routes/resource-routes.ts.tmpl"]
-		if !ok {
-			return fmt.Errorf("template routes/resource-routes.ts.tmpl not found")
-		}
-
-		// Create a new template with the function map
-		tmplWithFuncs, err := tmpl.Clone()
-		if err != nil {
-			return fmt.Errorf("failed to clone template: %w", err)
-		}
-		tmplWithFuncs.Funcs(funcMap)
-
-		data := struct {
-			Resource  string
-			Endpoints []ir.Endpoint
-			IR        ir.IR
-		}{
-			Resource:  resource,
-			Endpoints: endpoints,
-			IR:        g.IR,
-		}
-
-		filename := fmt.Sprintf("%sRoutes.ts", resource)
-		filePath := filepath.Join(g.OutputDir, "src", "routes", filename)
-
-		file, err := os.Create(filePath)
-		if err != nil {
-			return fmt.Errorf("failed to create file %s: %w", filePath, err)
-		}
-		defer file.Close()
-
-		if err := tmplWithFuncs.Execute(file, data); err != nil {
-			return fmt.Errorf("failed to execute template for routes %s: %w", resource, err)
-		}
+	if err := tmpl.Execute(file, data); err != nil {
+		return fmt.Errorf("failed to execute template for routes: %w", err)
 	}
 
-	// Generate routes index
-	// Create a new template with the function map
+	// Generate routes index that imports and uses the single routes file
 	indexTmpl, ok := g.Templates["routes/index.ts.tmpl"]
 	if !ok {
 		return fmt.Errorf("template routes/index.ts.tmpl not found")
 	}
-
-	indexTmplWithFuncs, err := indexTmpl.Clone()
-	if err != nil {
-		return fmt.Errorf("failed to clone template: %w", err)
-	}
-	indexTmplWithFuncs.Funcs(funcMap)
 
 	indexPath := filepath.Join(g.OutputDir, "src", "routes", "index.ts")
 	indexFile, err := os.Create(indexPath)
@@ -422,7 +445,16 @@ func (g *Generator) generateRoutes() error {
 	}
 	defer indexFile.Close()
 
-	if err := indexTmplWithFuncs.Execute(indexFile, g.IR); err != nil {
+	// Create a data structure for the index template that includes SingleRouteFile
+	indexData := struct {
+		SingleRouteFile bool
+		Models          map[string]ir.Model
+	}{
+		SingleRouteFile: true,
+		Models:          g.IR.Models,
+	}
+
+	if err := indexTmpl.Execute(indexFile, indexData); err != nil {
 		return fmt.Errorf("failed to execute template for routes index: %w", err)
 	}
 
@@ -453,11 +485,6 @@ func (g *Generator) generateConfig() error {
 		if tsConfig.FirestoreCollectionPrefix == "" {
 			tsConfig.FirestoreCollectionPrefix = "k8s" // Default collection prefix
 		}
-	}
-
-	// Add custom state path if applicable
-	if g.Config.InitialStateConfig.Type == "custom" {
-		tsConfig.CustomStatePath = g.Config.InitialStateConfig.Path
 	}
 
 	// Execute template

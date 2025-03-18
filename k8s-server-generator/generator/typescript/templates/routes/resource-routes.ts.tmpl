@@ -1,68 +1,384 @@
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { logger } from '../logger';
 import storage from '../storage';
 import { StorageError } from '../storage/StorageError';
 
 /**
- * Create {{ .Resource }} routes
+ * Create API routes
  */
-export function create{{ .Resource }}Routes(): Router {
+export function createAPIRoutes(): Router {
   const router = Router();
 
+  // Add Kubernetes API service discovery endpoints
+  
+  /**
+   * API version discovery endpoint
+   */
+  router.get('/api', (req, res) => {
+    logger.debug('GET /api called');
+    
+    // Return API version information
+    res.json({
+      kind: "APIVersions",
+      versions: ["v1"],
+      serverAddressByClientCIDRs: [
+        {
+          clientCIDR: "0.0.0.0/0",
+          serverAddress: req.headers.host || "localhost"
+        }
+      ]
+    });
+  });
+
+  /**
+   * API group discovery endpoint
+   */
+  router.get('/apis', (req, res) => {
+    logger.debug('GET /apis called');
+    
+    // Dynamically generate API groups from the IR data
+    const groups = [];
+    
+    {{- $apiGroups := dict }}
+    {{- range .Endpoints }}
+      {{- if hasSubstring .Path "/apis/" }}
+        {{- $parts := split .Path "/" }}
+        {{- if ge (len $parts) 4 }}
+          {{- $group := index $parts 3 }}
+          {{- $version := index $parts 4 }}
+          {{- if not (hasKey $apiGroups $group) }}
+            {{- $_ := set $apiGroups $group (list $version) }}
+          {{- else }}
+            {{- $versions := get $apiGroups $group }}
+            {{- if not (contains $versions $version) }}
+              {{- $_ := set $apiGroups $group (append $versions $version) }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+    
+    {{- range $group, $versions := $apiGroups }}
+    groups.push({
+      name: "{{ $group }}",
+      versions: [
+        {{- range $versions }}
+        {
+          groupVersion: "{{ $group }}/{{ . }}",
+          version: "{{ . }}"
+        },
+        {{- end }}
+      ],
+      preferredVersion: {
+        groupVersion: "{{ $group }}/{{ index $versions 0 }}",
+        version: "{{ index $versions 0 }}"
+      }
+    });
+    {{- end }}
+    
+    res.json({
+      kind: "APIGroupList",
+      apiVersion: "v1",
+      groups: groups
+    });
+  });
+
+  /**
+   * Core API resources discovery endpoint
+   */
+  router.get('/api/v1', (req, res) => {
+    logger.debug('GET /api/v1 called');
+    
+    // Dynamically generate core API resources from the IR data
+    const resources = [];
+    
+    {{- $coreResources := dict }}
+    {{- range .Endpoints }}
+      {{- if hasSubstring .Path "/api/v1" }}
+        {{- if not (hasSubstring .Path "/apis/") }}
+          {{- $parts := split .Path "/" }}
+          {{- if ge (len $parts) 4 }}
+            {{- $resource := index $parts 3 }}
+            {{- if ne $resource "namespaces" }}
+              {{- if not (hasKey $coreResources $resource) }}
+                {{- $_ := set $coreResources $resource true }}
+              {{- end }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+    
+    {{- range $resource, $_ := $coreResources }}
+    resources.push({
+      name: "{{ $resource }}s",
+      singularName: "{{ $resource }}",
+      namespaced: true,
+      kind: "{{ title $resource }}",
+      verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+    });
+    {{- end }}
+    
+    // Always include namespaces
+    resources.push({
+      name: "namespaces",
+      singularName: "namespace",
+      namespaced: false,
+      kind: "Namespace",
+      verbs: ["create", "delete", "get", "list", "patch", "update", "watch"]
+    });
+    
+    res.json({
+      kind: "APIResourceList",
+      apiVersion: "v1",
+      groupVersion: "v1",
+      resources: resources
+    });
+  });
+
+  /**
+   * API group resources discovery endpoints
+   */
+  {{- range $group, $versions := $apiGroups }}
+    {{- range $versions }}
+  router.get('/apis/{{ $group }}/{{ . }}', (req, res) => {
+    logger.debug('GET /apis/{{ $group }}/{{ . }} called');
+    
+    // Dynamically generate API group resources from the IR data
+    const resources = [];
+    
+    {{- $groupResources := dict }}
+    {{- range $.Endpoints }}
+      {{- if hasSubstring .Path (printf "/apis/%s/%s" $group .) }}
+        {{- $parts := split .Path "/" }}
+        {{- if ge (len $parts) 6 }}
+          {{- $resource := index $parts 5 }}
+          {{- if not (hasKey $groupResources $resource) }}
+            {{- $_ := set $groupResources $resource true }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+    {{- end }}
+    
+    {{- range $resource, $_ := $groupResources }}
+    resources.push({
+      name: "{{ $resource }}s",
+      singularName: "{{ $resource }}",
+      namespaced: true,
+      kind: "{{ title $resource }}",
+      verbs: ["create", "delete", "deletecollection", "get", "list", "patch", "update", "watch"]
+    });
+    {{- end }}
+    
+    res.json({
+      kind: "APIResourceList",
+      apiVersion: "v1",
+      groupVersion: "{{ $group }}/{{ . }}",
+      resources: resources
+    });
+  });
+    {{- end }}
+  {{- end }}
+
+  // Add dynamic routes from OpenAPI spec
   {{- range .Endpoints }}
   /**
    * {{ .Summary }}
    * {{ .Description }}
    */
-  router.{{ .Method }}('{{ .Path }}', async (req, res, next) => {
+  router.{{ .Method }}('{{ .Path }}', async (
+    req: Request<{
+      name?: string;
+      namespace?: string;
+      resourceType?: string;
+    }, any, any, {
+      watch?: string;
+      labelSelector?: string;
+      resourceVersion?: string;
+    }>,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       logger.debug(`{{ .Method | upper }} {{ .Path }} called with params:`, req.params);
       
       {{- if eq .Method "get" }}
       // Handle GET request
-      {{- if contains .Path ":name" }}
+      {{- if hasSubstring .Path ":name" }}
       // Get single resource
       const name = req.params.name;
-      const namespace = req.params.namespace || 'default';
+      if (!name) {
+        return res.status(400).json({
+          kind: 'Status',
+          apiVersion: 'v1',
+          status: 'Failure',
+          message: 'Name parameter is required',
+          reason: 'BadRequest',
+          code: 400
+        });
+      }
       
-      const resource = await storage.get{{ .Tags | first }}(name, namespace);
+      const namespace = req.params.namespace || 'default';
+      const resourceType = req.params.resourceType || '{{ index .Tags 0 }}';
+      
+      const resource = await storage.getResource(resourceType, name, namespace);
       return res.json(resource);
       {{- else }}
-      // List resources
+      // List or watch resources
       const namespace = req.params.namespace || 'default';
-      const resources = await storage.list{{ .Tags | first }}(namespace);
-      return res.json({
-        kind: '{{ .Tags | first }}List',
-        apiVersion: 'v1',
-        items: resources
-      });
+      const resourceType = req.params.resourceType || '{{ index .Tags 0 }}';
+      const watch = req.query.watch === 'true' || req.query.watch === '1';
+      const labelSelector = req.query.labelSelector;
+      const resourceVersion = req.query.resourceVersion;
+      
+      if (watch) {
+        // Handle watch request
+        // Set headers for streaming response
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Transfer-Encoding', 'chunked');
+        res.setHeader('Connection', 'keep-alive');
+        res.setHeader('Cache-Control', 'no-cache, no-transform');
+        
+        // Set up error handler
+        const onError = (err: any) => {
+          logger.error(`Watch error for ${resourceType}:`, err);
+          
+          // Send error event
+          const errorEvent = {
+            type: 'ERROR',
+            object: {
+              kind: 'Status',
+              apiVersion: 'v1',
+              metadata: {},
+              status: 'Failure',
+              message: err.message || 'Watch error',
+              reason: 'InternalError',
+              code: 500
+            }
+          };
+          
+          res.write(JSON.stringify(errorEvent) + '\n');
+          res.end();
+        };
+        
+        // Set up close handler
+        req.on('close', () => {
+          if (stopWatching) {
+            stopWatching();
+          }
+        });
+        
+        // Start watching
+        let stopWatching: (() => void) | null = null;
+        try {
+          stopWatching = await storage.watchResources(
+            resourceType,
+            namespace,
+            labelSelector,
+            resourceVersion,
+            (type, resource) => {
+              // Send watch event
+              const event = { type, object: resource };
+              res.write(JSON.stringify(event) + '\n');
+            }
+          );
+        } catch (err) {
+          onError(err);
+        }
+      } else {
+        // Handle list request
+        const resources = await storage.listResources(resourceType, namespace, labelSelector);
+        return res.json({
+          kind: `${resourceType}List`,
+          apiVersion: 'v1',
+          metadata: {
+            resourceVersion: Date.now().toString()
+          },
+          items: resources
+        });
+      }
       {{- end }}
       {{- else if eq .Method "post" }}
       // Handle POST request
       const namespace = req.params.namespace || 'default';
+      const resourceType = req.params.resourceType || '{{ index .Tags 0 }}';
       const resource = req.body;
       
-      const created = await storage.create{{ .Tags | first }}(resource, namespace);
+      // Ensure the resource has the correct kind
+      if (!resource.kind) {
+        resource.kind = resourceType;
+      }
+      
+      const created = await storage.createResource(resource, namespace);
       return res.status(201).json(created);
       {{- else if eq .Method "put" }}
       // Handle PUT request
       const name = req.params.name;
+      if (!name) {
+        return res.status(400).json({
+          kind: 'Status',
+          apiVersion: 'v1',
+          status: 'Failure',
+          message: 'Name parameter is required',
+          reason: 'BadRequest',
+          code: 400
+        });
+      }
+      
       const namespace = req.params.namespace || 'default';
+      const resourceType = req.params.resourceType || '{{ index .Tags 0 }}';
       const resource = req.body;
       
-      const updated = await storage.update{{ .Tags | first }}(name, resource, namespace);
+      // Ensure the resource has the correct kind
+      if (!resource.kind) {
+        resource.kind = resourceType;
+      }
+      
+      const updated = await storage.updateResource(resourceType, name, resource, namespace);
       return res.json(updated);
+      {{- else if eq .Method "patch" }}
+      // Handle PATCH request
+      const name = req.params.name;
+      if (!name) {
+        return res.status(400).json({
+          kind: 'Status',
+          apiVersion: 'v1',
+          status: 'Failure',
+          message: 'Name parameter is required',
+          reason: 'BadRequest',
+          code: 400
+        });
+      }
+      
+      const namespace = req.params.namespace || 'default';
+      const resourceType = req.params.resourceType || '{{ index .Tags 0 }}';
+      const patch = req.body;
+      
+      const patched = await storage.patchResource(resourceType, name, patch, namespace);
+      return res.json(patched);
       {{- else if eq .Method "delete" }}
       // Handle DELETE request
       const name = req.params.name;
-      const namespace = req.params.namespace || 'default';
+      if (!name) {
+        return res.status(400).json({
+          kind: 'Status',
+          apiVersion: 'v1',
+          status: 'Failure',
+          message: 'Name parameter is required',
+          reason: 'BadRequest',
+          code: 400
+        });
+      }
       
-      await storage.delete{{ .Tags | first }}(name, namespace);
+      const namespace = req.params.namespace || 'default';
+      const resourceType = req.params.resourceType || '{{ index .Tags 0 }}';
+      
+      await storage.deleteResource(resourceType, name, namespace);
       return res.status(200).json({
         kind: 'Status',
         apiVersion: 'v1',
         status: 'Success',
-        message: `{{ .Tags | first }} "${name}" deleted`
+        message: `${resourceType} "${name}" deleted`
       });
       {{- else }}
       // Handle other methods
@@ -83,4 +399,3 @@ export function create{{ .Resource }}Routes(): Router {
 
   return router;
 }
-

@@ -1,0 +1,27 @@
+/**
+ * Generate a random string of the specified length
+ */
+export function randomString(length: number): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  
+  for (let i = 0; i < length; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  
+  return result;
+}
+
+/**
+ * Deep clone an object
+ */
+export function deepClone<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+/**
+ * Check if two objects are deeply equal
+ */
+export function deepEqual(a: any, b: any): boolean {
+  return JSON.stringify(a) === JSON.stringify(b);
+}

@@ -3,54 +3,42 @@ import { createDiscoveryRoutes } from './discovery-routes';
 import storage from '../storage';
 
 // Import all route handlers
-{{ $resourceTypes := dict }}
-{{ range .Endpoints }}
-{{ $resourceType := extractResourceTypeFromEndpoint . }}
-{{ $sanitizedResourceType := $resourceType | sanitizeResourceType }}
-{{ $resourceTypes = set $resourceTypes $sanitizedResourceType (list $resourceType) }}
-{{ end }}
+{{- $resourceTypes := dict }}
 
-{{ range $sanitizedResourceType, $resourceType := $resourceTypes }}
+// Group endpoints by resource type
+{{- range .Endpoints }}
+{{- if ne .ResourceType "discovery" }}
+{{- $resourceType := .ResourceType }}
+{{- if eq $resourceType "" }}
+{{- if gt (len .Tags) 0 }}
+{{- $resourceType = index .Tags 0 }}
+{{- else }}
+{{- $resourceType = "resource" }}
+{{- end }}
+{{- end }}
+{{- $sanitizedResourceType := $resourceType | sanitizeResourceType }}
+{{- $resourceTypes = set $resourceTypes $sanitizedResourceType (list $resourceType) }}
+{{- end }}
+{{- end }}
+
+// Import route handlers
+{{- range $sanitizedResourceType, $resourceTypeList := $resourceTypes }}
 import { create{{ $sanitizedResourceType }}Routes } from './{{ $sanitizedResourceType }}-routes';
-{{ end }}
+{{- end }}
 
 /**
- * Create all routes for the API server
- */
+* Create all routes for the API server
+*/
 export function createRoutes(): express.Router {
-  const router = express.Router();
-  
-  // Add discovery routes
-  router.use('/', createDiscoveryRoutes(storage));
-  
-  // Add resource routes
-  {{ range $sanitizedResourceType, $resourceType := $resourceTypes }}
-  router.use('/', create{{ $sanitizedResourceType }}Routes(storage));
-  {{ end }}
-  
-  return router;
-}
-
-// Helper function to extract resource type from endpoint
-function extractResourceTypeFromEndpoint(endpoint) {
-  // First try to extract from path
-  const parts = endpoint.Path.split('/');
-  for (let i = 0; i < parts.length; i++) {
-    const part = parts[i];
-    // Skip empty parts, path parameters, and common API path segments
-    if (part === '' || part.startsWith(':') || part === 'api' || part === 'apis' || part === 'v1' || part === 'namespaces') {
-      continue;
-    }
-    
-    // Found a potential resource type
-    return part;
-  }
-  
-  // If not found in path, try to use tags
-  if (endpoint.Tags && endpoint.Tags.length > 0) {
-    return endpoint.Tags[0];
-  }
-  
-  // Default fallback
-  return 'resource';
+ const router = express.Router();
+ 
+ // Add discovery routes
+ router.use('/', createDiscoveryRoutes(storage));
+ 
+ // Add resource routes
+{{- range $sanitizedResourceType, $resourceTypeList := $resourceTypes }}
+ router.use('/', create{{ $sanitizedResourceType }}Routes(storage));
+{{- end }}
+ 
+ return router;
 }

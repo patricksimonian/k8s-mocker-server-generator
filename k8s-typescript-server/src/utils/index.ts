@@ -43,7 +43,7 @@ export function parseQueryParams(query: any): Record<string, any> {
 /**
  * Utility function to deep merge objects
  */
-export function deepMerge<T>(target: T, source: any): T {
+export function deepMerge<T extends object>(target: T, source: any): T {
   if (!source) return target;
   
   const output = { ...target } as any;

@@ -531,47 +531,98 @@ func (g *Generator) generateModels() error {
 		return fmt.Errorf("failed to create models directory: %w", err)
 	}
 
-	// Generate model interfaces for each model in the IR
+	// Group models by resource type
+	modelsByResourceType := make(map[string]map[string]ir.Model)
+
 	for originalName, model := range g.IR.Models {
-		// Get the template
-		tmpl, ok := g.Templates["models/model.ts.tmpl"]
-		if !ok {
-			return fmt.Errorf("template models/model.ts.tmpl not found")
+		resourceType := model.ResourceType
+		if resourceType == "" {
+			// If ResourceType is empty, try to infer it from the model name
+			parts := strings.Split(originalName, ".")
+			if len(parts) > 1 {
+				resourceType = parts[len(parts)-2]
+			} else {
+				resourceType = "core"
+			}
 		}
 
-		// Get sanitized model name
-		sanitizedName := g.getSanitizedModelName(originalName)
-
-		// Process model to enhance with additional metadata
-		enhancedModel := g.enhanceModel(originalName, sanitizedName, model)
-
-		data := struct {
-			OriginalModelName string
-			ModelName         string
-			Model             EnhancedModel
-			IR                ir.IR
-		}{
-			OriginalModelName: originalName,
-			ModelName:         sanitizedName,
-			Model:             enhancedModel,
-			IR:                g.IR,
+		if modelsByResourceType[resourceType] == nil {
+			modelsByResourceType[resourceType] = make(map[string]ir.Model)
 		}
-
-		filename := fmt.Sprintf("%s.ts", sanitizedName)
-		filePath := filepath.Join(modelsDir, filename)
-
-		file, err := os.Create(filePath)
-		if err != nil {
-			return fmt.Errorf("failed to create file %s: %w", filePath, err)
-		}
-		defer file.Close()
-
-		if err := tmpl.Execute(file, data); err != nil {
-			return fmt.Errorf("failed to execute template for model %s: %w", originalName, err)
-		}
+		modelsByResourceType[resourceType][originalName] = model
 	}
 
-	// Generate models index
+	// Generate model files for each resource type
+	for resourceType, models := range modelsByResourceType {
+		// Create resource type directory
+		resourceTypeDir := filepath.Join(modelsDir, sanitizeResourceType(resourceType))
+		if err := os.MkdirAll(resourceTypeDir, 0755); err != nil {
+			return fmt.Errorf("failed to create resource type directory %s: %w", resourceType, err)
+		}
+
+		// Generate model files for this resource type
+		for originalName, model := range models {
+			// Get the template
+			tmpl, ok := g.Templates["models/model.ts.tmpl"]
+			if !ok {
+				return fmt.Errorf("template models/model.ts.tmpl not found")
+			}
+
+			// Get sanitized model name
+			sanitizedName := g.getSanitizedModelName(originalName)
+
+			// Process model to enhance with additional metadata
+			enhancedModel := g.enhanceModel(originalName, sanitizedName, model)
+
+			data := struct {
+				OriginalModelName string
+				ModelName         string
+				Model             EnhancedModel
+				IR                ir.IR
+				ResourceType      string
+			}{
+				OriginalModelName: originalName,
+				ModelName:         sanitizedName,
+				Model:             enhancedModel,
+				IR:                g.IR,
+				ResourceType:      resourceType,
+			}
+
+			filename := fmt.Sprintf("%s.ts", sanitizedName)
+			filePath := filepath.Join(resourceTypeDir, filename)
+
+			file, err := os.Create(filePath)
+			if err != nil {
+				return fmt.Errorf("failed to create file %s: %w", filePath, err)
+			}
+			defer file.Close()
+
+			if err := tmpl.Execute(file, data); err != nil {
+				return fmt.Errorf("failed to execute template for model %s: %w", originalName, err)
+			}
+		}
+
+		// Generate index.ts for this resource type
+		resourceIndexPath := filepath.Join(resourceTypeDir, "index.ts")
+		resourceIndexFile, err := os.Create(resourceIndexPath)
+		if err != nil {
+			return fmt.Errorf("failed to create file %s: %w", resourceIndexPath, err)
+		}
+
+		// Write exports for all models in this resource type
+		for originalName := range models {
+			sanitizedName := g.getSanitizedModelName(originalName)
+			_, err := fmt.Fprintf(resourceIndexFile, "export * from './%s';\n", sanitizedName)
+			if err != nil {
+				resourceIndexFile.Close()
+				return fmt.Errorf("failed to write to resource index file: %w", err)
+			}
+		}
+
+		resourceIndexFile.Close()
+	}
+
+	// Generate main models index
 	indexTmpl, ok := g.Templates["models/index.ts.tmpl"]
 	if !ok {
 		return fmt.Errorf("template models/index.ts.tmpl not found")
@@ -584,15 +635,15 @@ func (g *Generator) generateModels() error {
 	}
 	defer indexFile.Close()
 
-	// Create data for index template with models and sanitized model names
+	// Create data for index template with models grouped by resource type
 	indexData := struct {
-		Models              map[string]ir.Model
-		IR                  ir.IR
-		SanitizedModelNames map[string]string
+		ModelsByResourceType map[string]map[string]ir.Model
+		IR                   ir.IR
+		SanitizedModelNames  map[string]string
 	}{
-		Models:              g.IR.Models,
-		IR:                  g.IR,
-		SanitizedModelNames: g.SanitizedModelNames,
+		ModelsByResourceType: modelsByResourceType,
+		IR:                   g.IR,
+		SanitizedModelNames:  g.SanitizedModelNames,
 	}
 
 	if err := indexTmpl.Execute(indexFile, indexData); err != nil {
@@ -600,30 +651,6 @@ func (g *Generator) generateModels() error {
 	}
 
 	return nil
-}
-
-// EnhancedModel represents a model with additional metadata for code generation
-type EnhancedModel struct {
-	OriginalName string
-	Name         string
-	Description  string
-	Schema       ir.Schema
-	Properties   []EnhancedProperty
-	Imports      map[string]string // Map of sanitized name to original name
-}
-
-// EnhancedProperty represents a property with additional metadata for code generation
-type EnhancedProperty struct {
-	Name            string
-	Description     string
-	Type            string
-	IsRequired      bool
-	IsArray         bool
-	IsObject        bool
-	IsReference     bool
-	RefName         string
-	OriginalRefName string
-	DefaultValue    string
 }
 
 // enhanceModel processes a model to add additional metadata for code generation
@@ -635,6 +662,76 @@ func (g *Generator) enhanceModel(originalName, sanitizedName string, model ir.Mo
 		Schema:       model.Schema,
 		Properties:   []EnhancedProperty{},
 		Imports:      make(map[string]string),
+		ResourceType: model.ResourceType,
+	}
+
+	// If ResourceType is empty, try to infer it from the model name
+	if enhanced.ResourceType == "" {
+		parts := strings.Split(originalName, ".")
+		if len(parts) > 1 {
+			enhanced.ResourceType = parts[len(parts)-2]
+		} else {
+			// Try to infer from the model name itself
+			// Common Kubernetes resource types
+			resourceTypes := []string{
+				"pod", "deployment", "service", "configmap", "secret",
+				"namespace", "node", "persistentvolume", "persistentvolumeclaim",
+				"statefulset", "daemonset", "job", "cronjob", "ingress", "networkpolicy",
+				"serviceaccount", "role", "rolebinding", "clusterrole", "clusterrolebinding",
+			}
+
+			lowerName := strings.ToLower(originalName)
+			for _, rt := range resourceTypes {
+				if strings.Contains(lowerName, rt) {
+					enhanced.ResourceType = rt
+					break
+				}
+			}
+
+			// If still not found, default to "core"
+			if enhanced.ResourceType == "" {
+				enhanced.ResourceType = "core"
+			}
+		}
+	}
+
+	// Handle the 'list' edge case
+	// If resourceType ends with 'list', it's a list of another resource type
+	if strings.HasSuffix(strings.ToLower(enhanced.ResourceType), "list") {
+		// Extract the base resource type (remove 'list' suffix)
+		baseResourceType := strings.TrimSuffix(strings.ToLower(enhanced.ResourceType), "list")
+
+		// Find the corresponding model for the base resource type
+		var baseModelName string
+		var baseModelOriginalName string
+
+		for origName, mdl := range g.IR.Models {
+			rt := mdl.ResourceType
+			if rt == "" {
+				parts := strings.Split(origName, ".")
+				if len(parts) > 1 {
+					rt = parts[len(parts)-2]
+				}
+			}
+
+			if strings.ToLower(rt) == baseResourceType {
+				baseModelOriginalName = origName
+				baseModelName = g.getSanitizedModelName(origName)
+				break
+			}
+		}
+
+		// If we found a base model, add it to imports
+		if baseModelName != "" {
+			enhanced.Imports[baseModelName] = fmt.Sprintf("%s/%s",
+				sanitizeResourceType(baseResourceType), baseModelName)
+
+			// Add a special flag to indicate this is a list type
+			enhanced.IsList = true
+			enhanced.BaseResourceType = baseResourceType
+			enhanced.BaseModelName = baseModelName
+			enhanced.BaseModelOriginalName = baseModelOriginalName
+		}
 	}
 
 	// Process properties
@@ -651,6 +748,20 @@ func (g *Generator) enhanceModel(originalName, sanitizedName string, model ir.Mo
 			Name:        propName,
 			Description: propSchema.Description,
 			IsRequired:  isRequired,
+		}
+
+		// Special handling for 'items' property in list types
+		if enhanced.IsList && propName == "items" {
+			// Set the type to an array of the base model
+			prop.Type = enhanced.BaseModelName + "[]"
+			prop.IsArray = true
+			prop.IsReference = true
+			prop.RefName = enhanced.BaseModelName
+			prop.OriginalRefName = enhanced.BaseModelOriginalName
+
+			// The import is already added above
+			enhanced.Properties = append(enhanced.Properties, prop)
+			continue
 		}
 
 		// Determine property type
@@ -740,7 +851,63 @@ func (g *Generator) enhanceModel(originalName, sanitizedName string, model ir.Mo
 		// Set default value
 		prop.DefaultValue = g.getDefaultValue(propSchema)
 
+		// For reference types, we need to determine the resource type of the referenced model
+		if prop.IsReference && prop.RefName != "" {
+			// Find the resource type of the referenced model
+			refModel, exists := g.IR.Models[prop.OriginalRefName]
+			if exists {
+				refResourceType := refModel.ResourceType
+				if refResourceType == "" {
+					parts := strings.Split(prop.OriginalRefName, ".")
+					if len(parts) > 1 {
+						refResourceType = parts[len(parts)-2]
+					} else {
+						// Try to infer from the model name itself
+						// Common Kubernetes resource types
+						resourceTypes := []string{
+							"pod", "deployment", "service", "configmap", "secret",
+							"namespace", "node", "persistentvolume", "persistentvolumeclaim",
+							"statefulset", "daemonset", "job", "cronjob", "ingress", "networkpolicy",
+							"serviceaccount", "role", "rolebinding", "clusterrole", "clusterrolebinding",
+						}
+
+						lowerName := strings.ToLower(prop.OriginalRefName)
+						for _, rt := range resourceTypes {
+							if strings.Contains(lowerName, rt) {
+								refResourceType = rt
+								break
+							}
+						}
+
+						// If still not found, default to "core"
+						if refResourceType == "" {
+							refResourceType = "core"
+						}
+					}
+				}
+
+				// If the referenced model is in a different resource type, adjust the import path
+				if refResourceType != enhanced.ResourceType {
+					// Update the import path to include the resource type directory
+					enhanced.Imports[prop.RefName] = fmt.Sprintf("%s/%s",
+						sanitizeResourceType(refResourceType), prop.RefName)
+				}
+			}
+		}
+
 		enhanced.Properties = append(enhanced.Properties, prop)
+	}
+
+	// Set the display name to be the capitalized resource type
+	if enhanced.ResourceType != "" {
+		enhanced.DisplayName = strings.Title(enhanced.ResourceType)
+
+		// If it's a list type, make sure the display name reflects that
+		if enhanced.IsList {
+			enhanced.DisplayName = strings.Title(enhanced.BaseResourceType) + "List"
+		}
+	} else {
+		enhanced.DisplayName = enhanced.Name
 	}
 
 	return enhanced
@@ -949,11 +1116,21 @@ func (g *Generator) generateDiscoveryRoutes() error {
 	}
 	defer file.Close()
 
+	// Filter discovery endpoints
+	var discoveryEndpoints []ir.Endpoint
+	for _, endpoint := range g.IR.Endpoints {
+		if endpoint.ResourceType == "discovery" {
+			discoveryEndpoints = append(discoveryEndpoints, endpoint)
+		}
+	}
+
 	// Execute template
 	data := struct {
-		IR ir.IR
+		IR                 ir.IR
+		DiscoveryEndpoints []ir.Endpoint
 	}{
-		IR: g.IR,
+		IR:                 g.IR,
+		DiscoveryEndpoints: discoveryEndpoints,
 	}
 
 	if err := tmpl.Execute(file, data); err != nil {
@@ -972,18 +1149,58 @@ func (g *Generator) generateEndpointRoutes() error {
 	}
 
 	// Group endpoints by resource type
-	endpointsByResource := make(map[string][]ir.Endpoint)
+	endpointsByResourceType := make(map[string][]ir.Endpoint)
 
-	// Process endpoints and extract resource types
+	// Map to track which models are used by each resource type
+	modelsByResourceType := make(map[string][]string)
+
+	// Process endpoints and group by resource type
 	for _, endpoint := range g.IR.Endpoints {
-		resourceType := g.extractResourceTypeFromEndpoint(endpoint)
-		endpointsByResource[resourceType] = append(endpointsByResource[resourceType], endpoint)
+		// Skip discovery endpoints as they are handled separately
+		if endpoint.ResourceType == "discovery" {
+			continue
+		}
+
+		// Use the ResourceType property, or fall back to the first tag, or "resource" if neither exists
+		resourceType := endpoint.ResourceType
+		if resourceType == "" {
+			if len(endpoint.Tags) > 0 {
+				resourceType = endpoint.Tags[0]
+			} else {
+				resourceType = "resource"
+			}
+		}
+
+		endpointsByResourceType[resourceType] = append(endpointsByResourceType[resourceType], endpoint)
+	}
+
+	// Process models and group by resource type
+	for modelName, model := range g.IR.Models {
+		resourceType := model.ResourceType
+		if resourceType == "" {
+			resourceType = "core"
+		}
+
+		sanitizedName := g.getSanitizedModelName(modelName)
+		modelsByResourceType[resourceType] = append(modelsByResourceType[resourceType], sanitizedName)
 	}
 
 	// Generate a route file for each resource type
-	for resourceType, endpoints := range endpointsByResource {
+	for resourceType, endpoints := range endpointsByResourceType {
 		// Use the same sanitization function as for models
 		sanitizedResourceType := sanitizeResourceType(resourceType)
+
+		// Get models for this resource type
+		models := modelsByResourceType[resourceType]
+		if len(models) == 0 {
+			// If no models found for this resource type, try to find models with similar names
+			for modelResourceType, modelList := range modelsByResourceType {
+				if strings.Contains(strings.ToLower(modelResourceType), strings.ToLower(resourceType)) ||
+					strings.Contains(strings.ToLower(resourceType), strings.ToLower(modelResourceType)) {
+					models = append(models, modelList...)
+				}
+			}
+		}
 
 		// Create file name from sanitized resource type
 		fileName := fmt.Sprintf("%s-routes.ts", sanitizedResourceType)
@@ -999,11 +1216,13 @@ func (g *Generator) generateEndpointRoutes() error {
 			ResourceType          string
 			SanitizedResourceType string
 			Endpoints             []ir.Endpoint
+			Models                []string
 			IR                    ir.IR
 		}{
 			ResourceType:          resourceType,
 			SanitizedResourceType: sanitizedResourceType,
 			Endpoints:             endpoints,
+			Models:                models,
 			IR:                    g.IR,
 		}
 
@@ -1018,33 +1237,11 @@ func (g *Generator) generateEndpointRoutes() error {
 	return nil
 }
 
+// Remove this function as it's no longer needed
 // extractResourceTypeFromEndpoint extracts the resource type from an endpoint
-func (g *Generator) extractResourceTypeFromEndpoint(endpoint ir.Endpoint) string {
-	// First try to extract from path
-	parts := strings.Split(endpoint.Path, "/")
-	for _, part := range parts {
-		// Skip empty parts, path parameters, and common API path segments
-		if part == "" || strings.HasPrefix(part, ":") || part == "api" || part == "apis" || part == "v1" {
-			continue
-		}
-
-		// Skip "namespaces" part
-		if part == "namespaces" {
-			continue
-		}
-
-		// Found a potential resource type
-		return part
-	}
-
-	// If not found in path, try to use tags
-	if len(endpoint.Tags) > 0 {
-		return endpoint.Tags[0]
-	}
-
-	// Default fallback
-	return "resource"
-}
+// func (g *Generator) extractResourceTypeFromEndpoint(endpoint ir.Endpoint) string {
+//     ...
+// }
 
 // generateConfig generates the config.ts file.
 func (g *Generator) generateConfig() error {

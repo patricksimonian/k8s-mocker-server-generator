@@ -2,179 +2,245 @@ import express from 'express';
 import { Storage } from '../storage/Storage';
 import { logger } from '../logger';
 import { 
-  fetchResourceList, 
-  validateResource, 
-  applyPatch, 
-  handleResourceError,
-  createNotFoundResponse
+fetchResourceList, 
+validateResource, 
+applyPatch, 
+handleResourceError,
+createNotFoundResponse
 } from '../utils';
 
-// Import all models to ensure we have what we need
-import * as models from '../models';
+
 
 /**
- * Create routes for {{ .ResourceType }} resources
- */
+* Create routes for {{ .ResourceType }} resources
+* @resourceType {{ .ResourceType }}
+*/
 export function create{{ .SanitizedResourceType }}Routes(storage: Storage): express.Router {
-  const router = express.Router();
+const router = express.Router();
 
-  {{ if eq (len .Endpoints) 0 }}
-  // No endpoints defined for this resource type
-  logger.debug('No endpoints defined for resource type: {{ .ResourceType }}');
-  {{ else }}
-  {{ range .Endpoints }}
-  /**
-   * {{ .Method | upper }} {{ .Path }}
-   * {{ .Description }}
-   */
-  router.{{ .Method | lower }}('{{ .Path }}', async (req, res, next) => {
-    try {
-      await handle{{ .Method | lower }}{{ .Path | sanitizePath | title | sanitizeIdentifier }}(req, res, storage);
-    } catch (error) {
-      next(error);
-    }
-  });
-  {{ end }}
-  {{ end }}
+{{ if eq (len .Endpoints) 0 }}
+// No endpoints defined for this resource type
+logger.debug('No endpoints defined for resource type: {{ .ResourceType }}');
+{{ else }}
+{{ range .Endpoints }}
+/**
+ * {{ .Method | upper }} {{ .Path }}
+ * {{ .Description }}
+ */
+router.{{ .Method | lower }}('{{ .Path }}', async (req, res, next) => {
+  try {
+    await handle{{ .Method | lower }}{{ .Path | sanitizePath | title | sanitizeIdentifier }}(req, res, storage);
+  } catch (error) {
+    next(error);
+  }
+});
+{{ end }}
+{{ end }}
 
-  return router;
+return router;
 }
 
 {{ if gt (len .Endpoints) 0 }}
 {{ range .Endpoints }}
 /**
- * Handler for {{ .Method | upper }} {{ .Path }}
- * {{ .Description }}
- */
+* Handler for {{ .Method | upper }} {{ .Path }}
+* {{ .Description }}
+* @resourceType {{ .ResourceType }}
+*/
 async function handle{{ .Method | lower }}{{ .Path | sanitizePath | title | sanitizeIdentifier }}(
-  req: express.Request, 
-  res: express.Response, 
-  storage: Storage
+req: express.Request, 
+res: express.Response, 
+storage: Storage
 ): Promise<void> {
-  {{ if eq .Method "get" }}
-  {{ if hasSubstring .Path ":name" }}
-  // Get single resource
-  const namespace = req.params.namespace || 'default';
-  const name = req.params.name;
-  
-  logger.info(`Getting {{ .ResourceType }} ${name} in namespace ${namespace}`);
-  
-  try {
-    // Get the resource from storage
-    const result = await storage.getResource('{{ .ResourceType }}', name, namespace);
-    res.json(result);
-  } catch (error) {
-    if (error.code === 'NOT_FOUND') {
-      res.status(404).json(createNotFoundResponse('{{ .ResourceType }}', name, namespace));
-      return;
-    }
-    throw error;
+{{ if eq .Method "get" }}
+{{ if hasSubstring .Path ":name" }}
+// Get single resource
+const namespace = req.params.namespace || 'default';
+const name = req.params.name;
+
+logger.info(`Getting {{ .ResourceType }} ${name} in namespace ${namespace}`);
+
+try {
+  // Get the resource from storage
+  const result = await storage.getResource('{{ .ResourceType }}', name, namespace);
+  res.json(result);
+} catch (error) {
+  if (error.code === 'NOT_FOUND') {
+    res.status(404).json(createNotFoundResponse('{{ .ResourceType }}', name, namespace));
+    return;
   }
-  {{ else }}
-  // List resources
-  const namespace = req.params.namespace || 'default';
-  const { limit, continue: continueToken, labelSelector, fieldSelector } = req.query;
+  throw error;
+}
+{{ else }}
+// List resources
+const namespace = req.params.namespace || 'default';
+const { limit, continue: continueToken, labelSelector, fieldSelector, watch } = req.query;
+
+logger.info(`Listing {{ .ResourceType }}s in namespace ${namespace}`);
+
+// Check if this is a watch request
+if (watch === 'true' || watch === '1') {
+  // Handle watch request
+  const resourceVersion = req.query.resourceVersion as string;
   
-  logger.info(`Listing {{ .ResourceType }}s in namespace ${namespace}`);
+  // Set headers for streaming response
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Transfer-Encoding', 'chunked');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
   
-  // Fetch resources from storage
-  const result = await fetchResourceList(
+  // Set up error handler
+  const onError = (err: any) => {
+    logger.error(`Watch error for {{ .ResourceType }}:`, err);
+    
+    // Send error event
+    const errorEvent = {
+      type: 'ERROR',
+      object: {
+        kind: 'Status',
+        apiVersion: 'v1',
+        metadata: {},
+        status: 'Failure',
+        message: err.message || 'Watch error',
+        reason: 'InternalError',
+        code: 500
+      }
+    };
+    
+    res.write(JSON.stringify(errorEvent) + '\n');
+    res.end();
+  };
+  
+  // Set up close handler
+  req.on('close', () => {
+    if (stopWatching) {
+      stopWatching();
+    }
+  });
+  
+  // Start watching
+  let stopWatching: (() => void) | null = null;
+  try {
+    stopWatching = await storage.watchResources(
+      '{{ .ResourceType }}',
+      namespace,
+      labelSelector as string,
+      resourceVersion,
+      (type, resource) => {
+        // Send watch event
+        const event = {
+          type,
+          object: resource
+        };
+        res.write(JSON.stringify(event) + '\n');
+      }
+    );
+  } catch (err) {
+    onError(err);
+  }
+  
+  return;
+}
+
+// Regular list request
+// Fetch resources from storage
+const result = await fetchResourceList(
+  storage, 
+  '{{ .ResourceType }}',
+  namespace, 
+  {
+    limit: limit ? parseInt(limit as string) : undefined,
+    continueToken: continueToken as string,
+    labelSelector: labelSelector as string,
+    fieldSelector: fieldSelector as string
+  }
+);
+
+res.json(result);
+{{ end }}
+{{ else if eq .Method "post" }}
+// Create resource
+const namespace = req.params.namespace || 'default';
+const resource = req.body;
+
+logger.info(`Creating {{ .ResourceType }} ${resource.metadata?.name} in namespace ${namespace}`);
+
+try {
+  // Validate the resource
+  await validateResource(resource);
+  
+  // Create the resource in storage
+  const result = await storage.createResource(resource, namespace);
+  res.status(201).json(result);
+} catch (error) {
+  handleResourceError(error, res);
+}
+{{ else if eq .Method "put" }}
+// Update resource
+const namespace = req.params.namespace || 'default';
+const name = req.params.name;
+const resource = req.body;
+
+logger.info(`Updating {{ .ResourceType }} ${name} in namespace ${namespace}`);
+
+try {
+  // Validate the resource
+  await validateResource(resource);
+  
+  // Update the resource in storage
+  const result = await storage.updateResource('{{ .ResourceType }}', name, resource, namespace);
+  res.json(result);
+} catch (error) {
+  handleResourceError(error, res);
+}
+{{ else if eq .Method "delete" }}
+// Delete resource
+const namespace = req.params.namespace || 'default';
+const name = req.params.name;
+
+logger.info(`Deleting {{ .ResourceType }} ${name} in namespace ${namespace}`);
+
+try {
+  // Delete the resource from storage
+  await storage.deleteResource('{{ .ResourceType }}', name, namespace);
+  
+  // Return success response
+  res.json({
+    kind: 'Status',
+    apiVersion: 'v1',
+    metadata: {},
+    status: 'Success',
+    message: `{{ .ResourceType }} "${name}" deleted`
+  });
+} catch (error) {
+  if (error.code === 'NOT_FOUND') {
+    res.status(404).json(createNotFoundResponse('{{ .ResourceType }}', name, namespace));
+    return;
+  }
+  throw error;
+}
+{{ else if eq .Method "patch" }}
+// Patch resource
+const namespace = req.params.namespace || 'default';
+const name = req.params.name;
+const patchData = req.body;
+
+logger.info(`Patching {{ .ResourceType }} ${name} in namespace ${namespace}`);
+
+try {
+  // Apply patch to the resource
+  const result = await applyPatch(
     storage, 
     '{{ .ResourceType }}',
     namespace, 
-    {
-      limit: limit ? parseInt(limit as string) : undefined,
-      continueToken: continueToken as string,
-      labelSelector: labelSelector as string,
-      fieldSelector: fieldSelector as string
-    }
+    name, 
+    patchData
   );
-  
   res.json(result);
-  {{ end }}
-  {{ else if eq .Method "post" }}
-  // Create resource
-  const namespace = req.params.namespace || 'default';
-  const resource = req.body;
-  
-  logger.info(`Creating {{ .ResourceType }} ${resource.metadata?.name} in namespace ${namespace}`);
-  
-  try {
-    // Validate the resource
-    await validateResource(resource);
-    
-    // Create the resource in storage
-    const result = await storage.createResource(resource, namespace);
-    res.status(201).json(result);
-  } catch (error) {
-    handleResourceError(error, res);
-  }
-  {{ else if eq .Method "put" }}
-  // Update resource
-  const namespace = req.params.namespace || 'default';
-  const name = req.params.name;
-  const resource = req.body;
-  
-  logger.info(`Updating {{ .ResourceType }} ${name} in namespace ${namespace}`);
-  
-  try {
-    // Validate the resource
-    await validateResource(resource);
-    
-    // Update the resource in storage
-    const result = await storage.updateResource('{{ .ResourceType }}', name, resource, namespace);
-    res.json(result);
-  } catch (error) {
-    handleResourceError(error, res);
-  }
-  {{ else if eq .Method "delete" }}
-  // Delete resource
-  const namespace = req.params.namespace || 'default';
-  const name = req.params.name;
-  
-  logger.info(`Deleting {{ .ResourceType }} ${name} in namespace ${namespace}`);
-  
-  try {
-    // Delete the resource from storage
-    await storage.deleteResource('{{ .ResourceType }}', name, namespace);
-    
-    // Return success response
-    res.json({
-      kind: 'Status',
-      apiVersion: 'v1',
-      metadata: {},
-      status: 'Success',
-      message: `{{ .ResourceType }} "${name}" deleted`
-    });
-  } catch (error) {
-    if (error.code === 'NOT_FOUND') {
-      res.status(404).json(createNotFoundResponse('{{ .ResourceType }}', name, namespace));
-      return;
-    }
-    throw error;
-  }
-  {{ else if eq .Method "patch" }}
-  // Patch resource
-  const namespace = req.params.namespace || 'default';
-  const name = req.params.name;
-  const patchData = req.body;
-  
-  logger.info(`Patching {{ .ResourceType }} ${name} in namespace ${namespace}`);
-  
-  try {
-    // Apply patch to the resource
-    const result = await applyPatch(
-      storage, 
-      '{{ .ResourceType }}',
-      namespace, 
-      name, 
-      patchData
-    );
-    res.json(result);
-  } catch (error) {
-    handleResourceError(error, res);
-  }
-  {{ end }}
+} catch (error) {
+  handleResourceError(error, res);
+}
+{{ end }}
 }
 {{ end }}
 {{ end }}

@@ -1,5 +1,7 @@
 import winston from 'winston';
 import { Request, Response } from 'express';
+import { Storage } from '../storage';
+
 export interface WatchEvent {
     type: 'ADDED' | 'MODIFIED' | 'DELETED' | 'ERROR';
     object: any;
@@ -23,7 +25,7 @@ interface RequestQuery {
   resourceVersion?: string;
 }
 
-export async function watch(req: Request<RequestParams, any, any, RequestQuery>,, res: Response, resourceType: string, resourceVersion: string, namespace: string, labelSelector, logger: winston.Logger, storage: Storage) {
+export async function watch(req: Request<RequestParams, any, any, RequestQuery>, res: Response, resourceType: string, resourceVersion: string, namespace: string, labelSelector, logger: winston.Logger, storage: Storage) {
     // Handle watch request
     // Set headers for streaming response
     res.setHeader('Content-Type', 'application/json');

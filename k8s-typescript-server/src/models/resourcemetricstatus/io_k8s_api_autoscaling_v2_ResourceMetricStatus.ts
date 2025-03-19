@@ -9,7 +9,7 @@ export interface io_k8s_api_autoscaling_v2_ResourceMetricStatus {
 * @required
 * @isObject
 */
-current: { value?: string; averageUtilization?: number; averageValue?: string };
+current: { averageUtilization?: number; averageValue?: string; value?: string };
 /**
 * name is the name of the resource in question.
 * @required

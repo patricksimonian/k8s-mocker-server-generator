@@ -13,12 +13,12 @@ replicas?: number;
 * @required
 * @isObject
 */
-selector: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> };
+selector: { matchExpressions?: Array<{ operator: string; values?: string[]; key: string }>; matchLabels?: Record<string, any> };
 /**
 * PodTemplateSpec describes the data a pod should have when created from a template
 * @isObject
 */
-template?: { metadata?: { generation?: number; ownerReferences?: Array<{ uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string }>; selfLink?: string; creationTimestamp?: Date; deletionTimestamp?: Date; generateName?: string; labels?: Record<string, any>; managedFields?: Array<{ operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string }>; annotations?: Record<string, any>; deletionGracePeriodSeconds?: number; namespace?: string; finalizers?: string[]; name?: string; resourceVersion?: string; uid?: string }; spec?: Record<string, any> };
+template?: { metadata?: { labels?: Record<string, any>; namespace?: string; resourceVersion?: string; creationTimestamp?: Date; generateName?: string; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; selfLink?: string; annotations?: Record<string, any>; deletionTimestamp?: Date; generation?: number; deletionGracePeriodSeconds?: number; finalizers?: string[]; uid?: string; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; name?: string }; spec?: Record<string, any> };
 /**
 * Minimum number of seconds for which a newly created pod should be ready without any of its container crashing, for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready)
 */

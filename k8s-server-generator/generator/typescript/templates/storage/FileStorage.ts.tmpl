@@ -222,7 +222,7 @@ export class FileStorage implements Storage {
  /**
   * Delete a resource
   */
- async deleteResource(kind: string, name: string, namespace: string = 'default'): Promise<void> {
+ async deleteResource(kind: string, name: string, namespace: string = 'default'): Promise<boolean> {
    const collection = this.getOrCreateCollection(namespace, kind);
    
    // Check if resource exists
@@ -235,6 +235,7 @@ export class FileStorage implements Storage {
    
    // Save data to file
    await this.saveData();
+   return true;
  }
 
  /**

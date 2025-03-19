@@ -5,10 +5,19 @@
 */
 export interface io_k8s_api_core_v1_PersistentVolumeClaimStatus {
 /**
+* conditions is the current Condition of persistent volume claim. If underlying persistent volume is being resized then the Condition will be set to 'Resizing'.
+* @isArray
+*/
+conditions?: Array<{ lastProbeTime?: Date; lastTransitionTime?: Date; message?: string; reason?: string; status: string; type: string }>;
+/**
+* currentVolumeAttributesClassName is the current name of the VolumeAttributesClass the PVC is using. When unset, there is no VolumeAttributeClass applied to this PersistentVolumeClaim This is a beta field and requires enabling VolumeAttributesClass feature (off by default).
+*/
+currentVolumeAttributesClassName?: string;
+/**
 * ModifyVolumeStatus represents the status object of ControllerModifyVolume operation
 * @isObject
 */
-modifyVolumeStatus?: { status: 'InProgress' | 'Infeasible' | 'Pending'; targetVolumeAttributesClassName?: string };
+modifyVolumeStatus?: { targetVolumeAttributesClassName?: string; status: 'InProgress' | 'Infeasible' | 'Pending' };
 /**
 * phase represents the current phase of PersistentVolumeClaim.
 
@@ -74,15 +83,6 @@ allocatedResources?: Record<string, any>;
 * capacity represents the actual resources of the underlying volume.
 */
 capacity?: Record<string, any>;
-/**
-* conditions is the current Condition of persistent volume claim. If underlying persistent volume is being resized then the Condition will be set to 'Resizing'.
-* @isArray
-*/
-conditions?: Array<{ message?: string; reason?: string; status: string; type: string; lastProbeTime?: Date; lastTransitionTime?: Date }>;
-/**
-* currentVolumeAttributesClassName is the current name of the VolumeAttributesClass the PVC is using. When unset, there is no VolumeAttributeClass applied to this PersistentVolumeClaim This is a beta field and requires enabling VolumeAttributesClass feature (off by default).
-*/
-currentVolumeAttributesClassName?: string;
 }
 
 /**
@@ -92,13 +92,13 @@ currentVolumeAttributesClassName?: string;
 */
 export function createio_k8s_api_core_v1_PersistentVolumeClaimStatus(data?: Partial<io_k8s_api_core_v1_PersistentVolumeClaimStatus>): io_k8s_api_core_v1_PersistentVolumeClaimStatus {
  return {
+   conditions: data?.conditions !== undefined ? data.conditions : [],
+   currentVolumeAttributesClassName: data?.currentVolumeAttributesClassName !== undefined ? data.currentVolumeAttributesClassName : '',
    modifyVolumeStatus: data?.modifyVolumeStatus !== undefined ? data.modifyVolumeStatus : { status: '' },
    phase: data?.phase !== undefined ? data.phase : '',
    accessModes: data?.accessModes !== undefined ? data.accessModes : [],
    allocatedResourceStatuses: data?.allocatedResourceStatuses !== undefined ? data.allocatedResourceStatuses : {},
    allocatedResources: data?.allocatedResources !== undefined ? data.allocatedResources : {},
    capacity: data?.capacity !== undefined ? data.capacity : {},
-   conditions: data?.conditions !== undefined ? data.conditions : [],
-   currentVolumeAttributesClassName: data?.currentVolumeAttributesClassName !== undefined ? data.currentVolumeAttributesClassName : '',
  };
 }

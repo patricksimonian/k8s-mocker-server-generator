@@ -5,6 +5,10 @@
 */
 export interface io_k8s_api_core_v1_FlexVolumeSource {
 /**
+* readOnly is Optional: defaults to false (read/write). ReadOnly here will force the ReadOnly setting in VolumeMounts.
+*/
+readOnly?: boolean;
+/**
 * LocalObjectReference contains enough information to let you locate the referenced object inside the same namespace.
 * @isObject
 */
@@ -22,10 +26,6 @@ fsType?: string;
 * options is Optional: this field holds extra command options if any.
 */
 options?: Record<string, any>;
-/**
-* readOnly is Optional: defaults to false (read/write). ReadOnly here will force the ReadOnly setting in VolumeMounts.
-*/
-readOnly?: boolean;
 }
 
 /**
@@ -35,10 +35,10 @@ readOnly?: boolean;
 */
 export function createio_k8s_api_core_v1_FlexVolumeSource(data?: Partial<io_k8s_api_core_v1_FlexVolumeSource>): io_k8s_api_core_v1_FlexVolumeSource {
  return {
+   readOnly: data?.readOnly !== undefined ? data.readOnly : false,
    secretRef: data?.secretRef !== undefined ? data.secretRef : {},
    driver: data?.driver !== undefined ? data.driver : '',
    fsType: data?.fsType !== undefined ? data.fsType : '',
    options: data?.options !== undefined ? data.options : {},
-   readOnly: data?.readOnly !== undefined ? data.readOnly : false,
  };
 }

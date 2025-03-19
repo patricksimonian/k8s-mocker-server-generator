@@ -5,10 +5,6 @@
 */
 export interface io_k8s_api_authorization_v1_LocalSubjectAccessReview {
 /**
-* APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
-*/
-apiVersion?: string;
-/**
 * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 */
 kind?: string;
@@ -16,18 +12,22 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { creationTimestamp?: Date; deletionTimestamp?: Date; namespace?: string; annotations?: Record<string, any>; deletionGracePeriodSeconds?: number; generation?: number; labels?: Record<string, any>; uid?: string; name?: string; resourceVersion?: string; selfLink?: string; finalizers?: string[]; generateName?: string; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; ownerReferences?: Array<{ uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string }> };
+metadata?: { annotations?: Record<string, any>; creationTimestamp?: Date; deletionGracePeriodSeconds?: number; generateName?: string; generation?: number; namespace?: string; resourceVersion?: string; labels?: Record<string, any>; selfLink?: string; deletionTimestamp?: Date; finalizers?: string[]; managedFields?: Array<{ operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string }>; name?: string; ownerReferences?: Array<{ kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean }>; uid?: string };
 /**
 * SubjectAccessReviewSpec is a description of the access request.  Exactly one of ResourceAuthorizationAttributes and NonResourceAuthorizationAttributes must be set
 * @required
 * @isObject
 */
-spec: { resourceAttributes?: { namespace?: string; resource?: string; verb?: string; version?: string; fieldSelector?: { rawSelector?: string; requirements?: Array<{ key: string; operator: string; values?: string[] }> }; group?: string; labelSelector?: { requirements?: Array<{ key: string; operator: string; values?: string[] }>; rawSelector?: string }; name?: string; subresource?: string }; uid?: string; user?: string; extra?: Record<string, any>; groups?: string[]; nonResourceAttributes?: { path?: string; verb?: string } };
+spec: { extra?: Record<string, any>; groups?: string[]; nonResourceAttributes?: { path?: string; verb?: string }; resourceAttributes?: { group?: string; name?: string; verb?: string; fieldSelector?: { requirements?: Array<{ key: string; operator: string; values?: string[] }>; rawSelector?: string }; labelSelector?: { requirements?: Array<{ operator: string; values?: string[]; key: string }>; rawSelector?: string }; namespace?: string; resource?: string; subresource?: string; version?: string }; uid?: string; user?: string };
 /**
 * SubjectAccessReviewStatus
 * @isObject
 */
-status?: { allowed: boolean; denied?: boolean; evaluationError?: string; reason?: string };
+status?: { evaluationError?: string; reason?: string; allowed: boolean; denied?: boolean };
+/**
+* APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+*/
+apiVersion?: string;
 }
 
 /**
@@ -37,10 +37,10 @@ status?: { allowed: boolean; denied?: boolean; evaluationError?: string; reason?
 */
 export function createio_k8s_api_authorization_v1_LocalSubjectAccessReview(data?: Partial<io_k8s_api_authorization_v1_LocalSubjectAccessReview>): io_k8s_api_authorization_v1_LocalSubjectAccessReview {
  return {
-   apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
    kind: data?.kind !== undefined ? data.kind : '',
    metadata: data?.metadata !== undefined ? data.metadata : {},
    spec: data?.spec !== undefined ? data.spec : {},
    status: data?.status !== undefined ? data.status : { allowed: false },
+   apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
  };
 }

@@ -5,6 +5,16 @@
 */
 export interface io_k8s_api_apps_v1_ControllerRevision {
 /**
+* ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
+* @isObject
+*/
+metadata?: { deletionTimestamp?: Date; generation?: number; namespace?: string; uid?: string; creationTimestamp?: Date; deletionGracePeriodSeconds?: number; labels?: Record<string, any>; resourceVersion?: string; selfLink?: string; annotations?: Record<string, any>; finalizers?: string[]; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; generateName?: string; managedFields?: Array<{ time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string }>; name?: string };
+/**
+* Revision indicates the revision of the state represented by Data.
+* @required
+*/
+revision: number;
+/**
 * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
 */
 apiVersion?: string;
@@ -53,16 +63,6 @@ data?: Record<string, any>;
 * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 */
 kind?: string;
-/**
-* ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
-* @isObject
-*/
-metadata?: { managedFields?: Array<{ fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string }>; selfLink?: string; uid?: string; name?: string; annotations?: Record<string, any>; creationTimestamp?: Date; deletionTimestamp?: Date; generation?: number; resourceVersion?: string; deletionGracePeriodSeconds?: number; generateName?: string; labels?: Record<string, any>; ownerReferences?: Array<{ kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean }>; finalizers?: string[]; namespace?: string };
-/**
-* Revision indicates the revision of the state represented by Data.
-* @required
-*/
-revision: number;
 }
 
 /**
@@ -72,10 +72,10 @@ revision: number;
 */
 export function createio_k8s_api_apps_v1_ControllerRevision(data?: Partial<io_k8s_api_apps_v1_ControllerRevision>): io_k8s_api_apps_v1_ControllerRevision {
  return {
+   metadata: data?.metadata !== undefined ? data.metadata : {},
+   revision: data?.revision !== undefined ? data.revision : 0,
    apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
    data: data?.data !== undefined ? data.data : {},
    kind: data?.kind !== undefined ? data.kind : '',
-   metadata: data?.metadata !== undefined ? data.metadata : {},
-   revision: data?.revision !== undefined ? data.revision : 0,
  };
 }

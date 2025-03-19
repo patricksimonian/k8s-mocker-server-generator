@@ -8,7 +8,7 @@ export interface io_k8s_api_batch_v1_JobTemplateSpec {
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; resourceVersion?: string; selfLink?: string; annotations?: Record<string, any>; creationTimestamp?: Date; labels?: Record<string, any>; namespace?: string; deletionGracePeriodSeconds?: number; deletionTimestamp?: Date; finalizers?: string[]; uid?: string; generateName?: string; name?: string; ownerReferences?: Array<{ blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string; apiVersion: string }>; generation?: number };
+metadata?: { name?: string; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; namespace?: string; deletionTimestamp?: Date; finalizers?: string[]; managedFields?: Array<{ time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string }>; selfLink?: string; deletionGracePeriodSeconds?: number; generateName?: string; generation?: number; resourceVersion?: string; uid?: string; annotations?: Record<string, any>; creationTimestamp?: Date; labels?: Record<string, any> };
 /**
 * JobSpec describes how the job execution will look like.
 * @isObject

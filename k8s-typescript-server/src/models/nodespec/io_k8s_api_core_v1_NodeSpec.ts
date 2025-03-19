@@ -5,6 +5,10 @@
 */
 export interface io_k8s_api_core_v1_NodeSpec {
 /**
+* Deprecated. Not all kubelets will set this field. Remove field after 1.13. see: https://issues.k8s.io/61966
+*/
+externalID?: string;
+/**
 * PodCIDR represents the pod IP range assigned to the node.
 */
 podCIDR?: string;
@@ -21,7 +25,7 @@ providerID?: string;
 * If specified, the node's taints.
 * @isArray
 */
-taints?: Array<{ effect: 'NoExecute' | 'NoSchedule' | 'PreferNoSchedule'; key: string; timeAdded?: Date; value?: string }>;
+taints?: Array<{ timeAdded?: Date; value?: string; effect: 'NoExecute' | 'NoSchedule' | 'PreferNoSchedule'; key: string }>;
 /**
 * Unschedulable controls node schedulability of new pods. By default, node is schedulable. More info: https://kubernetes.io/docs/concepts/nodes/node/#manual-node-administration
 */
@@ -31,10 +35,6 @@ unschedulable?: boolean;
 * @isObject
 */
 configSource?: { configMap?: { kubeletConfigKey: string; name: string; namespace: string; resourceVersion?: string; uid?: string } };
-/**
-* Deprecated. Not all kubelets will set this field. Remove field after 1.13. see: https://issues.k8s.io/61966
-*/
-externalID?: string;
 }
 
 /**
@@ -44,12 +44,12 @@ externalID?: string;
 */
 export function createio_k8s_api_core_v1_NodeSpec(data?: Partial<io_k8s_api_core_v1_NodeSpec>): io_k8s_api_core_v1_NodeSpec {
  return {
+   externalID: data?.externalID !== undefined ? data.externalID : '',
    podCIDR: data?.podCIDR !== undefined ? data.podCIDR : '',
    podCIDRs: data?.podCIDRs !== undefined ? data.podCIDRs : [],
    providerID: data?.providerID !== undefined ? data.providerID : '',
    taints: data?.taints !== undefined ? data.taints : [],
    unschedulable: data?.unschedulable !== undefined ? data.unschedulable : false,
    configSource: data?.configSource !== undefined ? data.configSource : {},
-   externalID: data?.externalID !== undefined ? data.externalID : '',
  };
 }

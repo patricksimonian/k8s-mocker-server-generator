@@ -5,6 +5,16 @@
 */
 export interface io_k8s_api_storage_v1_CSIDriverSpec {
 /**
+* storageCapacity indicates that the CSI volume driver wants pod scheduling to consider the storage capacity that the driver deployment will report by creating CSIStorageCapacity objects with capacity information, if set to true.
+
+The check can be enabled immediately when deploying a driver. In that case, provisioning new volumes with late binding will pause until the driver deployment has published some suitable CSIStorageCapacity object.
+
+Alternatively, the driver can be deployed with the field unset or false and it can be flipped later when storage capacity information has been published.
+
+This field was immutable in Kubernetes <= 1.22 and now is mutable.
+*/
+storageCapacity?: boolean;
+/**
 * tokenRequests indicates the CSI driver needs pods' service account tokens it is mounting volume for to do necessary authentication. Kubelet will pass the tokens in VolumeContext in the CSI NodePublishVolume calls. The CSI driver should parse and validate the following VolumeContext: "csi.storage.k8s.io/serviceAccount.tokens": {
   "<audience>": {
     "token": <token>,
@@ -16,7 +26,7 @@ export interface io_k8s_api_storage_v1_CSIDriverSpec {
 Note: Audience in each TokenRequest should be different and at most one token is empty string. To receive a new token after expiry, RequiresRepublish can be used to trigger NodePublishVolume periodically.
 * @isArray
 */
-tokenRequests?: Array<{ expirationSeconds?: number; audience: string }>;
+tokenRequests?: Array<{ audience: string; expirationSeconds?: number }>;
 /**
 * volumeLifecycleModes defines what kind of volumes this CSI volume driver supports. The default if the list is empty is "Persistent", which is the usage defined by the CSI specification and implemented in Kubernetes via the usual PV/PVC mechanism.
 
@@ -71,16 +81,6 @@ When "false", Kubernetes won't pass any special SELinux mount options to the dri
 Default is "false".
 */
 seLinuxMount?: boolean;
-/**
-* storageCapacity indicates that the CSI volume driver wants pod scheduling to consider the storage capacity that the driver deployment will report by creating CSIStorageCapacity objects with capacity information, if set to true.
-
-The check can be enabled immediately when deploying a driver. In that case, provisioning new volumes with late binding will pause until the driver deployment has published some suitable CSIStorageCapacity object.
-
-Alternatively, the driver can be deployed with the field unset or false and it can be flipped later when storage capacity information has been published.
-
-This field was immutable in Kubernetes <= 1.22 and now is mutable.
-*/
-storageCapacity?: boolean;
 }
 
 /**
@@ -90,6 +90,7 @@ storageCapacity?: boolean;
 */
 export function createio_k8s_api_storage_v1_CSIDriverSpec(data?: Partial<io_k8s_api_storage_v1_CSIDriverSpec>): io_k8s_api_storage_v1_CSIDriverSpec {
  return {
+   storageCapacity: data?.storageCapacity !== undefined ? data.storageCapacity : false,
    tokenRequests: data?.tokenRequests !== undefined ? data.tokenRequests : [],
    volumeLifecycleModes: data?.volumeLifecycleModes !== undefined ? data.volumeLifecycleModes : [],
    attachRequired: data?.attachRequired !== undefined ? data.attachRequired : false,
@@ -97,6 +98,5 @@ export function createio_k8s_api_storage_v1_CSIDriverSpec(data?: Partial<io_k8s_
    podInfoOnMount: data?.podInfoOnMount !== undefined ? data.podInfoOnMount : false,
    requiresRepublish: data?.requiresRepublish !== undefined ? data.requiresRepublish : false,
    seLinuxMount: data?.seLinuxMount !== undefined ? data.seLinuxMount : false,
-   storageCapacity: data?.storageCapacity !== undefined ? data.storageCapacity : false,
  };
 }

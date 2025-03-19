@@ -1,117 +1,59 @@
+// endpoint-route.ts.tmpl
 import express from 'express';
 import { Storage } from '../storage/Storage';
 import { logger } from '../logger';
-import { 
-fetchResourceList, 
-validateResource, 
-applyPatch, 
-handleResourceError,
-createNotFoundResponse
-} from '../utils';
+import { handleResourceError } from '../utils';
 
-
-
-/**
-* Create routes for portforward resources
-* @resourceType portforward
-*/
 export function createportforwardRoutes(storage: Storage): express.Router {
-const router = express.Router();
-
-
-
-/**
- * GET /api/v1/namespaces/:namespace/pods/:name/portforward
- * connect GET requests to portforward of Pod
- */
-router.get('/api/v1/namespaces/:namespace/pods/:name/portforward', async (req, res, next) => {
-  try {
-    await handlegetModel_Api_V1_Namespaces__namespace_Pods__name_Portforward(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * POST /api/v1/namespaces/:namespace/pods/:name/portforward
- * connect POST requests to portforward of Pod
- */
-router.post('/api/v1/namespaces/:namespace/pods/:name/portforward', async (req, res, next) => {
-  try {
-    await handlepostModel_Api_V1_Namespaces__namespace_Pods__name_Portforward(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-
-
-return router;
-}
-
-
-
-/**
-* Handler for GET /api/v1/namespaces/:namespace/pods/:name/portforward
-* connect GET requests to portforward of Pod
-* @resourceType portforward
-*/
-async function handlegetModel_Api_V1_Namespaces__namespace_Pods__name_Portforward(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-
-// Get single resource
-const namespace = req.params.namespace || 'default';
-const name = req.params.name;
-
-logger.info(`Getting portforward ${name} in namespace ${namespace}`);
-
-try {
-  // Get the resource from storage
-  const result = await storage.getResource('portforward', name, namespace);
-  res.json(result);
-} catch (error) {
-  if (error.code === 'NOT_FOUND') {
-    res.status(404).json(createNotFoundResponse('portforward', name, namespace));
-    return;
-  }
-  throw error;
-}
-
-
-}
-
-/**
-* Handler for POST /api/v1/namespaces/:namespace/pods/:name/portforward
-* connect POST requests to portforward of Pod
-* @resourceType portforward
-*/
-async function handlepostModel_Api_V1_Namespaces__namespace_Pods__name_Portforward(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-// Create resource
-const namespace = req.params.namespace || 'default';
-const resource = req.body;
-
-logger.info(`Creating portforward ${resource.metadata?.name} in namespace ${namespace}`);
-
-try {
-  // Validate the resource
-  await validateResource(resource);
+  const router = express.Router();
+  // Create portforward
+  router.post('/api/v1/namespaces/:namespace/pods/:name/portforward', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      logger.info(`Creating portforward in namespace ${namespace}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set namespace in metadata
+      resource.metadata.namespace = namespace;
+      
+      const createdResource = await storage.createOrUpdateResource('portforward', resource);
+      
+      res.status(201).json(createdResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+    
   
-  // Create the resource in storage
-  const result = await storage.createResource(resource, namespace);
-  res.status(201).json(result);
-} catch (error) {
-  handleResourceError(error, res);
+  
+  // List portforward
+  router.get('/api/v1/namespaces/:namespace/pods/:name/portforward', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      logger.info(`Listing portforward in namespace ${namespace}`);
+      
+      const resources = await storage.listResources('portforward', namespace);
+      
+      const response = {
+        kind: 'PortforwardList',
+        apiVersion: 'v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  return router;
 }
-
-}
-
-

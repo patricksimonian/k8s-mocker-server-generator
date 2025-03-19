@@ -16,7 +16,7 @@ readOnly?: boolean;
 * ObjectReference contains enough information to let you inspect or modify the referred object.
 * @isObject
 */
-secretRef?: { fieldPath?: string; kind?: string; name?: string; namespace?: string; resourceVersion?: string; uid?: string; apiVersion?: string };
+secretRef?: { apiVersion?: string; fieldPath?: string; kind?: string; name?: string; namespace?: string; resourceVersion?: string; uid?: string };
 /**
 * volumeName is the human-readable name of the StorageOS volume.  Volume names are only unique within a namespace.
 */

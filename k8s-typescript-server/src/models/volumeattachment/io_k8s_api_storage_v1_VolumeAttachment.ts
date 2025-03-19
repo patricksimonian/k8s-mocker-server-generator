@@ -7,6 +7,17 @@ VolumeAttachment objects are non-namespaced.
 */
 export interface io_k8s_api_storage_v1_VolumeAttachment {
 /**
+* VolumeAttachmentSpec is the specification of a VolumeAttachment request.
+* @required
+* @isObject
+*/
+spec: { attacher: string; nodeName: string; source: { inlineVolumeSpec?: Record<string, any>; persistentVolumeName?: string } };
+/**
+* VolumeAttachmentStatus is the status of a VolumeAttachment request.
+* @isObject
+*/
+status?: { attachmentMetadata?: Record<string, any>; detachError?: { message?: string; time?: Date }; attachError?: { message?: string; time?: Date }; attached: boolean };
+/**
 * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
 */
 apiVersion?: string;
@@ -18,18 +29,7 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { resourceVersion?: string; annotations?: Record<string, any>; creationTimestamp?: Date; generation?: number; labels?: Record<string, any>; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; namespace?: string; ownerReferences?: Array<{ kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean }>; selfLink?: string; uid?: string; deletionTimestamp?: Date; finalizers?: string[]; generateName?: string; deletionGracePeriodSeconds?: number; name?: string };
-/**
-* VolumeAttachmentSpec is the specification of a VolumeAttachment request.
-* @required
-* @isObject
-*/
-spec: { attacher: string; nodeName: string; source: { inlineVolumeSpec?: Record<string, any>; persistentVolumeName?: string } };
-/**
-* VolumeAttachmentStatus is the status of a VolumeAttachment request.
-* @isObject
-*/
-status?: { attached: boolean; attachmentMetadata?: Record<string, any>; detachError?: { message?: string; time?: Date }; attachError?: { message?: string; time?: Date } };
+metadata?: { annotations?: Record<string, any>; generation?: number; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; deletionTimestamp?: Date; name?: string; selfLink?: string; namespace?: string; resourceVersion?: string; uid?: string; creationTimestamp?: Date; deletionGracePeriodSeconds?: number; generateName?: string; finalizers?: string[]; labels?: Record<string, any>; ownerReferences?: Array<{ name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string }> };
 }
 
 /**
@@ -39,10 +39,10 @@ status?: { attached: boolean; attachmentMetadata?: Record<string, any>; detachEr
 */
 export function createio_k8s_api_storage_v1_VolumeAttachment(data?: Partial<io_k8s_api_storage_v1_VolumeAttachment>): io_k8s_api_storage_v1_VolumeAttachment {
  return {
+   spec: data?.spec !== undefined ? data.spec : { attacher: '', nodeName: '', source: {} },
+   status: data?.status !== undefined ? data.status : { attached: false },
    apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
    kind: data?.kind !== undefined ? data.kind : '',
    metadata: data?.metadata !== undefined ? data.metadata : {},
-   spec: data?.spec !== undefined ? data.spec : { attacher: '', nodeName: '', source: {} },
-   status: data?.status !== undefined ? data.status : { attached: false },
  };
 }

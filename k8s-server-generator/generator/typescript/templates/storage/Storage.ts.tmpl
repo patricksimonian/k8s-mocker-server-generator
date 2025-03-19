@@ -65,7 +65,7 @@ export interface Storage {
   * @param name Name of the resource
   * @param namespace Namespace of the resource
   */
- deleteResource(kind: string, name: string, namespace?: string): Promise<void>;
+ deleteResource(kind: string, name: string, namespace?: string): Promise<boolean>;
  
  /**
   * Watch resources of a specific kind in a namespace

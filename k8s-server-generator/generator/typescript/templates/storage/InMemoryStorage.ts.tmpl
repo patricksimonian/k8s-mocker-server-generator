@@ -229,7 +229,7 @@ export class InMemoryStorage implements Storage {
  /**
   * Delete a resource
   */
- async deleteResource(kind: string, name: string, namespace: string = 'default'): Promise<void> {
+ async deleteResource(kind: string, name: string, namespace: string = 'default'): Promise<boolean> {
    const collection = this.getOrCreateCollection(namespace, kind);
    
    // Check if resource exists
@@ -245,6 +245,8 @@ export class InMemoryStorage implements Storage {
    
    // Emit watch event
    this.emitWatchEvent(WatchEventType.DELETED, resource, namespace);
+
+   return true;
  }
  
  /**

@@ -5,16 +5,16 @@
 */
 export interface io_k8s_api_autoscaling_v2_ResourceMetricSource {
 /**
-* name is the name of the resource in question.
-* @required
-*/
-name: string;
-/**
 * MetricTarget defines the target value, average value, or average utilization of a specific metric
 * @required
 * @isObject
 */
-target: { averageValue?: string; type: string; value?: string; averageUtilization?: number };
+target: { averageUtilization?: number; averageValue?: string; type: string; value?: string };
+/**
+* name is the name of the resource in question.
+* @required
+*/
+name: string;
 }
 
 /**
@@ -24,7 +24,7 @@ target: { averageValue?: string; type: string; value?: string; averageUtilizatio
 */
 export function createio_k8s_api_autoscaling_v2_ResourceMetricSource(data?: Partial<io_k8s_api_autoscaling_v2_ResourceMetricSource>): io_k8s_api_autoscaling_v2_ResourceMetricSource {
  return {
-   name: data?.name !== undefined ? data.name : '',
    target: data?.target !== undefined ? data.target : { type: '' },
+   name: data?.name !== undefined ? data.name : '',
  };
 }

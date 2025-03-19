@@ -1,669 +1,261 @@
+// endpoint-route.ts.tmpl
 import express from 'express';
 import { Storage } from '../storage/Storage';
 import { logger } from '../logger';
-import { 
-fetchResourceList, 
-validateResource, 
-applyPatch, 
-handleResourceError,
-createNotFoundResponse
-} from '../utils';
+import { handleResourceError } from '../utils';
 
-
-
-/**
-* Create routes for daemonset resources
-* @resourceType daemonset
-*/
 export function createdaemonsetRoutes(storage: Storage): express.Router {
-const router = express.Router();
-
-
-
-/**
- * GET /apis/apps/v1/namespaces/:namespace/daemonsets
- * list or watch objects of kind DaemonSet
- */
-router.get('/apis/apps/v1/namespaces/:namespace/daemonsets', async (req, res, next) => {
-  try {
-    await handlegetModel_Apis_Apps_V1_Namespaces__namespace_Daemonsets(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * POST /apis/apps/v1/namespaces/:namespace/daemonsets
- * create a DaemonSet
- */
-router.post('/apis/apps/v1/namespaces/:namespace/daemonsets', async (req, res, next) => {
-  try {
-    await handlepostModel_Apis_Apps_V1_Namespaces__namespace_Daemonsets(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * DELETE /apis/apps/v1/namespaces/:namespace/daemonsets
- * delete collection of DaemonSet
- */
-router.delete('/apis/apps/v1/namespaces/:namespace/daemonsets', async (req, res, next) => {
-  try {
-    await handledeleteModel_Apis_Apps_V1_Namespaces__namespace_Daemonsets(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * GET /apis/apps/v1/daemonsets
- * list or watch objects of kind DaemonSet
- */
-router.get('/apis/apps/v1/daemonsets', async (req, res, next) => {
-  try {
-    await handlegetModel_Apis_Apps_V1_Daemonsets(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * GET /apis/apps/v1/watch/namespaces/:namespace/daemonsets/:name
- * watch changes to an object of kind DaemonSet. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
- */
-router.get('/apis/apps/v1/watch/namespaces/:namespace/daemonsets/:name', async (req, res, next) => {
-  try {
-    await handlegetModel_Apis_Apps_V1_Watch_Namespaces__namespace_Daemonsets__name(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * GET /apis/apps/v1/watch/daemonsets
- * watch individual changes to a list of DaemonSet. deprecated: use the 'watch' parameter with a list operation instead.
- */
-router.get('/apis/apps/v1/watch/daemonsets', async (req, res, next) => {
-  try {
-    await handlegetModel_Apis_Apps_V1_Watch_Daemonsets(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * GET /apis/apps/v1/namespaces/:namespace/daemonsets/:name
- * read the specified DaemonSet
- */
-router.get('/apis/apps/v1/namespaces/:namespace/daemonsets/:name', async (req, res, next) => {
-  try {
-    await handlegetModel_Apis_Apps_V1_Namespaces__namespace_Daemonsets__name(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * PUT /apis/apps/v1/namespaces/:namespace/daemonsets/:name
- * replace the specified DaemonSet
- */
-router.put('/apis/apps/v1/namespaces/:namespace/daemonsets/:name', async (req, res, next) => {
-  try {
-    await handleputModel_Apis_Apps_V1_Namespaces__namespace_Daemonsets__name(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * DELETE /apis/apps/v1/namespaces/:namespace/daemonsets/:name
- * delete a DaemonSet
- */
-router.delete('/apis/apps/v1/namespaces/:namespace/daemonsets/:name', async (req, res, next) => {
-  try {
-    await handledeleteModel_Apis_Apps_V1_Namespaces__namespace_Daemonsets__name(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * PATCH /apis/apps/v1/namespaces/:namespace/daemonsets/:name
- * partially update the specified DaemonSet
- */
-router.patch('/apis/apps/v1/namespaces/:namespace/daemonsets/:name', async (req, res, next) => {
-  try {
-    await handlepatchModel_Apis_Apps_V1_Namespaces__namespace_Daemonsets__name(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * GET /apis/apps/v1/watch/namespaces/:namespace/daemonsets
- * watch individual changes to a list of DaemonSet. deprecated: use the 'watch' parameter with a list operation instead.
- */
-router.get('/apis/apps/v1/watch/namespaces/:namespace/daemonsets', async (req, res, next) => {
-  try {
-    await handlegetModel_Apis_Apps_V1_Watch_Namespaces__namespace_Daemonsets(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-
-
-return router;
-}
-
-
-
-/**
-* Handler for GET /apis/apps/v1/namespaces/:namespace/daemonsets
-* list or watch objects of kind DaemonSet
-* @resourceType daemonset
-*/
-async function handlegetModel_Apis_Apps_V1_Namespaces__namespace_Daemonsets(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-
-// Get single resource
-const namespace = req.params.namespace || 'default';
-const name = req.params.name;
-
-logger.info(`Getting daemonset ${name} in namespace ${namespace}`);
-
-try {
-  // Get the resource from storage
-  const result = await storage.getResource('daemonset', name, namespace);
-  res.json(result);
-} catch (error) {
-  if (error.code === 'NOT_FOUND') {
-    res.status(404).json(createNotFoundResponse('daemonset', name, namespace));
-    return;
-  }
-  throw error;
-}
-
-
-}
-
-/**
-* Handler for POST /apis/apps/v1/namespaces/:namespace/daemonsets
-* create a DaemonSet
-* @resourceType daemonset
-*/
-async function handlepostModel_Apis_Apps_V1_Namespaces__namespace_Daemonsets(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-// Create resource
-const namespace = req.params.namespace || 'default';
-const resource = req.body;
-
-logger.info(`Creating daemonset ${resource.metadata?.name} in namespace ${namespace}`);
-
-try {
-  // Validate the resource
-  await validateResource(resource);
-  
-  // Create the resource in storage
-  const result = await storage.createResource(resource, namespace);
-  res.status(201).json(result);
-} catch (error) {
-  handleResourceError(error, res);
-}
-
-}
-
-/**
-* Handler for DELETE /apis/apps/v1/namespaces/:namespace/daemonsets
-* delete collection of DaemonSet
-* @resourceType daemonset
-*/
-async function handledeleteModel_Apis_Apps_V1_Namespaces__namespace_Daemonsets(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-// Delete resource
-const namespace = req.params.namespace || 'default';
-const name = req.params.name;
-
-logger.info(`Deleting daemonset ${name} in namespace ${namespace}`);
-
-try {
-  // Delete the resource from storage
-  await storage.deleteResource('daemonset', name, namespace);
-  
-  // Return success response
-  res.json({
-    kind: 'Status',
-    apiVersion: 'v1',
-    metadata: {},
-    status: 'Success',
-    message: `daemonset "${name}" deleted`
-  });
-} catch (error) {
-  if (error.code === 'NOT_FOUND') {
-    res.status(404).json(createNotFoundResponse('daemonset', name, namespace));
-    return;
-  }
-  throw error;
-}
-
-}
-
-/**
-* Handler for GET /apis/apps/v1/daemonsets
-* list or watch objects of kind DaemonSet
-* @resourceType daemonset
-*/
-async function handlegetModel_Apis_Apps_V1_Daemonsets(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-
-// List resources
-const namespace = req.params.namespace || 'default';
-const { limit, continue: continueToken, labelSelector, fieldSelector, watch } = req.query;
-
-logger.info(`Listing daemonsets in namespace ${namespace}`);
-
-// Check if this is a watch request
-if (watch === 'true' || watch === '1') {
-  // Handle watch request
-  const resourceVersion = req.query.resourceVersion as string;
-  
-  // Set headers for streaming response
-  res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Transfer-Encoding', 'chunked');
-  res.setHeader('Connection', 'keep-alive');
-  res.setHeader('Cache-Control', 'no-cache, no-transform');
-  
-  // Set up error handler
-  const onError = (err: any) => {
-    logger.error(`Watch error for daemonset:`, err);
+  const router = express.Router();
     
-    // Send error event
-    const errorEvent = {
-      type: 'ERROR',
-      object: {
+  
+  
+  // List daemonset
+  router.get('/apis/apps/v1/daemonsets', async (req, res, next) => {
+    try {
+      logger.info(`Listing daemonset`);
+      
+      const resources = await storage.listResources('daemonset');
+      
+      const response = {
+        kind: 'DaemonsetList',
+        apiVersion: 'apps/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+    
+  
+  
+  // List daemonset
+  router.get('/apis/apps/v1/watch/daemonsets', async (req, res, next) => {
+    try {
+      logger.info(`Listing daemonset`);
+      
+      const resources = await storage.listResources('daemonset');
+      
+      const response = {
+        kind: 'DaemonsetList',
+        apiVersion: 'apps/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+    
+  
+  
+  // Get specific daemonset
+  router.get('/apis/apps/v1/watch/namespaces/:namespace/daemonsets/:name', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Getting daemonset ${name} in namespace ${namespace}`);
+      
+      const resource = await storage.getResource('daemonset', name, namespace);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`daemonset ${name} not found in namespace ${namespace}`), res);
+      }
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+    
+  
+  
+  // List daemonset
+  router.get('/apis/apps/v1/namespaces/:namespace/daemonsets', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      logger.info(`Listing daemonset in namespace ${namespace}`);
+      
+      const resources = await storage.listResources('daemonset', namespace);
+      
+      const response = {
+        kind: 'DaemonsetList',
+        apiVersion: 'apps/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+  // Create daemonset
+  router.post('/apis/apps/v1/namespaces/:namespace/daemonsets', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      logger.info(`Creating daemonset in namespace ${namespace}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set namespace in metadata
+      resource.metadata.namespace = namespace;
+      
+      const createdResource = await storage.createOrUpdateResource('daemonset', resource);
+      
+      res.status(201).json(createdResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+  // Delete daemonset
+  router.delete('/apis/apps/v1/namespaces/:namespace/daemonsets', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Deleting daemonset ${name} in namespace ${namespace}`);
+      try {
+
+        const deleted = await storage.deleteResource('daemonset', name, namespace);
+        
+        if (!deleted) {
+          return handleResourceError(new Error(`daemonset ${name} not found in namespace ${namespace}`), res);
+        }
+      } catch(e) {
+          return handleResourceError(new Error(`daemonset ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message)}`), res);
+      }
+      
+      res.status(200).json({
         kind: 'Status',
         apiVersion: 'v1',
         metadata: {},
-        status: 'Failure',
-        message: err.message || 'Watch error',
-        reason: 'InternalError',
-        code: 500
-      }
-    };
-    
-    res.write(JSON.stringify(errorEvent) + '\n');
-    res.end();
-  };
-  
-  // Set up close handler
-  req.on('close', () => {
-    if (stopWatching) {
-      stopWatching();
+        status: 'Success',
+        details: {
+          name: name,
+          kind: 'daemonset'
+        }
+      });
+    } catch (error) {
+      next(error);
     }
   });
-  
-  // Start watching
-  let stopWatching: (() => void) | null = null;
-  try {
-    stopWatching = await storage.watchResources(
-      'daemonset',
-      namespace,
-      labelSelector as string,
-      resourceVersion,
-      (type, resource) => {
-        // Send watch event
-        const event = {
-          type,
-          object: resource
-        };
-        res.write(JSON.stringify(event) + '\n');
-      }
-    );
-  } catch (err) {
-    onError(err);
-  }
-  
-  return;
-}
-
-// Regular list request
-// Fetch resources from storage
-const result = await fetchResourceList(
-  storage, 
-  'daemonset',
-  namespace, 
-  {
-    limit: limit ? parseInt(limit as string) : undefined,
-    continueToken: continueToken as string,
-    labelSelector: labelSelector as string,
-    fieldSelector: fieldSelector as string
-  }
-);
-
-res.json(result);
-
-
-}
-
-/**
-* Handler for GET /apis/apps/v1/watch/namespaces/:namespace/daemonsets/:name
-* watch changes to an object of kind DaemonSet. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
-* @resourceType daemonset
-*/
-async function handlegetModel_Apis_Apps_V1_Watch_Namespaces__namespace_Daemonsets__name(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-
-// Get single resource
-const namespace = req.params.namespace || 'default';
-const name = req.params.name;
-
-logger.info(`Getting daemonset ${name} in namespace ${namespace}`);
-
-try {
-  // Get the resource from storage
-  const result = await storage.getResource('daemonset', name, namespace);
-  res.json(result);
-} catch (error) {
-  if (error.code === 'NOT_FOUND') {
-    res.status(404).json(createNotFoundResponse('daemonset', name, namespace));
-    return;
-  }
-  throw error;
-}
-
-
-}
-
-/**
-* Handler for GET /apis/apps/v1/watch/daemonsets
-* watch individual changes to a list of DaemonSet. deprecated: use the 'watch' parameter with a list operation instead.
-* @resourceType daemonset
-*/
-async function handlegetModel_Apis_Apps_V1_Watch_Daemonsets(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-
-// List resources
-const namespace = req.params.namespace || 'default';
-const { limit, continue: continueToken, labelSelector, fieldSelector, watch } = req.query;
-
-logger.info(`Listing daemonsets in namespace ${namespace}`);
-
-// Check if this is a watch request
-if (watch === 'true' || watch === '1') {
-  // Handle watch request
-  const resourceVersion = req.query.resourceVersion as string;
-  
-  // Set headers for streaming response
-  res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Transfer-Encoding', 'chunked');
-  res.setHeader('Connection', 'keep-alive');
-  res.setHeader('Cache-Control', 'no-cache, no-transform');
-  
-  // Set up error handler
-  const onError = (err: any) => {
-    logger.error(`Watch error for daemonset:`, err);
     
-    // Send error event
-    const errorEvent = {
-      type: 'ERROR',
-      object: {
+  
+  
+  // List daemonset
+  router.get('/apis/apps/v1/watch/namespaces/:namespace/daemonsets', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      logger.info(`Listing daemonset in namespace ${namespace}`);
+      
+      const resources = await storage.listResources('daemonset', namespace);
+      
+      const response = {
+        kind: 'DaemonsetList',
+        apiVersion: 'apps/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+  // Update daemonset
+  router.put('/apis/apps/v1/namespaces/:namespace/daemonsets/:name', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Updating daemonset ${name} in namespace ${namespace}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set name and namespace in metadata
+      resource.metadata.name = name;
+      resource.metadata.namespace = namespace;
+      
+      const updatedResource = await storage.createOrUpdateResource('daemonset', resource);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+  // Delete daemonset
+  router.delete('/apis/apps/v1/namespaces/:namespace/daemonsets/:name', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Deleting daemonset ${name} in namespace ${namespace}`);
+      try {
+
+        const deleted = await storage.deleteResource('daemonset', name, namespace);
+        
+        if (!deleted) {
+          return handleResourceError(new Error(`daemonset ${name} not found in namespace ${namespace}`), res);
+        }
+      } catch(e) {
+          return handleResourceError(new Error(`daemonset ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message)}`), res);
+      }
+      
+      res.status(200).json({
         kind: 'Status',
         apiVersion: 'v1',
         metadata: {},
-        status: 'Failure',
-        message: err.message || 'Watch error',
-        reason: 'InternalError',
-        code: 500
-      }
-    };
-    
-    res.write(JSON.stringify(errorEvent) + '\n');
-    res.end();
-  };
-  
-  // Set up close handler
-  req.on('close', () => {
-    if (stopWatching) {
-      stopWatching();
+        status: 'Success',
+        details: {
+          name: name,
+          kind: 'daemonset'
+        }
+      });
+    } catch (error) {
+      next(error);
     }
   });
+    
   
-  // Start watching
-  let stopWatching: (() => void) | null = null;
-  try {
-    stopWatching = await storage.watchResources(
-      'daemonset',
-      namespace,
-      labelSelector as string,
-      resourceVersion,
-      (type, resource) => {
-        // Send watch event
-        const event = {
-          type,
-          object: resource
-        };
-        res.write(JSON.stringify(event) + '\n');
+  
+  // Get specific daemonset
+  router.get('/apis/apps/v1/namespaces/:namespace/daemonsets/:name', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Getting daemonset ${name} in namespace ${namespace}`);
+      
+      const resource = await storage.getResource('daemonset', name, namespace);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`daemonset ${name} not found in namespace ${namespace}`), res);
       }
-    );
-  } catch (err) {
-    onError(err);
-  }
-  
-  return;
-}
-
-// Regular list request
-// Fetch resources from storage
-const result = await fetchResourceList(
-  storage, 
-  'daemonset',
-  namespace, 
-  {
-    limit: limit ? parseInt(limit as string) : undefined,
-    continueToken: continueToken as string,
-    labelSelector: labelSelector as string,
-    fieldSelector: fieldSelector as string
-  }
-);
-
-res.json(result);
-
-
-}
-
-/**
-* Handler for GET /apis/apps/v1/namespaces/:namespace/daemonsets/:name
-* read the specified DaemonSet
-* @resourceType daemonset
-*/
-async function handlegetModel_Apis_Apps_V1_Namespaces__namespace_Daemonsets__name(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-
-// Get single resource
-const namespace = req.params.namespace || 'default';
-const name = req.params.name;
-
-logger.info(`Getting daemonset ${name} in namespace ${namespace}`);
-
-try {
-  // Get the resource from storage
-  const result = await storage.getResource('daemonset', name, namespace);
-  res.json(result);
-} catch (error) {
-  if (error.code === 'NOT_FOUND') {
-    res.status(404).json(createNotFoundResponse('daemonset', name, namespace));
-    return;
-  }
-  throw error;
-}
-
-
-}
-
-/**
-* Handler for PUT /apis/apps/v1/namespaces/:namespace/daemonsets/:name
-* replace the specified DaemonSet
-* @resourceType daemonset
-*/
-async function handleputModel_Apis_Apps_V1_Namespaces__namespace_Daemonsets__name(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-// Update resource
-const namespace = req.params.namespace || 'default';
-const name = req.params.name;
-const resource = req.body;
-
-logger.info(`Updating daemonset ${name} in namespace ${namespace}`);
-
-try {
-  // Validate the resource
-  await validateResource(resource);
-  
-  // Update the resource in storage
-  const result = await storage.updateResource('daemonset', name, resource, namespace);
-  res.json(result);
-} catch (error) {
-  handleResourceError(error, res);
-}
-
-}
-
-/**
-* Handler for DELETE /apis/apps/v1/namespaces/:namespace/daemonsets/:name
-* delete a DaemonSet
-* @resourceType daemonset
-*/
-async function handledeleteModel_Apis_Apps_V1_Namespaces__namespace_Daemonsets__name(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-// Delete resource
-const namespace = req.params.namespace || 'default';
-const name = req.params.name;
-
-logger.info(`Deleting daemonset ${name} in namespace ${namespace}`);
-
-try {
-  // Delete the resource from storage
-  await storage.deleteResource('daemonset', name, namespace);
-  
-  // Return success response
-  res.json({
-    kind: 'Status',
-    apiVersion: 'v1',
-    metadata: {},
-    status: 'Success',
-    message: `daemonset "${name}" deleted`
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
   });
-} catch (error) {
-  if (error.code === 'NOT_FOUND') {
-    res.status(404).json(createNotFoundResponse('daemonset', name, namespace));
-    return;
-  }
-  throw error;
+
+  return router;
 }
-
-}
-
-/**
-* Handler for PATCH /apis/apps/v1/namespaces/:namespace/daemonsets/:name
-* partially update the specified DaemonSet
-* @resourceType daemonset
-*/
-async function handlepatchModel_Apis_Apps_V1_Namespaces__namespace_Daemonsets__name(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-// Patch resource
-const namespace = req.params.namespace || 'default';
-const name = req.params.name;
-const patchData = req.body;
-
-logger.info(`Patching daemonset ${name} in namespace ${namespace}`);
-
-try {
-  // Apply patch to the resource
-  const result = await applyPatch(
-    storage, 
-    'daemonset',
-    namespace, 
-    name, 
-    patchData
-  );
-  res.json(result);
-} catch (error) {
-  handleResourceError(error, res);
-}
-
-}
-
-/**
-* Handler for GET /apis/apps/v1/watch/namespaces/:namespace/daemonsets
-* watch individual changes to a list of DaemonSet. deprecated: use the 'watch' parameter with a list operation instead.
-* @resourceType daemonset
-*/
-async function handlegetModel_Apis_Apps_V1_Watch_Namespaces__namespace_Daemonsets(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-
-// Get single resource
-const namespace = req.params.namespace || 'default';
-const name = req.params.name;
-
-logger.info(`Getting daemonset ${name} in namespace ${namespace}`);
-
-try {
-  // Get the resource from storage
-  const result = await storage.getResource('daemonset', name, namespace);
-  res.json(result);
-} catch (error) {
-  if (error.code === 'NOT_FOUND') {
-    res.status(404).json(createNotFoundResponse('daemonset', name, namespace));
-    return;
-  }
-  throw error;
-}
-
-
-}
-
-

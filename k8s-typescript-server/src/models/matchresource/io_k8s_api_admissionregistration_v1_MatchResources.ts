@@ -5,11 +5,6 @@
 */
 export interface io_k8s_api_admissionregistration_v1_MatchResources {
 /**
-* ResourceRules describes what operations on what resources/subresources the ValidatingAdmissionPolicy matches. The policy cares about an operation if it matches _any_ Rule.
-* @isArray
-*/
-resourceRules?: Array<{ apiGroups?: string[]; apiVersions?: string[]; operations?: '*' | 'CONNECT' | 'CREATE' | 'DELETE' | 'UPDATE'[]; resourceNames?: string[]; resources?: string[]; scope?: string }>;
-/**
 * ExcludeResourceRules describes what operations on what resources/subresources the ValidatingAdmissionPolicy should not care about. The exclude rules take precedence over include rules (if a resource matches both, it is excluded)
 * @isArray
 */
@@ -38,6 +33,11 @@ namespaceSelector?: { matchExpressions?: Array<{ key: string; operator: string; 
 * @isObject
 */
 objectSelector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> };
+/**
+* ResourceRules describes what operations on what resources/subresources the ValidatingAdmissionPolicy matches. The policy cares about an operation if it matches _any_ Rule.
+* @isArray
+*/
+resourceRules?: Array<{ apiGroups?: string[]; apiVersions?: string[]; operations?: '*' | 'CONNECT' | 'CREATE' | 'DELETE' | 'UPDATE'[]; resourceNames?: string[]; resources?: string[]; scope?: string }>;
 }
 
 /**
@@ -47,10 +47,10 @@ objectSelector?: { matchExpressions?: Array<{ key: string; operator: string; val
 */
 export function createio_k8s_api_admissionregistration_v1_MatchResources(data?: Partial<io_k8s_api_admissionregistration_v1_MatchResources>): io_k8s_api_admissionregistration_v1_MatchResources {
  return {
-   resourceRules: data?.resourceRules !== undefined ? data.resourceRules : [],
    excludeResourceRules: data?.excludeResourceRules !== undefined ? data.excludeResourceRules : [],
    matchPolicy: data?.matchPolicy !== undefined ? data.matchPolicy : '',
    namespaceSelector: data?.namespaceSelector !== undefined ? data.namespaceSelector : {},
    objectSelector: data?.objectSelector !== undefined ? data.objectSelector : {},
+   resourceRules: data?.resourceRules !== undefined ? data.resourceRules : [],
  };
 }

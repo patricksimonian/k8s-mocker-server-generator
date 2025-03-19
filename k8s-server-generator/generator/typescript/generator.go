@@ -653,6 +653,145 @@ func (g *Generator) generateModels() error {
 	return nil
 }
 
+// preprocessIRForDiscovery extracts API groups, versions, and resources from the IR
+// for use in the discovery routes template
+func preprocessIRForDiscovery(ir *ir.IR) map[string]interface{} {
+	discoveryData := make(map[string]interface{})
+
+	// Extract API groups and versions
+	apiGroups := make(map[string][]string)
+	coreResources := make(map[string]map[string]interface{})
+	groupVersionResources := make(map[string]map[string]map[string]interface{})
+
+	// Process all endpoints
+	for _, endpoint := range ir.Endpoints {
+		path := endpoint.Path
+
+		// Skip watch endpoints - they're not separate resources
+		if strings.Contains(path, "/watch/") {
+			continue
+		}
+
+		// Extract API groups and versions from /apis/ paths
+		if strings.Contains(path, "/apis/") {
+			parts := strings.Split(path, "/")
+			if len(parts) > 4 {
+				group := parts[2]
+				version := parts[3]
+
+				// Skip if this is a watch endpoint
+				if parts[4] == "watch" {
+					continue
+				}
+
+				// Get the resource type - it's at different positions depending on whether it's namespaced
+				var resourceType string
+
+				if len(parts) > 5 && parts[4] == "namespaces" {
+					// Namespaced resource: /apis/{group}/{version}/namespaces/{namespace}/{resource}
+					if len(parts) > 6 {
+						resourceType = parts[6]
+					}
+				} else {
+					// Non-namespaced resource: /apis/{group}/{version}/{resource}
+					resourceType = parts[4]
+				}
+
+				if resourceType != "" {
+					// Add group and version
+					if _, ok := apiGroups[group]; !ok {
+						apiGroups[group] = []string{version}
+					} else if !contains(apiGroups[group], version) {
+						apiGroups[group] = append(apiGroups[group], version)
+					}
+
+					// Add resource to group/version
+					groupVersion := fmt.Sprintf("%s/%s", group, version)
+
+					if _, ok := groupVersionResources[groupVersion]; !ok {
+						groupVersionResources[groupVersion] = make(map[string]map[string]interface{})
+					}
+
+					if _, ok := groupVersionResources[groupVersion][resourceType]; !ok {
+						groupVersionResources[groupVersion][resourceType] = map[string]interface{}{
+							"name":       resourceType,
+							"namespaced": endpoint.Namespaced, // Use the Namespaced property from the IR
+						}
+					}
+				}
+			}
+		}
+
+		// Extract core resources from /api/v1 paths
+		if strings.Contains(path, "/api/v1") {
+			parts := strings.Split(path, "/")
+
+			// Skip if this is a watch endpoint
+			if len(parts) > 3 && parts[3] == "watch" {
+				continue
+			}
+
+			var resourceType string
+
+			if len(parts) > 3 && parts[3] == "namespaces" {
+				// Namespaced resource: /api/v1/namespaces/{namespace}/{resource}
+				if len(parts) > 5 {
+					resourceType = parts[5]
+				}
+			} else if len(parts) > 3 {
+				// Non-namespaced resource: /api/v1/{resource}
+				resourceType = parts[3]
+			}
+
+			if resourceType != "" && resourceType != "namespaces" {
+				coreResources[resourceType] = map[string]interface{}{
+					"name":       resourceType,
+					"namespaced": endpoint.Namespaced, // Use the Namespaced property from the IR
+				}
+			}
+		}
+	}
+
+	// Add namespaces as a special case
+	coreResources["namespaces"] = map[string]interface{}{
+		"name":       "namespaces",
+		"namespaced": false, // Namespaces are never namespaced
+	}
+
+	// Convert core resources to array
+	coreResourcesList := make([]map[string]interface{}, 0, len(coreResources))
+	for _, resource := range coreResources {
+		coreResourcesList = append(coreResourcesList, resource)
+	}
+
+	// Convert group version resources to a more usable format
+	groupVersionResourcesList := make(map[string][]map[string]interface{})
+	for groupVersion, resources := range groupVersionResources {
+		resourcesList := make([]map[string]interface{}, 0, len(resources))
+		for _, resource := range resources {
+			resourcesList = append(resourcesList, resource)
+		}
+		groupVersionResourcesList[groupVersion] = resourcesList
+	}
+
+	// Build the discovery data structure
+	discoveryData["apiGroups"] = apiGroups
+	discoveryData["coreResources"] = coreResourcesList
+	discoveryData["groupVersionResources"] = groupVersionResourcesList
+
+	return discoveryData
+}
+
+// Helper function to check if a string is in a slice
+func contains(slice []string, item string) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
+}
+
 // enhanceModel processes a model to add additional metadata for code generation
 func (g *Generator) enhanceModel(originalName, sanitizedName string, model ir.Model) EnhancedModel {
 	enhanced := EnhancedModel{
@@ -1123,14 +1262,17 @@ func (g *Generator) generateDiscoveryRoutes() error {
 			discoveryEndpoints = append(discoveryEndpoints, endpoint)
 		}
 	}
+	discoveryData := preprocessIRForDiscovery(&g.IR)
 
 	// Execute template
 	data := struct {
 		IR                 ir.IR
 		DiscoveryEndpoints []ir.Endpoint
+		DiscoveryData      map[string]interface{}
 	}{
 		IR:                 g.IR,
 		DiscoveryEndpoints: discoveryEndpoints,
+		DiscoveryData:      discoveryData,
 	}
 
 	if err := tmpl.Execute(file, data); err != nil {
@@ -1156,6 +1298,9 @@ func (g *Generator) generateEndpointRoutes() error {
 
 	// Process endpoints and group by resource type
 	for _, endpoint := range g.IR.Endpoints {
+		if endpoint.ResourceType == "node" {
+			fmt.Printf("nodes being processed method: %v, endpoint: %v, namespaced: %v \n", endpoint.Method, endpoint.Path, endpoint.Namespaced)
+		}
 		// Skip discovery endpoints as they are handled separately
 		if endpoint.ResourceType == "discovery" {
 			continue

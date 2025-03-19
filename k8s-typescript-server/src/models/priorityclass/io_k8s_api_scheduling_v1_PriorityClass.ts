@@ -5,6 +5,14 @@
 */
 export interface io_k8s_api_scheduling_v1_PriorityClass {
 /**
+* preemptionPolicy is the Policy for preempting pods with lower priority. One of Never, PreemptLowerPriority. Defaults to PreemptLowerPriority if unset.
+
+Possible enum values:
+ - `"Never"` means that pod never preempts other pods with lower priority.
+ - `"PreemptLowerPriority"` means that pod can preempt other pods with lower priority.
+*/
+preemptionPolicy?: 'Never' | 'PreemptLowerPriority';
+/**
 * value represents the integer value of this priority class. This is the actual priority that pods receive when they have the name of this class in their pod spec.
 * @required
 */
@@ -29,15 +37,7 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { generation?: number; labels?: Record<string, any>; ownerReferences?: Array<{ blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string; apiVersion: string }>; resourceVersion?: string; selfLink?: string; generateName?: string; finalizers?: string[]; uid?: string; creationTimestamp?: Date; deletionTimestamp?: Date; managedFields?: Array<{ time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string }>; name?: string; namespace?: string; annotations?: Record<string, any>; deletionGracePeriodSeconds?: number };
-/**
-* preemptionPolicy is the Policy for preempting pods with lower priority. One of Never, PreemptLowerPriority. Defaults to PreemptLowerPriority if unset.
-
-Possible enum values:
- - `"Never"` means that pod never preempts other pods with lower priority.
- - `"PreemptLowerPriority"` means that pod can preempt other pods with lower priority.
-*/
-preemptionPolicy?: 'Never' | 'PreemptLowerPriority';
+metadata?: { name?: string; creationTimestamp?: Date; generation?: number; generateName?: string; labels?: Record<string, any>; namespace?: string; deletionGracePeriodSeconds?: number; finalizers?: string[]; managedFields?: Array<{ manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any> }>; ownerReferences?: Array<{ uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string }>; resourceVersion?: string; selfLink?: string; uid?: string; annotations?: Record<string, any>; deletionTimestamp?: Date };
 }
 
 /**
@@ -47,12 +47,12 @@ preemptionPolicy?: 'Never' | 'PreemptLowerPriority';
 */
 export function createio_k8s_api_scheduling_v1_PriorityClass(data?: Partial<io_k8s_api_scheduling_v1_PriorityClass>): io_k8s_api_scheduling_v1_PriorityClass {
  return {
+   preemptionPolicy: data?.preemptionPolicy !== undefined ? data.preemptionPolicy : '',
    value: data?.value !== undefined ? data.value : 0,
    apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
    description: data?.description !== undefined ? data.description : '',
    globalDefault: data?.globalDefault !== undefined ? data.globalDefault : false,
    kind: data?.kind !== undefined ? data.kind : '',
    metadata: data?.metadata !== undefined ? data.metadata : {},
-   preemptionPolicy: data?.preemptionPolicy !== undefined ? data.preemptionPolicy : '',
  };
 }

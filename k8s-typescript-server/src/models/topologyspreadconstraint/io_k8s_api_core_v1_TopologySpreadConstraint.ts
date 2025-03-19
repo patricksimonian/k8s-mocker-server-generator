@@ -5,21 +5,6 @@
 */
 export interface io_k8s_api_core_v1_TopologySpreadConstraint {
 /**
-* NodeTaintsPolicy indicates how we will treat node taints when calculating pod topology spread skew. Options are: - Honor: nodes without taints, along with tainted nodes for which the incoming pod has a toleration, are included. - Ignore: node taints are ignored. All nodes are included.
-
-If this value is nil, the behavior is equivalent to the Ignore policy. This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
-
-Possible enum values:
- - `"Honor"` means use this scheduling directive when calculating pod topology spread skew.
- - `"Ignore"` means ignore this scheduling directive when calculating pod topology spread skew.
-*/
-nodeTaintsPolicy?: 'Honor' | 'Ignore';
-/**
-* TopologyKey is the key of node labels. Nodes that have a label with this key and identical values are considered to be in the same topology. We consider each <key, value> as a "bucket", and try to put balanced number of pods into each bucket. We define a domain as a particular instance of a topology. Also, we define an eligible domain as a domain whose nodes meet the requirements of nodeAffinityPolicy and nodeTaintsPolicy. e.g. If TopologyKey is "kubernetes.io/hostname", each Node is a domain of that topology. And, if TopologyKey is "topology.kubernetes.io/zone", each zone is a domain of that topology. It's a required field.
-* @required
-*/
-topologyKey: string;
-/**
 * WhenUnsatisfiable indicates how to deal with a pod if it doesn't satisfy the spread constraint. - DoNotSchedule (default) tells the scheduler not to schedule it. - ScheduleAnyway tells the scheduler to schedule the pod in any location,
   but giving higher precedence to topologies that would help reduce the
   skew.
@@ -35,7 +20,7 @@ whenUnsatisfiable: 'DoNotSchedule' | 'ScheduleAnyway';
 * A label selector is a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. An empty label selector matches all objects. A null label selector matches no objects.
 * @isObject
 */
-labelSelector?: { matchExpressions?: Array<{ values?: string[]; key: string; operator: string }>; matchLabels?: Record<string, any> };
+labelSelector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> };
 /**
 * MatchLabelKeys is a set of pod label keys to select the pods over which spreading will be calculated. The keys are used to lookup values from the incoming pod labels, those key-value labels are ANDed with labelSelector to select the group of existing pods over which spreading will be calculated for the incoming pod. The same key is forbidden to exist in both MatchLabelKeys and LabelSelector. MatchLabelKeys cannot be set when LabelSelector isn't set. Keys that don't exist in the incoming pod labels will be ignored. A null or empty list means only match against labelSelector.
 
@@ -64,6 +49,21 @@ Possible enum values:
  - `"Ignore"` means ignore this scheduling directive when calculating pod topology spread skew.
 */
 nodeAffinityPolicy?: 'Honor' | 'Ignore';
+/**
+* NodeTaintsPolicy indicates how we will treat node taints when calculating pod topology spread skew. Options are: - Honor: nodes without taints, along with tainted nodes for which the incoming pod has a toleration, are included. - Ignore: node taints are ignored. All nodes are included.
+
+If this value is nil, the behavior is equivalent to the Ignore policy. This is a beta-level feature default enabled by the NodeInclusionPolicyInPodTopologySpread feature flag.
+
+Possible enum values:
+ - `"Honor"` means use this scheduling directive when calculating pod topology spread skew.
+ - `"Ignore"` means ignore this scheduling directive when calculating pod topology spread skew.
+*/
+nodeTaintsPolicy?: 'Honor' | 'Ignore';
+/**
+* TopologyKey is the key of node labels. Nodes that have a label with this key and identical values are considered to be in the same topology. We consider each <key, value> as a "bucket", and try to put balanced number of pods into each bucket. We define a domain as a particular instance of a topology. Also, we define an eligible domain as a domain whose nodes meet the requirements of nodeAffinityPolicy and nodeTaintsPolicy. e.g. If TopologyKey is "kubernetes.io/hostname", each Node is a domain of that topology. And, if TopologyKey is "topology.kubernetes.io/zone", each zone is a domain of that topology. It's a required field.
+* @required
+*/
+topologyKey: string;
 }
 
 /**
@@ -73,13 +73,13 @@ nodeAffinityPolicy?: 'Honor' | 'Ignore';
 */
 export function createio_k8s_api_core_v1_TopologySpreadConstraint(data?: Partial<io_k8s_api_core_v1_TopologySpreadConstraint>): io_k8s_api_core_v1_TopologySpreadConstraint {
  return {
-   nodeTaintsPolicy: data?.nodeTaintsPolicy !== undefined ? data.nodeTaintsPolicy : '',
-   topologyKey: data?.topologyKey !== undefined ? data.topologyKey : '',
    whenUnsatisfiable: data?.whenUnsatisfiable !== undefined ? data.whenUnsatisfiable : '',
    labelSelector: data?.labelSelector !== undefined ? data.labelSelector : {},
    matchLabelKeys: data?.matchLabelKeys !== undefined ? data.matchLabelKeys : [],
    maxSkew: data?.maxSkew !== undefined ? data.maxSkew : 0,
    minDomains: data?.minDomains !== undefined ? data.minDomains : 0,
    nodeAffinityPolicy: data?.nodeAffinityPolicy !== undefined ? data.nodeAffinityPolicy : '',
+   nodeTaintsPolicy: data?.nodeTaintsPolicy !== undefined ? data.nodeTaintsPolicy : '',
+   topologyKey: data?.topologyKey !== undefined ? data.topologyKey : '',
  };
 }

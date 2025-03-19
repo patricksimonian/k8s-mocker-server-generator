@@ -25,7 +25,7 @@ readOnly?: boolean;
 * SecretReference represents a Secret Reference. It has enough information to retrieve secret in any namespace
 * @isObject
 */
-secretRef?: { name?: string; namespace?: string };
+secretRef?: { namespace?: string; name?: string };
 }
 
 /**

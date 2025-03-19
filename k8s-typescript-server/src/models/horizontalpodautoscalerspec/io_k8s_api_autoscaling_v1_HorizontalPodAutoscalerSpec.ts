@@ -18,7 +18,7 @@ minReplicas?: number;
 * @required
 * @isObject
 */
-scaleTargetRef: { kind: string; name: string; apiVersion?: string };
+scaleTargetRef: { apiVersion?: string; kind: string; name: string };
 /**
 * targetCPUUtilizationPercentage is the target average CPU utilization (represented as a percentage of requested CPU) over all the pods; if not specified the default autoscaling policy will be used.
 */

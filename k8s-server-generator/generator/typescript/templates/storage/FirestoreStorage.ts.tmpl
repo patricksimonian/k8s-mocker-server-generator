@@ -212,7 +212,7 @@ export class FirestoreStorage implements Storage {
  /**
   * Delete a resource
   */
- async deleteResource(kind: string, name: string, namespace: string = 'default'): Promise<void> {
+ async deleteResource(kind: string, name: string, namespace: string = 'default'): Promise<boolean> {
    try {
      const collectionName = `${kind.toLowerCase()}s`;
      
@@ -230,11 +230,13 @@ export class FirestoreStorage implements Storage {
      
      // Delete resource
      await docRef.delete();
+     return true;
    } catch (error) {
      if (error instanceof StorageError) {
        throw error;
      }
      logger.error(`Error deleting ${kind}:`, error);
+    
      throw StorageError.internal(`Failed to delete ${kind} "${name}"`, error as Error);
    }
  }

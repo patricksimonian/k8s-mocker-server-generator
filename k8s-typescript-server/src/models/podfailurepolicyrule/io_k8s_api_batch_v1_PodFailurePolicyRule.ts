@@ -36,7 +36,7 @@ onExitCodes?: { containerName?: string; operator: 'In' | 'NotIn'; values: number
 * Represents the requirement on the pod conditions. The requirement is represented as a list of pod condition patterns. The requirement is satisfied if at least one pattern matches an actual pod condition. At most 20 elements are allowed.
 * @isArray
 */
-onPodConditions?: Array<{ type: string; status: string }>;
+onPodConditions?: Array<{ status: string; type: string }>;
 }
 
 /**

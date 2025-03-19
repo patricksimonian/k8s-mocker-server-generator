@@ -12,7 +12,7 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { deletionGracePeriodSeconds?: number; labels?: Record<string, any>; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; name?: string; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; annotations?: Record<string, any>; finalizers?: string[]; generation?: number; namespace?: string; resourceVersion?: string; selfLink?: string; uid?: string; creationTimestamp?: Date; deletionTimestamp?: Date; generateName?: string };
+metadata?: { deletionGracePeriodSeconds?: number; generateName?: string; generation?: number; managedFields?: Array<{ fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string }>; name?: string; ownerReferences?: Array<{ uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string }>; resourceVersion?: string; finalizers?: string[]; labels?: Record<string, any>; selfLink?: string; annotations?: Record<string, any>; deletionTimestamp?: Date; creationTimestamp?: Date; namespace?: string; uid?: string };
 /**
 * ScaleSpec describes the attributes of a scale subresource.
 * @isObject

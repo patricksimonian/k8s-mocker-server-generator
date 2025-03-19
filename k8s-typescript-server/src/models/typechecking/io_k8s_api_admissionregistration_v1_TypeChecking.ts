@@ -8,7 +8,7 @@ export interface io_k8s_api_admissionregistration_v1_TypeChecking {
 * The type checking warnings for each expression.
 * @isArray
 */
-expressionWarnings?: Array<{ warning: string; fieldRef: string }>;
+expressionWarnings?: Array<{ fieldRef: string; warning: string }>;
 }
 
 /**

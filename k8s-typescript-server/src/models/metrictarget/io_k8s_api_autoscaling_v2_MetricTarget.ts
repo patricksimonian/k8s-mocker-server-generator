@@ -5,11 +5,6 @@
 */
 export interface io_k8s_api_autoscaling_v2_MetricTarget {
 /**
-* type represents whether the metric type is Utilization, Value, or AverageValue
-* @required
-*/
-type: string;
-/**
 * Quantity is a fixed-point representation of a number. It provides convenient marshaling/unmarshaling in JSON and YAML, in addition to String() and AsInt64() accessors.
 
 The serialization format is:
@@ -93,6 +88,11 @@ Non-canonical values will still parse as long as they are well formed, but will 
 This format is intended to make it difficult to use these numbers without writing some sort of special handling code in the hopes that that will cause implementors to also use a fixed point implementation.
 */
 averageValue?: string;
+/**
+* type represents whether the metric type is Utilization, Value, or AverageValue
+* @required
+*/
+type: string;
 }
 
 /**
@@ -102,9 +102,9 @@ averageValue?: string;
 */
 export function createio_k8s_api_autoscaling_v2_MetricTarget(data?: Partial<io_k8s_api_autoscaling_v2_MetricTarget>): io_k8s_api_autoscaling_v2_MetricTarget {
  return {
-   type: data?.type !== undefined ? data.type : '',
    value: data?.value !== undefined ? data.value : '',
    averageUtilization: data?.averageUtilization !== undefined ? data.averageUtilization : 0,
    averageValue: data?.averageValue !== undefined ? data.averageValue : '',
+   type: data?.type !== undefined ? data.type : '',
  };
 }

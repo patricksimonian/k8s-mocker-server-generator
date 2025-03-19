@@ -2,1557 +2,925 @@ import express from 'express';
 import { Storage } from '../storage/Storage';
 import { logger } from '../logger';
 import { handleResourceError } from '../utils';
+import pluralize from 'pluralize';
 
 export function createDiscoveryRoutes(storage: Storage): express.Router {
- const router = express.Router();
+  const router = express.Router();
 
- 
- 
- /**
-  * GET /apis/rbac.authorization.k8s.io/v1/
-  * get available resources
-  */
- router.get('/apis/rbac.authorization.k8s.io/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Rbac_Authorization_K8s_Io_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/scheduling.k8s.io/
-  * get information of a group
-  */
- router.get('/apis/scheduling.k8s.io/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Scheduling_K8s_Io_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/certificates.k8s.io/
-  * get information of a group
-  */
- router.get('/apis/certificates.k8s.io/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Certificates_K8s_Io_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/events.k8s.io/v1/
-  * get available resources
-  */
- router.get('/apis/events.k8s.io/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Events_K8s_Io_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/flowcontrol.apiserver.k8s.io/
-  * get information of a group
-  */
- router.get('/apis/flowcontrol.apiserver.k8s.io/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Flowcontrol_Apiserver_K8s_Io_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/storage.k8s.io/
-  * get information of a group
-  */
- router.get('/apis/storage.k8s.io/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Storage_K8s_Io_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /api/
-  * get available API versions
-  */
- router.get('/api/', async (req, res, next) => {
-   try {
-     await handlegetModel_Api_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/rbac.authorization.k8s.io/
-  * get information of a group
-  */
- router.get('/apis/rbac.authorization.k8s.io/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Rbac_Authorization_K8s_Io_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/admissionregistration.k8s.io/
-  * get information of a group
-  */
- router.get('/apis/admissionregistration.k8s.io/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Admissionregistration_K8s_Io_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/autoscaling/v1/
-  * get available resources
-  */
- router.get('/apis/autoscaling/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Autoscaling_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/discovery.k8s.io/
-  * get information of a group
-  */
- router.get('/apis/discovery.k8s.io/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Discovery_K8s_Io_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/
-  * get available API versions
-  */
- router.get('/apis/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/admissionregistration.k8s.io/v1/
-  * get available resources
-  */
- router.get('/apis/admissionregistration.k8s.io/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Admissionregistration_K8s_Io_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/apps/
-  * get information of a group
-  */
- router.get('/apis/apps/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Apps_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/discovery.k8s.io/v1/
-  * get available resources
-  */
- router.get('/apis/discovery.k8s.io/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Discovery_K8s_Io_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/policy/
-  * get information of a group
-  */
- router.get('/apis/policy/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Policy_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/apiextensions.k8s.io/
-  * get information of a group
-  */
- router.get('/apis/apiextensions.k8s.io/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Apiextensions_K8s_Io_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/node.k8s.io/v1/
-  * get available resources
-  */
- router.get('/apis/node.k8s.io/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Node_K8s_Io_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/batch/
-  * get information of a group
-  */
- router.get('/apis/batch/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Batch_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /.well-known/openid-configuration/
-  * get service account issuer OpenID configuration, also known as the 'OIDC discovery doc'
-  */
- router.get('/.well-known/openid-configuration/', async (req, res, next) => {
-   try {
-     await handlegetModel__Well_Known_Openid_Configuration_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/policy/v1/
-  * get available resources
-  */
- router.get('/apis/policy/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Policy_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/autoscaling/v2/
-  * get available resources
-  */
- router.get('/apis/autoscaling/v2/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Autoscaling_V2_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/networking.k8s.io/
-  * get information of a group
-  */
- router.get('/apis/networking.k8s.io/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Networking_K8s_Io_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/authorization.k8s.io/
-  * get information of a group
-  */
- router.get('/apis/authorization.k8s.io/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Authorization_K8s_Io_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/coordination.k8s.io/v1/
-  * get available resources
-  */
- router.get('/apis/coordination.k8s.io/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Coordination_K8s_Io_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /api/v1/
-  * get available resources
-  */
- router.get('/api/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Api_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/events.k8s.io/
-  * get information of a group
-  */
- router.get('/apis/events.k8s.io/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Events_K8s_Io_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/storage.k8s.io/v1/
-  * get available resources
-  */
- router.get('/apis/storage.k8s.io/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Storage_K8s_Io_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/apiregistration.k8s.io/
-  * get information of a group
-  */
- router.get('/apis/apiregistration.k8s.io/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Apiregistration_K8s_Io_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/coordination.k8s.io/
-  * get information of a group
-  */
- router.get('/apis/coordination.k8s.io/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Coordination_K8s_Io_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/authentication.k8s.io/
-  * get information of a group
-  */
- router.get('/apis/authentication.k8s.io/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Authentication_K8s_Io_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/apiregistration.k8s.io/v1/
-  * get available resources
-  */
- router.get('/apis/apiregistration.k8s.io/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Apiregistration_K8s_Io_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/authorization.k8s.io/v1/
-  * get available resources
-  */
- router.get('/apis/authorization.k8s.io/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Authorization_K8s_Io_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/scheduling.k8s.io/v1/
-  * get available resources
-  */
- router.get('/apis/scheduling.k8s.io/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Scheduling_K8s_Io_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/networking.k8s.io/v1/
-  * get available resources
-  */
- router.get('/apis/networking.k8s.io/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Networking_K8s_Io_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/flowcontrol.apiserver.k8s.io/v1/
-  * get available resources
-  */
- router.get('/apis/flowcontrol.apiserver.k8s.io/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Flowcontrol_Apiserver_K8s_Io_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/apps/v1/
-  * get available resources
-  */
- router.get('/apis/apps/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Apps_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/autoscaling/
-  * get information of a group
-  */
- router.get('/apis/autoscaling/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Autoscaling_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/batch/v1/
-  * get available resources
-  */
- router.get('/apis/batch/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Batch_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /version/
-  * get the code version
-  */
- router.get('/version/', async (req, res, next) => {
-   try {
-     await handlegetModel_Version_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/authentication.k8s.io/v1/
-  * get available resources
-  */
- router.get('/apis/authentication.k8s.io/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Authentication_K8s_Io_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/certificates.k8s.io/v1/
-  * get available resources
-  */
- router.get('/apis/certificates.k8s.io/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Certificates_K8s_Io_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/apiextensions.k8s.io/v1/
-  * get available resources
-  */
- router.get('/apis/apiextensions.k8s.io/v1/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Apiextensions_K8s_Io_V1_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- /**
-  * GET /apis/node.k8s.io/
-  * get information of a group
-  */
- router.get('/apis/node.k8s.io/', async (req, res, next) => {
-   try {
-     await handlegetModel_Apis_Node_K8s_Io_(req, res, storage);
-   } catch (error) {
-     next(error);
-   }
- });
- 
- 
+  // Root path handler
+  router.get('/', async (req, res, next) => {
+    try {
+      await handleRootPath(req, res, storage);
+    } catch (error) {
+      next(error);
+    }
+  });
 
- return router;
-}
+  // API versions handler
+  router.get('/api', async (req, res, next) => {
+    try {
+      await handleApiVersions(req, res, storage);
+    } catch (error) {
+      next(error);
+    }
+  });
 
+  // API groups handler
+  router.get('/apis', async (req, res, next) => {
+    try {
+      await handleApiGroups(req, res, storage);
+    } catch (error) {
+      next(error);
+    }
+  });
 
+  // API resources handler
+  router.get('/api/v1', async (req, res, next) => {
+    try {
+      await handleApiResources(req, res, storage);
+    } catch (error) {
+      next(error);
+    }
+  });
 
-/**
-* Handler for GET /apis/rbac.authorization.k8s.io/v1/
-* get available resources
-*/
-async function handlegetModel_Apis_Rbac_Authorization_K8s_Io_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/rbac.authorization.k8s.io/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
+  // API group resources handler
+  router.get('/apis/:group/:version', async (req, res, next) => {
+    try {
+      await handleApiGroupResources(req, res, storage);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  return router;
 }
 
 /**
-* Handler for GET /apis/scheduling.k8s.io/
-* get information of a group
+* Handler for GET /
 */
-async function handlegetModel_Apis_Scheduling_K8s_Io_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
+async function handleRootPath(
+  req: express.Request,
+  res: express.Response,
+  storage: Storage
 ): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/scheduling.k8s.io/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
+  logger.info('Getting API discovery information');
+
+  const paths = {
+    paths: ['/api', '/apis']
+  };
+
+  res.json(paths);
 }
 
 /**
-* Handler for GET /apis/certificates.k8s.io/
-* get information of a group
+* Handler for GET /api
 */
-async function handlegetModel_Apis_Certificates_K8s_Io_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
+async function handleApiVersions(
+  req: express.Request,
+  res: express.Response,
+  storage: Storage
 ): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/certificates.k8s.io/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
+  logger.info('Getting API versions');
+
+  const apiVersions = {
+    kind: 'APIVersions',
+    versions: ['v1'],
+    serverAddressByClientCIDRs: [
+      {
+        clientCIDR: '0.0.0.0/0',
+        serverAddress: req.headers.host || 'localhost'
+      }
+    ]
+  };
+
+  res.json(apiVersions);
 }
 
 /**
-* Handler for GET /apis/events.k8s.io/v1/
-* get available resources
+* Handler for GET /apis
 */
-async function handlegetModel_Apis_Events_K8s_Io_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
+async function handleApiGroups(
+  req: express.Request,
+  res: express.Response,
+  storage: Storage
 ): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/events.k8s.io/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
+  logger.info('Getting API groups');
+
+  // Use the pre-processed API groups data
+  const apiGroupsData = [
+    {
+      name: 'admissionregistration.k8s.io',
+      versions: [
+        {
+          groupVersion: 'admissionregistration.k8s.io/v1',
+          version: 'v1'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'admissionregistration.k8s.io/v1',
+        version: 'v1'
+      }
+    },
+    {
+      name: 'apiextensions.k8s.io',
+      versions: [
+        {
+          groupVersion: 'apiextensions.k8s.io/v1',
+          version: 'v1'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'apiextensions.k8s.io/v1',
+        version: 'v1'
+      }
+    },
+    {
+      name: 'apiregistration.k8s.io',
+      versions: [
+        {
+          groupVersion: 'apiregistration.k8s.io/v1',
+          version: 'v1'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'apiregistration.k8s.io/v1',
+        version: 'v1'
+      }
+    },
+    {
+      name: 'apps',
+      versions: [
+        {
+          groupVersion: 'apps/v1',
+          version: 'v1'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'apps/v1',
+        version: 'v1'
+      }
+    },
+    {
+      name: 'authentication.k8s.io',
+      versions: [
+        {
+          groupVersion: 'authentication.k8s.io/v1',
+          version: 'v1'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'authentication.k8s.io/v1',
+        version: 'v1'
+      }
+    },
+    {
+      name: 'authorization.k8s.io',
+      versions: [
+        {
+          groupVersion: 'authorization.k8s.io/v1',
+          version: 'v1'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'authorization.k8s.io/v1',
+        version: 'v1'
+      }
+    },
+    {
+      name: 'autoscaling',
+      versions: [
+        {
+          groupVersion: 'autoscaling/v1',
+          version: 'v1'
+        },
+        {
+          groupVersion: 'autoscaling/v2',
+          version: 'v2'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'autoscaling/v1',
+        version: 'v1'
+      }
+    },
+    {
+      name: 'batch',
+      versions: [
+        {
+          groupVersion: 'batch/v1',
+          version: 'v1'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'batch/v1',
+        version: 'v1'
+      }
+    },
+    {
+      name: 'certificates.k8s.io',
+      versions: [
+        {
+          groupVersion: 'certificates.k8s.io/v1',
+          version: 'v1'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'certificates.k8s.io/v1',
+        version: 'v1'
+      }
+    },
+    {
+      name: 'coordination.k8s.io',
+      versions: [
+        {
+          groupVersion: 'coordination.k8s.io/v1',
+          version: 'v1'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'coordination.k8s.io/v1',
+        version: 'v1'
+      }
+    },
+    {
+      name: 'discovery.k8s.io',
+      versions: [
+        {
+          groupVersion: 'discovery.k8s.io/v1',
+          version: 'v1'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'discovery.k8s.io/v1',
+        version: 'v1'
+      }
+    },
+    {
+      name: 'events.k8s.io',
+      versions: [
+        {
+          groupVersion: 'events.k8s.io/v1',
+          version: 'v1'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'events.k8s.io/v1',
+        version: 'v1'
+      }
+    },
+    {
+      name: 'flowcontrol.apiserver.k8s.io',
+      versions: [
+        {
+          groupVersion: 'flowcontrol.apiserver.k8s.io/v1',
+          version: 'v1'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'flowcontrol.apiserver.k8s.io/v1',
+        version: 'v1'
+      }
+    },
+    {
+      name: 'networking.k8s.io',
+      versions: [
+        {
+          groupVersion: 'networking.k8s.io/v1',
+          version: 'v1'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'networking.k8s.io/v1',
+        version: 'v1'
+      }
+    },
+    {
+      name: 'node.k8s.io',
+      versions: [
+        {
+          groupVersion: 'node.k8s.io/v1',
+          version: 'v1'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'node.k8s.io/v1',
+        version: 'v1'
+      }
+    },
+    {
+      name: 'policy',
+      versions: [
+        {
+          groupVersion: 'policy/v1',
+          version: 'v1'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'policy/v1',
+        version: 'v1'
+      }
+    },
+    {
+      name: 'rbac.authorization.k8s.io',
+      versions: [
+        {
+          groupVersion: 'rbac.authorization.k8s.io/v1',
+          version: 'v1'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'rbac.authorization.k8s.io/v1',
+        version: 'v1'
+      }
+    },
+    {
+      name: 'scheduling.k8s.io',
+      versions: [
+        {
+          groupVersion: 'scheduling.k8s.io/v1',
+          version: 'v1'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'scheduling.k8s.io/v1',
+        version: 'v1'
+      }
+    },
+    {
+      name: 'storage.k8s.io',
+      versions: [
+        {
+          groupVersion: 'storage.k8s.io/v1',
+          version: 'v1'
+        },
+      ],
+      preferredVersion: {
+        groupVersion: 'storage.k8s.io/v1',
+        version: 'v1'
+      }
+    },
+  ];
+
+  // Add common API groups if not already in the list
+  const commonGroups = ['apps', 'batch', 'networking.k8s.io', 'rbac.authorization.k8s.io'];
+  commonGroups.forEach(group => {
+    if (!apiGroupsData.some(g => g.name === group)) {
+      apiGroupsData.push({
+        name: group,
+        versions: [
+          {
+            groupVersion: `${group}/v1`,
+            version: 'v1'
+          }
+        ],
+        preferredVersion: {
+          groupVersion: `${group}/v1`,
+          version: 'v1'
+        }
+      });
+    }
+  });
+
+  const apiGroups = {
+    kind: 'APIGroupList',
+    apiVersion: 'v1',
+    groups: apiGroupsData
+  };
+
+  res.json(apiGroups);
 }
 
 /**
-* Handler for GET /apis/flowcontrol.apiserver.k8s.io/
-* get information of a group
+* Handler for GET /api/v1
 */
-async function handlegetModel_Apis_Flowcontrol_Apiserver_K8s_Io_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
+async function handleApiResources(
+  req: express.Request,
+  res: express.Response,
+  storage: Storage
 ): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/flowcontrol.apiserver.k8s.io/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
+  logger.info('Getting API resources for core v1');
+
+  // Use the pre-processed core resources data
+  const resources = [];
+
+  // Process the pre-extracted core resources
+  {
+    const singularName = pluralize.singular('resourcequotas');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'resourcequotas',
+      singularName: singularName,
+      namespaced: false,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+  {
+    const singularName = pluralize.singular('events');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'events',
+      singularName: singularName,
+      namespaced: true,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+  {
+    const singularName = pluralize.singular('replicationcontrollers');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'replicationcontrollers',
+      singularName: singularName,
+      namespaced: false,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+  {
+    const singularName = pluralize.singular('finalize');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'finalize',
+      singularName: singularName,
+      namespaced: true,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+  {
+    const singularName = pluralize.singular('serviceaccounts');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'serviceaccounts',
+      singularName: singularName,
+      namespaced: true,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+  {
+    const singularName = pluralize.singular('services');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'services',
+      singularName: singularName,
+      namespaced: true,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+  {
+    const singularName = pluralize.singular('podtemplates');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'podtemplates',
+      singularName: singularName,
+      namespaced: true,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+  {
+    const singularName = pluralize.singular('secrets');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'secrets',
+      singularName: singularName,
+      namespaced: true,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+  {
+    const singularName = pluralize.singular('status');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'status',
+      singularName: singularName,
+      namespaced: true,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+  {
+    const singularName = pluralize.singular('namespaces');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'namespaces',
+      singularName: singularName,
+      namespaced: false,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+  {
+    const singularName = pluralize.singular('persistentvolumeclaims');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'persistentvolumeclaims',
+      singularName: singularName,
+      namespaced: true,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+  {
+    const singularName = pluralize.singular('bindings');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'bindings',
+      singularName: singularName,
+      namespaced: true,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+  {
+    const singularName = pluralize.singular('configmaps');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'configmaps',
+      singularName: singularName,
+      namespaced: true,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+  {
+    const singularName = pluralize.singular('limitranges');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'limitranges',
+      singularName: singularName,
+      namespaced: true,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+  {
+    const singularName = pluralize.singular('componentstatuses');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'componentstatuses',
+      singularName: singularName,
+      namespaced: false,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+  {
+    const singularName = pluralize.singular('pods');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'pods',
+      singularName: singularName,
+      namespaced: true,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+  {
+    const singularName = pluralize.singular('endpoints');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'endpoints',
+      singularName: singularName,
+      namespaced: true,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+  {
+    const singularName = pluralize.singular('nodes');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'nodes',
+      singularName: singularName,
+      namespaced: false,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+  {
+    const singularName = pluralize.singular('persistentvolumes');
+    const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+    resources.push({
+      name: 'persistentvolumes',
+      singularName: singularName,
+      namespaced: false,
+      kind: kind,
+      verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+    });
+  }
+
+  // Add common core resources if not already in the list
+  const commonResources = ['pods', 'services', 'configmaps', 'secrets', 'namespaces'];
+  commonResources.forEach(resource => {
+    if (!resources.some(r => r.name === resource)) {
+      const singularName = pluralize.singular(resource);
+      const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+      resources.push({
+        name: resource,
+        singularName: singularName,
+        namespaced: resource !== 'namespaces',
+        kind: kind,
+        verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+      });
+    }
+  });
+
+  const apiResourceList = {
+    kind: 'APIResourceList',
+    apiVersion: 'v1',
+    groupVersion: 'v1',
+    resources: resources
+  };
+
+  res.json(apiResourceList);
 }
+
+// Pre-compute API group resources map at startup
+const apiGroupResourcesMap = {
+  'admissionregistration.k8s.io/v1': [
+    { 
+      name: 'validatingwebhookconfigurations',
+      namespaced: false
+    },
+    { 
+      name: 'mutatingwebhookconfigurations',
+      namespaced: false
+    },
+    { 
+      name: 'validatingadmissionpolicybindings',
+      namespaced: false
+    },
+    { 
+      name: 'validatingadmissionpolicies',
+      namespaced: false
+    },
+  ],
+  'apiextensions.k8s.io/v1': [
+    { 
+      name: 'customresourcedefinitions',
+      namespaced: false
+    },
+  ],
+  'apiregistration.k8s.io/v1': [
+    { 
+      name: 'apiservices',
+      namespaced: false
+    },
+  ],
+  'apps/v1': [
+    { 
+      name: 'controllerrevisions',
+      namespaced: true
+    },
+    { 
+      name: 'daemonsets',
+      namespaced: false
+    },
+    { 
+      name: 'statefulsets',
+      namespaced: true
+    },
+    { 
+      name: 'replicasets',
+      namespaced: false
+    },
+    { 
+      name: 'deployments',
+      namespaced: true
+    },
+  ],
+  'authentication.k8s.io/v1': [
+    { 
+      name: 'tokenreviews',
+      namespaced: false
+    },
+    { 
+      name: 'selfsubjectreviews',
+      namespaced: false
+    },
+  ],
+  'authorization.k8s.io/v1': [
+    { 
+      name: 'selfsubjectaccessreviews',
+      namespaced: false
+    },
+    { 
+      name: 'subjectaccessreviews',
+      namespaced: false
+    },
+    { 
+      name: 'selfsubjectrulesreviews',
+      namespaced: false
+    },
+    { 
+      name: 'localsubjectaccessreviews',
+      namespaced: true
+    },
+  ],
+  'autoscaling/v1': [
+    { 
+      name: 'horizontalpodautoscalers',
+      namespaced: true
+    },
+  ],
+  'autoscaling/v2': [
+    { 
+      name: 'horizontalpodautoscalers',
+      namespaced: true
+    },
+  ],
+  'batch/v1': [
+    { 
+      name: 'cronjobs',
+      namespaced: true
+    },
+    { 
+      name: 'jobs',
+      namespaced: false
+    },
+  ],
+  'certificates.k8s.io/v1': [
+    { 
+      name: 'certificatesigningrequests',
+      namespaced: false
+    },
+  ],
+  'coordination.k8s.io/v1': [
+    { 
+      name: 'leases',
+      namespaced: true
+    },
+  ],
+  'discovery.k8s.io/v1': [
+    { 
+      name: 'endpointslices',
+      namespaced: true
+    },
+  ],
+  'events.k8s.io/v1': [
+    { 
+      name: 'events',
+      namespaced: true
+    },
+  ],
+  'flowcontrol.apiserver.k8s.io/v1': [
+    { 
+      name: 'prioritylevelconfigurations',
+      namespaced: false
+    },
+    { 
+      name: 'flowschemas',
+      namespaced: false
+    },
+  ],
+  'networking.k8s.io/v1': [
+    { 
+      name: 'networkpolicies',
+      namespaced: false
+    },
+    { 
+      name: 'ingressclasses',
+      namespaced: false
+    },
+    { 
+      name: 'ingresses',
+      namespaced: true
+    },
+  ],
+  'node.k8s.io/v1': [
+    { 
+      name: 'runtimeclasses',
+      namespaced: false
+    },
+  ],
+  'policy/v1': [
+    { 
+      name: 'poddisruptionbudgets',
+      namespaced: false
+    },
+  ],
+  'rbac.authorization.k8s.io/v1': [
+    { 
+      name: 'clusterrolebindings',
+      namespaced: false
+    },
+    { 
+      name: 'roles',
+      namespaced: false
+    },
+    { 
+      name: 'rolebindings',
+      namespaced: false
+    },
+    { 
+      name: 'clusterroles',
+      namespaced: false
+    },
+  ],
+  'scheduling.k8s.io/v1': [
+    { 
+      name: 'priorityclasses',
+      namespaced: false
+    },
+  ],
+  'storage.k8s.io/v1': [
+    { 
+      name: 'csinodes',
+      namespaced: false
+    },
+    { 
+      name: 'volumeattachments',
+      namespaced: false
+    },
+    { 
+      name: 'csistoragecapacities',
+      namespaced: true
+    },
+    { 
+      name: 'storageclasses',
+      namespaced: false
+    },
+    { 
+      name: 'csidrivers',
+      namespaced: false
+    },
+  ],
+};
+
+// Common resources by API group
+const commonGroupResources = {
+  'apps/v1': ['deployments', 'statefulsets', 'daemonsets', 'replicasets'],
+  'batch/v1': ['jobs', 'cronjobs'],
+  'networking.k8s.io/v1': ['ingresses', 'networkpolicies'],
+  'rbac.authorization.k8s.io/v1': ['roles', 'rolebindings', 'clusterroles', 'clusterrolebindings']
+};
 
 /**
-* Handler for GET /apis/storage.k8s.io/
-* get information of a group
+* Handler for GET /apis/:group/:version
 */
-async function handlegetModel_Apis_Storage_K8s_Io_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
+async function handleApiGroupResources(
+  req: express.Request,
+  res: express.Response,
+  storage: Storage
 ): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/storage.k8s.io/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
+  const group = req.params.group;
+  const version = req.params.version;
+  const groupVersion = `${group}/${version}`;
+
+  logger.info(`Getting API resources for group ${groupVersion}`);
+
+  try {
+    // Extract resources from the pre-computed map
+    const resources = [];
+    
+    // Get resources from the pre-computed map
+    const groupResources = apiGroupResourcesMap[groupVersion] || [];
+    
+    // Process resources
+    groupResources.forEach(resource => {
+      if (!resources.some(r => r.name === resource.name)) {
+        const singularName = pluralize.singular(resource.name);
+        const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+        resources.push({
+          name: resource.name,
+          singularName: singularName,
+          namespaced: resource.namespaced,
+          kind: kind,
+          verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+        });
+      }
+    });
+    
+    // Add common resources for specific API groups if not already in the list
+    const commonResources = commonGroupResources[groupVersion] || [];
+    commonResources.forEach(resource => {
+      if (!resources.some(r => r.name === resource)) {
+        const singularName = pluralize.singular(resource);
+        const kind = singularName.charAt(0).toUpperCase() + singularName.slice(1);
+        resources.push({
+          name: resource,
+          singularName: singularName,
+          namespaced: true,
+          kind: kind,
+          verbs: ['get', 'list', 'create', 'update', 'patch', 'delete', 'deletecollection', 'watch']
+        });
+      }
+    });
+
+    const apiResourceList = {
+      kind: 'APIResourceList',
+      apiVersion: 'v1',
+      groupVersion: groupVersion,
+      resources: resources
+    };
+
+    res.json(apiResourceList);
+  } catch (error) {
+    handleResourceError(error, res);
+  }
 }
-
-/**
-* Handler for GET /api/
-* get available API versions
-*/
-async function handlegetModel_Api_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /api/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/rbac.authorization.k8s.io/
-* get information of a group
-*/
-async function handlegetModel_Apis_Rbac_Authorization_K8s_Io_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/rbac.authorization.k8s.io/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/admissionregistration.k8s.io/
-* get information of a group
-*/
-async function handlegetModel_Apis_Admissionregistration_K8s_Io_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/admissionregistration.k8s.io/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/autoscaling/v1/
-* get available resources
-*/
-async function handlegetModel_Apis_Autoscaling_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/autoscaling/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/discovery.k8s.io/
-* get information of a group
-*/
-async function handlegetModel_Apis_Discovery_K8s_Io_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/discovery.k8s.io/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/
-* get available API versions
-*/
-async function handlegetModel_Apis_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/admissionregistration.k8s.io/v1/
-* get available resources
-*/
-async function handlegetModel_Apis_Admissionregistration_K8s_Io_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/admissionregistration.k8s.io/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/apps/
-* get information of a group
-*/
-async function handlegetModel_Apis_Apps_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/apps/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/discovery.k8s.io/v1/
-* get available resources
-*/
-async function handlegetModel_Apis_Discovery_K8s_Io_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/discovery.k8s.io/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/policy/
-* get information of a group
-*/
-async function handlegetModel_Apis_Policy_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/policy/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/apiextensions.k8s.io/
-* get information of a group
-*/
-async function handlegetModel_Apis_Apiextensions_K8s_Io_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/apiextensions.k8s.io/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/node.k8s.io/v1/
-* get available resources
-*/
-async function handlegetModel_Apis_Node_K8s_Io_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/node.k8s.io/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/batch/
-* get information of a group
-*/
-async function handlegetModel_Apis_Batch_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/batch/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /.well-known/openid-configuration/
-* get service account issuer OpenID configuration, also known as the 'OIDC discovery doc'
-*/
-async function handlegetModel__Well_Known_Openid_Configuration_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /.well-known/openid-configuration/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/policy/v1/
-* get available resources
-*/
-async function handlegetModel_Apis_Policy_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/policy/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/autoscaling/v2/
-* get available resources
-*/
-async function handlegetModel_Apis_Autoscaling_V2_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/autoscaling/v2/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/networking.k8s.io/
-* get information of a group
-*/
-async function handlegetModel_Apis_Networking_K8s_Io_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/networking.k8s.io/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/authorization.k8s.io/
-* get information of a group
-*/
-async function handlegetModel_Apis_Authorization_K8s_Io_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/authorization.k8s.io/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/coordination.k8s.io/v1/
-* get available resources
-*/
-async function handlegetModel_Apis_Coordination_K8s_Io_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/coordination.k8s.io/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /api/v1/
-* get available resources
-*/
-async function handlegetModel_Api_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /api/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/events.k8s.io/
-* get information of a group
-*/
-async function handlegetModel_Apis_Events_K8s_Io_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/events.k8s.io/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/storage.k8s.io/v1/
-* get available resources
-*/
-async function handlegetModel_Apis_Storage_K8s_Io_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/storage.k8s.io/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/apiregistration.k8s.io/
-* get information of a group
-*/
-async function handlegetModel_Apis_Apiregistration_K8s_Io_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/apiregistration.k8s.io/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/coordination.k8s.io/
-* get information of a group
-*/
-async function handlegetModel_Apis_Coordination_K8s_Io_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/coordination.k8s.io/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/authentication.k8s.io/
-* get information of a group
-*/
-async function handlegetModel_Apis_Authentication_K8s_Io_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/authentication.k8s.io/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/apiregistration.k8s.io/v1/
-* get available resources
-*/
-async function handlegetModel_Apis_Apiregistration_K8s_Io_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/apiregistration.k8s.io/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/authorization.k8s.io/v1/
-* get available resources
-*/
-async function handlegetModel_Apis_Authorization_K8s_Io_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/authorization.k8s.io/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/scheduling.k8s.io/v1/
-* get available resources
-*/
-async function handlegetModel_Apis_Scheduling_K8s_Io_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/scheduling.k8s.io/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/networking.k8s.io/v1/
-* get available resources
-*/
-async function handlegetModel_Apis_Networking_K8s_Io_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/networking.k8s.io/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/flowcontrol.apiserver.k8s.io/v1/
-* get available resources
-*/
-async function handlegetModel_Apis_Flowcontrol_Apiserver_K8s_Io_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/flowcontrol.apiserver.k8s.io/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/apps/v1/
-* get available resources
-*/
-async function handlegetModel_Apis_Apps_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/apps/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/autoscaling/
-* get information of a group
-*/
-async function handlegetModel_Apis_Autoscaling_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/autoscaling/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/batch/v1/
-* get available resources
-*/
-async function handlegetModel_Apis_Batch_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/batch/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /version/
-* get the code version
-*/
-async function handlegetModel_Version_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /version/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/authentication.k8s.io/v1/
-* get available resources
-*/
-async function handlegetModel_Apis_Authentication_K8s_Io_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/authentication.k8s.io/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/certificates.k8s.io/v1/
-* get available resources
-*/
-async function handlegetModel_Apis_Certificates_K8s_Io_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/certificates.k8s.io/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/apiextensions.k8s.io/v1/
-* get available resources
-*/
-async function handlegetModel_Apis_Apiextensions_K8s_Io_V1_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/apiextensions.k8s.io/v1/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-/**
-* Handler for GET /apis/node.k8s.io/
-* get information of a group
-*/
-async function handlegetModel_Apis_Node_K8s_Io_(
- req: express.Request, 
- res: express.Response, 
- storage: Storage
-): Promise<void> {
- 
- // Generic handler for other discovery endpoints
- logger.info(`Handling discovery endpoint: /apis/node.k8s.io/`);
- 
- // Implement custom logic for this discovery endpoint
- res.json({
-   kind: 'Status',
-   apiVersion: 'v1',
-   status: 'Success',
-   message: 'Discovery endpoint handled successfully'
- });
- 
-}
-
-

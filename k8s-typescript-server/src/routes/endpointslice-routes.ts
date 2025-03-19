@@ -1,669 +1,261 @@
+// endpoint-route.ts.tmpl
 import express from 'express';
 import { Storage } from '../storage/Storage';
 import { logger } from '../logger';
-import { 
-fetchResourceList, 
-validateResource, 
-applyPatch, 
-handleResourceError,
-createNotFoundResponse
-} from '../utils';
+import { handleResourceError } from '../utils';
 
-
-
-/**
-* Create routes for endpointslice resources
-* @resourceType endpointslice
-*/
 export function createendpointsliceRoutes(storage: Storage): express.Router {
-const router = express.Router();
+  const router = express.Router();
+  // Delete endpointslice
+  router.delete('/apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Deleting endpointslice ${name} in namespace ${namespace}`);
+      try {
 
-
-
-/**
- * GET /apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices/:name
- * read the specified EndpointSlice
- */
-router.get('/apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices/:name', async (req, res, next) => {
-  try {
-    await handlegetModel_Apis_Discovery_K8s_Io_V1_Namespaces__namespace_Endpointslices__name(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * PUT /apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices/:name
- * replace the specified EndpointSlice
- */
-router.put('/apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices/:name', async (req, res, next) => {
-  try {
-    await handleputModel_Apis_Discovery_K8s_Io_V1_Namespaces__namespace_Endpointslices__name(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * DELETE /apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices/:name
- * delete an EndpointSlice
- */
-router.delete('/apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices/:name', async (req, res, next) => {
-  try {
-    await handledeleteModel_Apis_Discovery_K8s_Io_V1_Namespaces__namespace_Endpointslices__name(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * PATCH /apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices/:name
- * partially update the specified EndpointSlice
- */
-router.patch('/apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices/:name', async (req, res, next) => {
-  try {
-    await handlepatchModel_Apis_Discovery_K8s_Io_V1_Namespaces__namespace_Endpointslices__name(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * POST /apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices
- * create an EndpointSlice
- */
-router.post('/apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices', async (req, res, next) => {
-  try {
-    await handlepostModel_Apis_Discovery_K8s_Io_V1_Namespaces__namespace_Endpointslices(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * DELETE /apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices
- * delete collection of EndpointSlice
- */
-router.delete('/apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices', async (req, res, next) => {
-  try {
-    await handledeleteModel_Apis_Discovery_K8s_Io_V1_Namespaces__namespace_Endpointslices(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * GET /apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices
- * list or watch objects of kind EndpointSlice
- */
-router.get('/apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices', async (req, res, next) => {
-  try {
-    await handlegetModel_Apis_Discovery_K8s_Io_V1_Namespaces__namespace_Endpointslices(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * GET /apis/discovery.k8s.io/v1/watch/endpointslices
- * watch individual changes to a list of EndpointSlice. deprecated: use the 'watch' parameter with a list operation instead.
- */
-router.get('/apis/discovery.k8s.io/v1/watch/endpointslices', async (req, res, next) => {
-  try {
-    await handlegetModel_Apis_Discovery_K8s_Io_V1_Watch_Endpointslices(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * GET /apis/discovery.k8s.io/v1/watch/namespaces/:namespace/endpointslices/:name
- * watch changes to an object of kind EndpointSlice. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
- */
-router.get('/apis/discovery.k8s.io/v1/watch/namespaces/:namespace/endpointslices/:name', async (req, res, next) => {
-  try {
-    await handlegetModel_Apis_Discovery_K8s_Io_V1_Watch_Namespaces__namespace_Endpointslices__name(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * GET /apis/discovery.k8s.io/v1/endpointslices
- * list or watch objects of kind EndpointSlice
- */
-router.get('/apis/discovery.k8s.io/v1/endpointslices', async (req, res, next) => {
-  try {
-    await handlegetModel_Apis_Discovery_K8s_Io_V1_Endpointslices(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * GET /apis/discovery.k8s.io/v1/watch/namespaces/:namespace/endpointslices
- * watch individual changes to a list of EndpointSlice. deprecated: use the 'watch' parameter with a list operation instead.
- */
-router.get('/apis/discovery.k8s.io/v1/watch/namespaces/:namespace/endpointslices', async (req, res, next) => {
-  try {
-    await handlegetModel_Apis_Discovery_K8s_Io_V1_Watch_Namespaces__namespace_Endpointslices(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-
-
-return router;
-}
-
-
-
-/**
-* Handler for GET /apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices/:name
-* read the specified EndpointSlice
-* @resourceType endpointslice
-*/
-async function handlegetModel_Apis_Discovery_K8s_Io_V1_Namespaces__namespace_Endpointslices__name(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-
-// Get single resource
-const namespace = req.params.namespace || 'default';
-const name = req.params.name;
-
-logger.info(`Getting endpointslice ${name} in namespace ${namespace}`);
-
-try {
-  // Get the resource from storage
-  const result = await storage.getResource('endpointslice', name, namespace);
-  res.json(result);
-} catch (error) {
-  if (error.code === 'NOT_FOUND') {
-    res.status(404).json(createNotFoundResponse('endpointslice', name, namespace));
-    return;
-  }
-  throw error;
-}
-
-
-}
-
-/**
-* Handler for PUT /apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices/:name
-* replace the specified EndpointSlice
-* @resourceType endpointslice
-*/
-async function handleputModel_Apis_Discovery_K8s_Io_V1_Namespaces__namespace_Endpointslices__name(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-// Update resource
-const namespace = req.params.namespace || 'default';
-const name = req.params.name;
-const resource = req.body;
-
-logger.info(`Updating endpointslice ${name} in namespace ${namespace}`);
-
-try {
-  // Validate the resource
-  await validateResource(resource);
-  
-  // Update the resource in storage
-  const result = await storage.updateResource('endpointslice', name, resource, namespace);
-  res.json(result);
-} catch (error) {
-  handleResourceError(error, res);
-}
-
-}
-
-/**
-* Handler for DELETE /apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices/:name
-* delete an EndpointSlice
-* @resourceType endpointslice
-*/
-async function handledeleteModel_Apis_Discovery_K8s_Io_V1_Namespaces__namespace_Endpointslices__name(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-// Delete resource
-const namespace = req.params.namespace || 'default';
-const name = req.params.name;
-
-logger.info(`Deleting endpointslice ${name} in namespace ${namespace}`);
-
-try {
-  // Delete the resource from storage
-  await storage.deleteResource('endpointslice', name, namespace);
-  
-  // Return success response
-  res.json({
-    kind: 'Status',
-    apiVersion: 'v1',
-    metadata: {},
-    status: 'Success',
-    message: `endpointslice "${name}" deleted`
-  });
-} catch (error) {
-  if (error.code === 'NOT_FOUND') {
-    res.status(404).json(createNotFoundResponse('endpointslice', name, namespace));
-    return;
-  }
-  throw error;
-}
-
-}
-
-/**
-* Handler for PATCH /apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices/:name
-* partially update the specified EndpointSlice
-* @resourceType endpointslice
-*/
-async function handlepatchModel_Apis_Discovery_K8s_Io_V1_Namespaces__namespace_Endpointslices__name(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-// Patch resource
-const namespace = req.params.namespace || 'default';
-const name = req.params.name;
-const patchData = req.body;
-
-logger.info(`Patching endpointslice ${name} in namespace ${namespace}`);
-
-try {
-  // Apply patch to the resource
-  const result = await applyPatch(
-    storage, 
-    'endpointslice',
-    namespace, 
-    name, 
-    patchData
-  );
-  res.json(result);
-} catch (error) {
-  handleResourceError(error, res);
-}
-
-}
-
-/**
-* Handler for POST /apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices
-* create an EndpointSlice
-* @resourceType endpointslice
-*/
-async function handlepostModel_Apis_Discovery_K8s_Io_V1_Namespaces__namespace_Endpointslices(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-// Create resource
-const namespace = req.params.namespace || 'default';
-const resource = req.body;
-
-logger.info(`Creating endpointslice ${resource.metadata?.name} in namespace ${namespace}`);
-
-try {
-  // Validate the resource
-  await validateResource(resource);
-  
-  // Create the resource in storage
-  const result = await storage.createResource(resource, namespace);
-  res.status(201).json(result);
-} catch (error) {
-  handleResourceError(error, res);
-}
-
-}
-
-/**
-* Handler for DELETE /apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices
-* delete collection of EndpointSlice
-* @resourceType endpointslice
-*/
-async function handledeleteModel_Apis_Discovery_K8s_Io_V1_Namespaces__namespace_Endpointslices(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-// Delete resource
-const namespace = req.params.namespace || 'default';
-const name = req.params.name;
-
-logger.info(`Deleting endpointslice ${name} in namespace ${namespace}`);
-
-try {
-  // Delete the resource from storage
-  await storage.deleteResource('endpointslice', name, namespace);
-  
-  // Return success response
-  res.json({
-    kind: 'Status',
-    apiVersion: 'v1',
-    metadata: {},
-    status: 'Success',
-    message: `endpointslice "${name}" deleted`
-  });
-} catch (error) {
-  if (error.code === 'NOT_FOUND') {
-    res.status(404).json(createNotFoundResponse('endpointslice', name, namespace));
-    return;
-  }
-  throw error;
-}
-
-}
-
-/**
-* Handler for GET /apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices
-* list or watch objects of kind EndpointSlice
-* @resourceType endpointslice
-*/
-async function handlegetModel_Apis_Discovery_K8s_Io_V1_Namespaces__namespace_Endpointslices(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-
-// Get single resource
-const namespace = req.params.namespace || 'default';
-const name = req.params.name;
-
-logger.info(`Getting endpointslice ${name} in namespace ${namespace}`);
-
-try {
-  // Get the resource from storage
-  const result = await storage.getResource('endpointslice', name, namespace);
-  res.json(result);
-} catch (error) {
-  if (error.code === 'NOT_FOUND') {
-    res.status(404).json(createNotFoundResponse('endpointslice', name, namespace));
-    return;
-  }
-  throw error;
-}
-
-
-}
-
-/**
-* Handler for GET /apis/discovery.k8s.io/v1/watch/endpointslices
-* watch individual changes to a list of EndpointSlice. deprecated: use the 'watch' parameter with a list operation instead.
-* @resourceType endpointslice
-*/
-async function handlegetModel_Apis_Discovery_K8s_Io_V1_Watch_Endpointslices(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-
-// List resources
-const namespace = req.params.namespace || 'default';
-const { limit, continue: continueToken, labelSelector, fieldSelector, watch } = req.query;
-
-logger.info(`Listing endpointslices in namespace ${namespace}`);
-
-// Check if this is a watch request
-if (watch === 'true' || watch === '1') {
-  // Handle watch request
-  const resourceVersion = req.query.resourceVersion as string;
-  
-  // Set headers for streaming response
-  res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Transfer-Encoding', 'chunked');
-  res.setHeader('Connection', 'keep-alive');
-  res.setHeader('Cache-Control', 'no-cache, no-transform');
-  
-  // Set up error handler
-  const onError = (err: any) => {
-    logger.error(`Watch error for endpointslice:`, err);
-    
-    // Send error event
-    const errorEvent = {
-      type: 'ERROR',
-      object: {
+        const deleted = await storage.deleteResource('endpointslice', name, namespace);
+        
+        if (!deleted) {
+          return handleResourceError(new Error(`endpointslice ${name} not found in namespace ${namespace}`), res);
+        }
+      } catch(e) {
+          return handleResourceError(new Error(`endpointslice ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message)}`), res);
+      }
+      
+      res.status(200).json({
         kind: 'Status',
         apiVersion: 'v1',
         metadata: {},
-        status: 'Failure',
-        message: err.message || 'Watch error',
-        reason: 'InternalError',
-        code: 500
-      }
-    };
-    
-    res.write(JSON.stringify(errorEvent) + '\n');
-    res.end();
-  };
-  
-  // Set up close handler
-  req.on('close', () => {
-    if (stopWatching) {
-      stopWatching();
+        status: 'Success',
+        details: {
+          name: name,
+          kind: 'endpointslice'
+        }
+      });
+    } catch (error) {
+      next(error);
     }
   });
-  
-  // Start watching
-  let stopWatching: (() => void) | null = null;
-  try {
-    stopWatching = await storage.watchResources(
-      'endpointslice',
-      namespace,
-      labelSelector as string,
-      resourceVersion,
-      (type, resource) => {
-        // Send watch event
-        const event = {
-          type,
-          object: resource
-        };
-        res.write(JSON.stringify(event) + '\n');
-      }
-    );
-  } catch (err) {
-    onError(err);
-  }
-  
-  return;
-}
-
-// Regular list request
-// Fetch resources from storage
-const result = await fetchResourceList(
-  storage, 
-  'endpointslice',
-  namespace, 
-  {
-    limit: limit ? parseInt(limit as string) : undefined,
-    continueToken: continueToken as string,
-    labelSelector: labelSelector as string,
-    fieldSelector: fieldSelector as string
-  }
-);
-
-res.json(result);
-
-
-}
-
-/**
-* Handler for GET /apis/discovery.k8s.io/v1/watch/namespaces/:namespace/endpointslices/:name
-* watch changes to an object of kind EndpointSlice. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
-* @resourceType endpointslice
-*/
-async function handlegetModel_Apis_Discovery_K8s_Io_V1_Watch_Namespaces__namespace_Endpointslices__name(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-
-// Get single resource
-const namespace = req.params.namespace || 'default';
-const name = req.params.name;
-
-logger.info(`Getting endpointslice ${name} in namespace ${namespace}`);
-
-try {
-  // Get the resource from storage
-  const result = await storage.getResource('endpointslice', name, namespace);
-  res.json(result);
-} catch (error) {
-  if (error.code === 'NOT_FOUND') {
-    res.status(404).json(createNotFoundResponse('endpointslice', name, namespace));
-    return;
-  }
-  throw error;
-}
-
-
-}
-
-/**
-* Handler for GET /apis/discovery.k8s.io/v1/endpointslices
-* list or watch objects of kind EndpointSlice
-* @resourceType endpointslice
-*/
-async function handlegetModel_Apis_Discovery_K8s_Io_V1_Endpointslices(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-
-// List resources
-const namespace = req.params.namespace || 'default';
-const { limit, continue: continueToken, labelSelector, fieldSelector, watch } = req.query;
-
-logger.info(`Listing endpointslices in namespace ${namespace}`);
-
-// Check if this is a watch request
-if (watch === 'true' || watch === '1') {
-  // Handle watch request
-  const resourceVersion = req.query.resourceVersion as string;
-  
-  // Set headers for streaming response
-  res.setHeader('Content-Type', 'application/json');
-  res.setHeader('Transfer-Encoding', 'chunked');
-  res.setHeader('Connection', 'keep-alive');
-  res.setHeader('Cache-Control', 'no-cache, no-transform');
-  
-  // Set up error handler
-  const onError = (err: any) => {
-    logger.error(`Watch error for endpointslice:`, err);
     
-    // Send error event
-    const errorEvent = {
-      type: 'ERROR',
-      object: {
+  
+  
+  // List endpointslice
+  router.get('/apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      logger.info(`Listing endpointslice in namespace ${namespace}`);
+      
+      const resources = await storage.listResources('endpointslice', namespace);
+      
+      const response = {
+        kind: 'EndpointsliceList',
+        apiVersion: 'discovery.k8s.io/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+  // Create endpointslice
+  router.post('/apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      logger.info(`Creating endpointslice in namespace ${namespace}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set namespace in metadata
+      resource.metadata.namespace = namespace;
+      
+      const createdResource = await storage.createOrUpdateResource('endpointslice', resource);
+      
+      res.status(201).json(createdResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+    
+  
+  
+  // List endpointslice
+  router.get('/apis/discovery.k8s.io/v1/watch/endpointslices', async (req, res, next) => {
+    try {
+      logger.info(`Listing endpointslice`);
+      
+      const resources = await storage.listResources('endpointslice');
+      
+      const response = {
+        kind: 'EndpointsliceList',
+        apiVersion: 'discovery.k8s.io/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+    
+  
+  
+  // Get specific endpointslice
+  router.get('/apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices/:name', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Getting endpointslice ${name} in namespace ${namespace}`);
+      
+      const resource = await storage.getResource('endpointslice', name, namespace);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`endpointslice ${name} not found in namespace ${namespace}`), res);
+      }
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+  // Update endpointslice
+  router.put('/apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices/:name', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Updating endpointslice ${name} in namespace ${namespace}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set name and namespace in metadata
+      resource.metadata.name = name;
+      resource.metadata.namespace = namespace;
+      
+      const updatedResource = await storage.createOrUpdateResource('endpointslice', resource);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+  // Delete endpointslice
+  router.delete('/apis/discovery.k8s.io/v1/namespaces/:namespace/endpointslices/:name', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Deleting endpointslice ${name} in namespace ${namespace}`);
+      try {
+
+        const deleted = await storage.deleteResource('endpointslice', name, namespace);
+        
+        if (!deleted) {
+          return handleResourceError(new Error(`endpointslice ${name} not found in namespace ${namespace}`), res);
+        }
+      } catch(e) {
+          return handleResourceError(new Error(`endpointslice ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message)}`), res);
+      }
+      
+      res.status(200).json({
         kind: 'Status',
         apiVersion: 'v1',
         metadata: {},
-        status: 'Failure',
-        message: err.message || 'Watch error',
-        reason: 'InternalError',
-        code: 500
-      }
-    };
-    
-    res.write(JSON.stringify(errorEvent) + '\n');
-    res.end();
-  };
-  
-  // Set up close handler
-  req.on('close', () => {
-    if (stopWatching) {
-      stopWatching();
+        status: 'Success',
+        details: {
+          name: name,
+          kind: 'endpointslice'
+        }
+      });
+    } catch (error) {
+      next(error);
     }
   });
+    
   
-  // Start watching
-  let stopWatching: (() => void) | null = null;
-  try {
-    stopWatching = await storage.watchResources(
-      'endpointslice',
-      namespace,
-      labelSelector as string,
-      resourceVersion,
-      (type, resource) => {
-        // Send watch event
-        const event = {
-          type,
-          object: resource
-        };
-        res.write(JSON.stringify(event) + '\n');
+  
+  // Get specific endpointslice
+  router.get('/apis/discovery.k8s.io/v1/watch/namespaces/:namespace/endpointslices/:name', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Getting endpointslice ${name} in namespace ${namespace}`);
+      
+      const resource = await storage.getResource('endpointslice', name, namespace);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`endpointslice ${name} not found in namespace ${namespace}`), res);
       }
-    );
-  } catch (err) {
-    onError(err);
-  }
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+    
   
-  return;
+  
+  // List endpointslice
+  router.get('/apis/discovery.k8s.io/v1/endpointslices', async (req, res, next) => {
+    try {
+      logger.info(`Listing endpointslice`);
+      
+      const resources = await storage.listResources('endpointslice');
+      
+      const response = {
+        kind: 'EndpointsliceList',
+        apiVersion: 'discovery.k8s.io/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+    
+  
+  
+  // List endpointslice
+  router.get('/apis/discovery.k8s.io/v1/watch/namespaces/:namespace/endpointslices', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      logger.info(`Listing endpointslice in namespace ${namespace}`);
+      
+      const resources = await storage.listResources('endpointslice', namespace);
+      
+      const response = {
+        kind: 'EndpointsliceList',
+        apiVersion: 'discovery.k8s.io/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  return router;
 }
-
-// Regular list request
-// Fetch resources from storage
-const result = await fetchResourceList(
-  storage, 
-  'endpointslice',
-  namespace, 
-  {
-    limit: limit ? parseInt(limit as string) : undefined,
-    continueToken: continueToken as string,
-    labelSelector: labelSelector as string,
-    fieldSelector: fieldSelector as string
-  }
-);
-
-res.json(result);
-
-
-}
-
-/**
-* Handler for GET /apis/discovery.k8s.io/v1/watch/namespaces/:namespace/endpointslices
-* watch individual changes to a list of EndpointSlice. deprecated: use the 'watch' parameter with a list operation instead.
-* @resourceType endpointslice
-*/
-async function handlegetModel_Apis_Discovery_K8s_Io_V1_Watch_Namespaces__namespace_Endpointslices(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-
-// Get single resource
-const namespace = req.params.namespace || 'default';
-const name = req.params.name;
-
-logger.info(`Getting endpointslice ${name} in namespace ${namespace}`);
-
-try {
-  // Get the resource from storage
-  const result = await storage.getResource('endpointslice', name, namespace);
-  res.json(result);
-} catch (error) {
-  if (error.code === 'NOT_FOUND') {
-    res.status(404).json(createNotFoundResponse('endpointslice', name, namespace));
-    return;
-  }
-  throw error;
-}
-
-
-}
-
-

@@ -9,6 +9,13 @@ import (
 	"github.com/jinzhu/inflection"
 )
 
+// isVersion checks if a segment matches a version pattern like "v1" or "v1beta1".
+func isVersion(segment string) bool {
+	re := regexp.MustCompile(`^v\d+((alpha|beta)\d+)?$`)
+	return re.MatchString(segment)
+}
+
+// convertPath converts Swagger-style paths with {param} to Express-style :param.
 func convertPath(swaggerPath string) string {
 	result := swaggerPath
 	result = strings.ReplaceAll(result, "{", ":")
@@ -16,11 +23,13 @@ func convertPath(swaggerPath string) string {
 	return result
 }
 
+// generateOperationID creates a fallback operation ID.
 func generateOperationID(method, path string) string {
 	cleanPath := strings.ReplaceAll(path, "/", "_")
 	return strings.ToLower(method) + cleanPath
 }
 
+// mergeParameters merges global (path-level) parameters with operation-level parameters.
 func mergeParameters(global, operation []Parameter) []Parameter {
 	return append(global, operation...)
 }
@@ -40,41 +49,32 @@ func convertToIRParameters(params []Parameter) []IRParameter {
 	return irParams
 }
 
-// isVersion checks if a segment matches a version pattern like "v1" or "v1beta1".
-func isVersion(segment string) bool {
-	re := regexp.MustCompile(`^v\d+((alpha|beta)\d+)?$`)
-	return re.MatchString(segment)
-}
-
-// deriveResourceTypeForEndpointFromPath derives the resource type from an endpoint path.
-// It uses a path-based heuristic: if the path appears to be a discovery endpoint, it returns "discovery".
-// Otherwise, it iterates backwards over the segments (skipping parameters) to find the resource name.
-// If the last segment is a version (and the path is very short), we treat it as discovery.
+// deriveResourceTypeForEndpointFromPath uses a path-based heuristic to derive the resource type.
+// It splits the path into segments and, if it finds a known subresource (e.g., "status", "scale"),
+// it returns the segment preceding it. Otherwise, it returns the last non-parameter segment.
+// Additionally, if the path is very short or ends with a version, it returns "discovery".
 func deriveResourceTypeForEndpointFromPath(path string) string {
 	trimmed := strings.Trim(path, "/")
 	segments := strings.Split(trimmed, "/")
 	if len(segments) == 0 {
 		return "discovery"
 	}
-
-	// If the entire path is very short, e.g. "/api" or "/apis", treat as discovery.
+	// If the path is very short, treat it as discovery.
 	if len(segments) <= 2 {
 		return "discovery"
 	}
-
-	// If the last segment looks like a version and the path has few segments, treat as discovery.
+	// If the last segment is a version and the path has few segments, treat as discovery.
 	last := segments[len(segments)-1]
 	if isVersion(last) && len(segments) <= 3 {
 		return "discovery"
 	}
-
-	// Iterate backwards, skipping parameters.
+	// Iterate backward, skipping parameters.
 	for i := len(segments) - 1; i >= 0; i-- {
 		seg := segments[i]
 		if strings.HasPrefix(seg, ":") {
 			continue
 		}
-		// Check if seg is a known subresource; if so, use the previous segment.
+		// Check if seg is a known subresource.
 		subresources := map[string]bool{
 			"status":   true,
 			"scale":    true,
@@ -96,13 +96,13 @@ func deriveResourceTypeForEndpointFromPath(path string) string {
 func deriveResourceTypeForModel(modelName string) string {
 	parts := strings.Split(modelName, ".")
 	if len(parts) > 0 {
-		// Normalize to singular form to match the endpoint.
 		return inflection.Singular(strings.ToLower(parts[len(parts)-1]))
 	}
 	return strings.ToLower(modelName)
 }
 
-// convertToIRResponses simply maps responses; you could add deep resolution here if needed.
+// --- You'll need to import the inflection package: go get github.com/jinzhu/inflection ---
+
 func convertToIRResponses(resps map[string]Response, models map[string]Model) map[string]IRResponse {
 	irResps := make(map[string]IRResponse)
 	for code, r := range resps {
@@ -174,10 +174,13 @@ func GenerateIR(spec SwaggerSpec) IR {
 
 			convertedPath := convertPath(path)
 			resourceType := deriveResourceTypeForEndpointFromPath(convertedPath)
-			// If the resourceType is empty or looks like a version, treat it as "discovery".
+			// If resourceType is empty or looks like a version, set as "discovery".
 			if resourceType == "" || isVersion(resourceType) {
 				resourceType = "discovery"
 			}
+
+			// Determine if the endpoint is namespaced by checking if the path contains "namespaces".
+			namespaced := strings.Contains(convertedPath, "namespaces")
 
 			endpoint := Endpoint{
 				OperationID:  op.OperationID,
@@ -187,6 +190,7 @@ func GenerateIR(spec SwaggerSpec) IR {
 				Description:  op.Description,
 				Tags:         op.Tags,
 				ResourceType: resourceType,
+				Namespaced:   namespaced,
 				Parameters:   convertToIRParameters(mergedParams),
 				Responses:    convertToIRResponses(op.Responses, ir.Models),
 			}

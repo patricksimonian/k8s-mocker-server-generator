@@ -13,7 +13,7 @@ matchExpressions?: Array<{ key: string; operator: 'DoesNotExist' | 'Exists' | 'G
 * A list of node selector requirements by node's fields.
 * @isArray
 */
-matchFields?: Array<{ operator: 'DoesNotExist' | 'Exists' | 'Gt' | 'In' | 'Lt' | 'NotIn'; values?: string[]; key: string }>;
+matchFields?: Array<{ key: string; operator: 'DoesNotExist' | 'Exists' | 'Gt' | 'In' | 'Lt' | 'NotIn'; values?: string[] }>;
 }
 
 /**

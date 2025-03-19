@@ -5,10 +5,6 @@
 */
 export interface io_k8s_api_core_v1_ConfigMap {
 /**
-* APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
-*/
-apiVersion?: string;
-/**
 * BinaryData contains the binary data. Each key must consist of alphanumeric characters, '-', '_' or '.'. BinaryData can contain byte sequences that are not in the UTF-8 range. The keys stored in BinaryData must not overlap with the ones in the Data field, this is enforced during validation process. Using this field will require 1.10+ apiserver and kubelet.
 */
 binaryData?: Record<string, any>;
@@ -28,7 +24,11 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { deletionTimestamp?: Date; generateName?: string; namespace?: string; uid?: string; creationTimestamp?: Date; finalizers?: string[]; labels?: Record<string, any>; managedFields?: Array<{ fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string }>; name?: string; deletionGracePeriodSeconds?: number; annotations?: Record<string, any>; generation?: number; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; resourceVersion?: string; selfLink?: string };
+metadata?: { resourceVersion?: string; ownerReferences?: Array<{ blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string; apiVersion: string }>; generateName?: string; labels?: Record<string, any>; selfLink?: string; uid?: string; creationTimestamp?: Date; name?: string; annotations?: Record<string, any>; deletionTimestamp?: Date; finalizers?: string[]; generation?: number; managedFields?: Array<{ manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any> }>; namespace?: string; deletionGracePeriodSeconds?: number };
+/**
+* APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+*/
+apiVersion?: string;
 }
 
 /**
@@ -38,11 +38,11 @@ metadata?: { deletionTimestamp?: Date; generateName?: string; namespace?: string
 */
 export function createio_k8s_api_core_v1_ConfigMap(data?: Partial<io_k8s_api_core_v1_ConfigMap>): io_k8s_api_core_v1_ConfigMap {
  return {
-   apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
    binaryData: data?.binaryData !== undefined ? data.binaryData : {},
    data: data?.data !== undefined ? data.data : {},
    immutable: data?.immutable !== undefined ? data.immutable : false,
    kind: data?.kind !== undefined ? data.kind : '',
    metadata: data?.metadata !== undefined ? data.metadata : {},
+   apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
  };
 }

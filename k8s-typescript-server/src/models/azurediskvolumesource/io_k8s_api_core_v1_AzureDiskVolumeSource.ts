@@ -5,6 +5,10 @@
 */
 export interface io_k8s_api_core_v1_AzureDiskVolumeSource {
 /**
+* readOnly Defaults to false (read/write). ReadOnly here will force the ReadOnly setting in VolumeMounts.
+*/
+readOnly?: boolean;
+/**
 * cachingMode is the Host Caching mode: None, Read Only, Read Write.
 
 Possible enum values:
@@ -36,10 +40,6 @@ Possible enum values:
  - `"Shared"`
 */
 kind?: 'Dedicated' | 'Managed' | 'Shared';
-/**
-* readOnly Defaults to false (read/write). ReadOnly here will force the ReadOnly setting in VolumeMounts.
-*/
-readOnly?: boolean;
 }
 
 /**
@@ -49,11 +49,11 @@ readOnly?: boolean;
 */
 export function createio_k8s_api_core_v1_AzureDiskVolumeSource(data?: Partial<io_k8s_api_core_v1_AzureDiskVolumeSource>): io_k8s_api_core_v1_AzureDiskVolumeSource {
  return {
+   readOnly: data?.readOnly !== undefined ? data.readOnly : false,
    cachingMode: data?.cachingMode !== undefined ? data.cachingMode : '',
    diskName: data?.diskName !== undefined ? data.diskName : '',
    diskURI: data?.diskURI !== undefined ? data.diskURI : '',
    fsType: data?.fsType !== undefined ? data.fsType : '',
    kind: data?.kind !== undefined ? data.kind : '',
-   readOnly: data?.readOnly !== undefined ? data.readOnly : false,
  };
 }

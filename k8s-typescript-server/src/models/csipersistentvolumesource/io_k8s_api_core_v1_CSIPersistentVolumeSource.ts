@@ -5,19 +5,19 @@
 */
 export interface io_k8s_api_core_v1_CSIPersistentVolumeSource {
 /**
-* SecretReference represents a Secret Reference. It has enough information to retrieve secret in any namespace
-* @isObject
+* driver is the name of the driver to use for this volume. Required.
+* @required
 */
-nodeExpandSecretRef?: { name?: string; namespace?: string };
+driver: string;
+/**
+* fsType to mount. Must be a filesystem type supported by the host operating system. Ex. "ext4", "xfs", "ntfs".
+*/
+fsType?: string;
 /**
 * SecretReference represents a Secret Reference. It has enough information to retrieve secret in any namespace
 * @isObject
 */
-nodePublishSecretRef?: { name?: string; namespace?: string };
-/**
-* readOnly value to pass to ControllerPublishVolumeRequest. Defaults to false (read/write).
-*/
-readOnly?: boolean;
+nodePublishSecretRef?: { namespace?: string; name?: string };
 /**
 * volumeHandle is the unique volume name returned by the CSI volume plugin’s CreateVolume to refer to the volume on all subsequent calls. Required.
 * @required
@@ -34,23 +34,23 @@ controllerExpandSecretRef?: { name?: string; namespace?: string };
 */
 controllerPublishSecretRef?: { name?: string; namespace?: string };
 /**
-* SecretReference represents a Secret Reference. It has enough information to retrieve secret in any namespace
-* @isObject
+* readOnly value to pass to ControllerPublishVolumeRequest. Defaults to false (read/write).
 */
-nodeStageSecretRef?: { name?: string; namespace?: string };
+readOnly?: boolean;
 /**
 * volumeAttributes of the volume to publish.
 */
 volumeAttributes?: Record<string, any>;
 /**
-* driver is the name of the driver to use for this volume. Required.
-* @required
+* SecretReference represents a Secret Reference. It has enough information to retrieve secret in any namespace
+* @isObject
 */
-driver: string;
+nodeExpandSecretRef?: { name?: string; namespace?: string };
 /**
-* fsType to mount. Must be a filesystem type supported by the host operating system. Ex. "ext4", "xfs", "ntfs".
+* SecretReference represents a Secret Reference. It has enough information to retrieve secret in any namespace
+* @isObject
 */
-fsType?: string;
+nodeStageSecretRef?: { name?: string; namespace?: string };
 }
 
 /**
@@ -60,15 +60,15 @@ fsType?: string;
 */
 export function createio_k8s_api_core_v1_CSIPersistentVolumeSource(data?: Partial<io_k8s_api_core_v1_CSIPersistentVolumeSource>): io_k8s_api_core_v1_CSIPersistentVolumeSource {
  return {
-   nodeExpandSecretRef: data?.nodeExpandSecretRef !== undefined ? data.nodeExpandSecretRef : {},
+   driver: data?.driver !== undefined ? data.driver : '',
+   fsType: data?.fsType !== undefined ? data.fsType : '',
    nodePublishSecretRef: data?.nodePublishSecretRef !== undefined ? data.nodePublishSecretRef : {},
-   readOnly: data?.readOnly !== undefined ? data.readOnly : false,
    volumeHandle: data?.volumeHandle !== undefined ? data.volumeHandle : '',
    controllerExpandSecretRef: data?.controllerExpandSecretRef !== undefined ? data.controllerExpandSecretRef : {},
    controllerPublishSecretRef: data?.controllerPublishSecretRef !== undefined ? data.controllerPublishSecretRef : {},
-   nodeStageSecretRef: data?.nodeStageSecretRef !== undefined ? data.nodeStageSecretRef : {},
+   readOnly: data?.readOnly !== undefined ? data.readOnly : false,
    volumeAttributes: data?.volumeAttributes !== undefined ? data.volumeAttributes : {},
-   driver: data?.driver !== undefined ? data.driver : '',
-   fsType: data?.fsType !== undefined ? data.fsType : '',
+   nodeExpandSecretRef: data?.nodeExpandSecretRef !== undefined ? data.nodeExpandSecretRef : {},
+   nodeStageSecretRef: data?.nodeStageSecretRef !== undefined ? data.nodeStageSecretRef : {},
  };
 }

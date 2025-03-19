@@ -5,6 +5,10 @@
 */
 export interface io_k8s_api_autoscaling_v1_HorizontalPodAutoscaler {
 /**
+* APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+*/
+apiVersion?: string;
+/**
 * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 */
 kind?: string;
@@ -12,7 +16,7 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { labels?: Record<string, any>; ownerReferences?: Array<{ controller?: boolean; kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean }>; resourceVersion?: string; uid?: string; generateName?: string; generation?: number; namespace?: string; managedFields?: Array<{ fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string }>; selfLink?: string; creationTimestamp?: Date; deletionTimestamp?: Date; finalizers?: string[]; annotations?: Record<string, any>; deletionGracePeriodSeconds?: number; name?: string };
+metadata?: { deletionTimestamp?: Date; deletionGracePeriodSeconds?: number; generation?: number; labels?: Record<string, any>; namespace?: string; ownerReferences?: Array<{ kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean }>; creationTimestamp?: Date; finalizers?: string[]; generateName?: string; managedFields?: Array<{ operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string }>; name?: string; resourceVersion?: string; selfLink?: string; uid?: string; annotations?: Record<string, any> };
 /**
 * specification of a horizontal pod autoscaler.
 * @isObject
@@ -22,11 +26,7 @@ spec?: { maxReplicas: number; minReplicas?: number; scaleTargetRef: { apiVersion
 * current status of a horizontal pod autoscaler
 * @isObject
 */
-status?: { currentCPUUtilizationPercentage?: number; currentReplicas: number; desiredReplicas: number; lastScaleTime?: Date; observedGeneration?: number };
-/**
-* APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
-*/
-apiVersion?: string;
+status?: { lastScaleTime?: Date; observedGeneration?: number; currentCPUUtilizationPercentage?: number; currentReplicas: number; desiredReplicas: number };
 }
 
 /**
@@ -36,10 +36,10 @@ apiVersion?: string;
 */
 export function createio_k8s_api_autoscaling_v1_HorizontalPodAutoscaler(data?: Partial<io_k8s_api_autoscaling_v1_HorizontalPodAutoscaler>): io_k8s_api_autoscaling_v1_HorizontalPodAutoscaler {
  return {
+   apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
    kind: data?.kind !== undefined ? data.kind : '',
    metadata: data?.metadata !== undefined ? data.metadata : {},
-   spec: data?.spec !== undefined ? data.spec : { maxReplicas: 0, scaleTargetRef: { kind: '', name: '' } },
+   spec: data?.spec !== undefined ? data.spec : { scaleTargetRef: { kind: '', name: '' }, maxReplicas: 0 },
    status: data?.status !== undefined ? data.status : { currentReplicas: 0, desiredReplicas: 0 },
-   apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
  };
 }

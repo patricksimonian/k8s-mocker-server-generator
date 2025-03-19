@@ -5,11 +5,6 @@
 */
 export interface io_k8s_api_certificates_v1_CertificateSigningRequestStatus {
 /**
-* conditions applied to the request. Known conditions are "Approved", "Denied", and "Failed".
-* @isArray
-*/
-conditions?: Array<{ lastTransitionTime?: Date; lastUpdateTime?: Date; message?: string; reason?: string; status: string; type: string }>;
-/**
 * certificate is populated with an issued certificate by the signer after an Approved condition is present. This field is set via the /status subresource. Once populated, this field is immutable.
 
 If the certificate signing request is denied, a condition of type "Denied" is added and this field remains empty. If the signer cannot issue the certificate, a condition of type "Failed" is added and this field remains empty.
@@ -34,6 +29,11 @@ When serialized as JSON or YAML, the data is additionally base64-encoded, so it 
     )
 */
 certificate?: string;
+/**
+* conditions applied to the request. Known conditions are "Approved", "Denied", and "Failed".
+* @isArray
+*/
+conditions?: Array<{ status: string; type: string; lastTransitionTime?: Date; lastUpdateTime?: Date; message?: string; reason?: string }>;
 }
 
 /**
@@ -43,7 +43,7 @@ certificate?: string;
 */
 export function createio_k8s_api_certificates_v1_CertificateSigningRequestStatus(data?: Partial<io_k8s_api_certificates_v1_CertificateSigningRequestStatus>): io_k8s_api_certificates_v1_CertificateSigningRequestStatus {
  return {
-   conditions: data?.conditions !== undefined ? data.conditions : [],
    certificate: data?.certificate !== undefined ? data.certificate : '',
+   conditions: data?.conditions !== undefined ? data.conditions : [],
  };
 }

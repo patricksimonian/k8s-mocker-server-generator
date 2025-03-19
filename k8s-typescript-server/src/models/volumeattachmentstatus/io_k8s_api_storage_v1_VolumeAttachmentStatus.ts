@@ -5,11 +5,6 @@
 */
 export interface io_k8s_api_storage_v1_VolumeAttachmentStatus {
 /**
-* VolumeError captures an error encountered during a volume operation.
-* @isObject
-*/
-attachError?: { message?: string; time?: Date };
-/**
 * attached indicates the volume is successfully attached. This field must only be set by the entity completing the attach operation, i.e. the external-attacher.
 * @required
 */
@@ -23,6 +18,11 @@ attachmentMetadata?: Record<string, any>;
 * @isObject
 */
 detachError?: { message?: string; time?: Date };
+/**
+* VolumeError captures an error encountered during a volume operation.
+* @isObject
+*/
+attachError?: { message?: string; time?: Date };
 }
 
 /**
@@ -32,9 +32,9 @@ detachError?: { message?: string; time?: Date };
 */
 export function createio_k8s_api_storage_v1_VolumeAttachmentStatus(data?: Partial<io_k8s_api_storage_v1_VolumeAttachmentStatus>): io_k8s_api_storage_v1_VolumeAttachmentStatus {
  return {
-   attachError: data?.attachError !== undefined ? data.attachError : {},
    attached: data?.attached !== undefined ? data.attached : false,
    attachmentMetadata: data?.attachmentMetadata !== undefined ? data.attachmentMetadata : {},
    detachError: data?.detachError !== undefined ? data.detachError : {},
+   attachError: data?.attachError !== undefined ? data.attachError : {},
  };
 }

@@ -18,6 +18,6 @@ linux?: { gid: number; supplementalGroups?: number[]; uid: number };
 */
 export function createio_k8s_api_core_v1_ContainerUser(data?: Partial<io_k8s_api_core_v1_ContainerUser>): io_k8s_api_core_v1_ContainerUser {
  return {
-   linux: data?.linux !== undefined ? data.linux : { gid: 0, uid: 0 },
+   linux: data?.linux !== undefined ? data.linux : { uid: 0, gid: 0 },
  };
 }

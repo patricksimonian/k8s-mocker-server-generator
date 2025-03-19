@@ -9,13 +9,13 @@ export interface io_k8s_api_autoscaling_v2_ExternalMetricStatus {
 * @required
 * @isObject
 */
-current: { averageUtilization?: number; averageValue?: string; value?: string };
+current: { averageValue?: string; value?: string; averageUtilization?: number };
 /**
 * MetricIdentifier defines the name and optionally selector for a metric
 * @required
 * @isObject
 */
-metric: { selector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> }; name: string };
+metric: { name: string; selector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> } };
 }
 
 /**

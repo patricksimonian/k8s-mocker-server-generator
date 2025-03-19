@@ -16,7 +16,7 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { deletionGracePeriodSeconds?: number; deletionTimestamp?: Date; namespace?: string; uid?: string; creationTimestamp?: Date; labels?: Record<string, any>; managedFields?: Array<{ fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string }>; ownerReferences?: Array<{ kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean }>; resourceVersion?: string; finalizers?: string[]; generateName?: string; generation?: number; annotations?: Record<string, any>; name?: string; selfLink?: string };
+metadata?: { managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; ownerReferences?: Array<{ blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string; apiVersion: string }>; uid?: string; name?: string; namespace?: string; annotations?: Record<string, any>; deletionTimestamp?: Date; labels?: Record<string, any>; selfLink?: string; finalizers?: string[]; generateName?: string; generation?: number; creationTimestamp?: Date; deletionGracePeriodSeconds?: number; resourceVersion?: string };
 /**
 * RoleRef contains information that points to the role being used
 * @required
@@ -40,7 +40,7 @@ export function createio_k8s_api_rbac_v1_RoleBinding(data?: Partial<io_k8s_api_r
    apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
    kind: data?.kind !== undefined ? data.kind : '',
    metadata: data?.metadata !== undefined ? data.metadata : {},
-   roleRef: data?.roleRef !== undefined ? data.roleRef : { name: '', apiGroup: '', kind: '' },
+   roleRef: data?.roleRef !== undefined ? data.roleRef : { apiGroup: '', kind: '', name: '' },
    subjects: data?.subjects !== undefined ? data.subjects : [],
  };
 }

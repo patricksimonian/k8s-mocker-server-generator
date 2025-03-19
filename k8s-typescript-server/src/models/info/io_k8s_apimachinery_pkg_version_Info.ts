@@ -8,17 +8,7 @@ export interface io_k8s_apimachinery_pkg_version_Info {
 * 
 * @required
 */
-gitCommit: string;
-/**
-* 
-* @required
-*/
-gitVersion: string;
-/**
-* 
-* @required
-*/
-goVersion: string;
+buildDate: string;
 /**
 * 
 * @required
@@ -33,7 +23,7 @@ gitTreeState: string;
 * 
 * @required
 */
-major: string;
+goVersion: string;
 /**
 * 
 * @required
@@ -43,12 +33,22 @@ minor: string;
 * 
 * @required
 */
-platform: string;
+gitCommit: string;
 /**
 * 
 * @required
 */
-buildDate: string;
+gitVersion: string;
+/**
+* 
+* @required
+*/
+major: string;
+/**
+* 
+* @required
+*/
+platform: string;
 }
 
 /**
@@ -58,14 +58,14 @@ buildDate: string;
 */
 export function createio_k8s_apimachinery_pkg_version_Info(data?: Partial<io_k8s_apimachinery_pkg_version_Info>): io_k8s_apimachinery_pkg_version_Info {
  return {
-   gitCommit: data?.gitCommit !== undefined ? data.gitCommit : '',
-   gitVersion: data?.gitVersion !== undefined ? data.gitVersion : '',
-   goVersion: data?.goVersion !== undefined ? data.goVersion : '',
+   buildDate: data?.buildDate !== undefined ? data.buildDate : '',
    compiler: data?.compiler !== undefined ? data.compiler : '',
    gitTreeState: data?.gitTreeState !== undefined ? data.gitTreeState : '',
-   major: data?.major !== undefined ? data.major : '',
+   goVersion: data?.goVersion !== undefined ? data.goVersion : '',
    minor: data?.minor !== undefined ? data.minor : '',
+   gitCommit: data?.gitCommit !== undefined ? data.gitCommit : '',
+   gitVersion: data?.gitVersion !== undefined ? data.gitVersion : '',
+   major: data?.major !== undefined ? data.major : '',
    platform: data?.platform !== undefined ? data.platform : '',
-   buildDate: data?.buildDate !== undefined ? data.buildDate : '',
  };
 }

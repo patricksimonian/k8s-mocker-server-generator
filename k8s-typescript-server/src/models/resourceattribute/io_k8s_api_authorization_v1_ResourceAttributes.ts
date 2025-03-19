@@ -5,21 +5,26 @@
 */
 export interface io_k8s_api_authorization_v1_ResourceAttributes {
 /**
-* Resource is one of the existing resource types.  "*" means all.
+* LabelSelectorAttributes indicates a label limited access. Webhook authors are encouraged to * ensure rawSelector and requirements are not both set * consider the requirements field if set * not try to parse or consider the rawSelector field if set. This is to avoid another CVE-2022-2880 (i.e. getting different systems to agree on how exactly to parse a query is not something we want), see https://www.oxeye.io/resources/golang-parameter-smuggling-attack for more details. For the *SubjectAccessReview endpoints of the kube-apiserver: * If rawSelector is empty and requirements are empty, the request is not limited. * If rawSelector is present and requirements are empty, the rawSelector will be parsed and limited if the parsing succeeds. * If rawSelector is empty and requirements are present, the requirements should be honored * If rawSelector is present and requirements are present, the request is invalid.
+* @isObject
 */
-resource?: string;
-/**
-* Group is the API Group of the Resource.  "*" means all.
-*/
-group?: string;
+labelSelector?: { rawSelector?: string; requirements?: Array<{ key: string; operator: string; values?: string[] }> };
 /**
 * Namespace is the namespace of the action being requested.  Currently, there is no distinction between no namespace and all namespaces "" (empty) is defaulted for LocalSubjectAccessReviews "" (empty) is empty for cluster-scoped resources "" (empty) means "all" for namespace scoped resources from a SubjectAccessReview or SelfSubjectAccessReview
 */
 namespace?: string;
 /**
+* Group is the API Group of the Resource.  "*" means all.
+*/
+group?: string;
+/**
 * Name is the name of the resource being requested for a "get" or deleted for a "delete". "" (empty) means all.
 */
 name?: string;
+/**
+* Resource is one of the existing resource types.  "*" means all.
+*/
+resource?: string;
 /**
 * Subresource is one of the existing resource types.  "" means none.
 */
@@ -37,11 +42,6 @@ version?: string;
 * @isObject
 */
 fieldSelector?: { rawSelector?: string; requirements?: Array<{ key: string; operator: string; values?: string[] }> };
-/**
-* LabelSelectorAttributes indicates a label limited access. Webhook authors are encouraged to * ensure rawSelector and requirements are not both set * consider the requirements field if set * not try to parse or consider the rawSelector field if set. This is to avoid another CVE-2022-2880 (i.e. getting different systems to agree on how exactly to parse a query is not something we want), see https://www.oxeye.io/resources/golang-parameter-smuggling-attack for more details. For the *SubjectAccessReview endpoints of the kube-apiserver: * If rawSelector is empty and requirements are empty, the request is not limited. * If rawSelector is present and requirements are empty, the rawSelector will be parsed and limited if the parsing succeeds. * If rawSelector is empty and requirements are present, the requirements should be honored * If rawSelector is present and requirements are present, the request is invalid.
-* @isObject
-*/
-labelSelector?: { rawSelector?: string; requirements?: Array<{ operator: string; values?: string[]; key: string }> };
 }
 
 /**
@@ -51,14 +51,14 @@ labelSelector?: { rawSelector?: string; requirements?: Array<{ operator: string;
 */
 export function createio_k8s_api_authorization_v1_ResourceAttributes(data?: Partial<io_k8s_api_authorization_v1_ResourceAttributes>): io_k8s_api_authorization_v1_ResourceAttributes {
  return {
-   resource: data?.resource !== undefined ? data.resource : '',
-   group: data?.group !== undefined ? data.group : '',
+   labelSelector: data?.labelSelector !== undefined ? data.labelSelector : {},
    namespace: data?.namespace !== undefined ? data.namespace : '',
+   group: data?.group !== undefined ? data.group : '',
    name: data?.name !== undefined ? data.name : '',
+   resource: data?.resource !== undefined ? data.resource : '',
    subresource: data?.subresource !== undefined ? data.subresource : '',
    verb: data?.verb !== undefined ? data.verb : '',
    version: data?.version !== undefined ? data.version : '',
    fieldSelector: data?.fieldSelector !== undefined ? data.fieldSelector : {},
-   labelSelector: data?.labelSelector !== undefined ? data.labelSelector : {},
  };
 }

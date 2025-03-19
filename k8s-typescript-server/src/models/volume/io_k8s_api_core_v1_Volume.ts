@@ -5,32 +5,64 @@
 */
 export interface io_k8s_api_core_v1_Volume {
 /**
-* Represents an empty directory for a pod. Empty directory volumes support ownership management and SELinux relabeling.
-* @isObject
-*/
-emptyDir?: { medium?: string; sizeLimit?: string };
-/**
-* Represents a Flocker volume mounted by the Flocker agent. One and only one of datasetName and datasetUUID should be set. Flocker volumes do not support ownership management or SELinux relabeling.
-* @isObject
-*/
-flocker?: { datasetName?: string; datasetUUID?: string };
-/**
-* Represents an ISCSI disk. ISCSI volumes can only be mounted as read/write once. ISCSI volumes support ownership management and SELinux relabeling.
-* @isObject
-*/
-iscsi?: { fsType?: string; iscsiInterface?: string; portals?: string[]; readOnly?: boolean; secretRef?: { name?: string }; chapAuthDiscovery?: boolean; chapAuthSession?: boolean; initiatorName?: string; iqn: string; lun: number; targetPortal: string };
-/**
-* AzureFile represents an Azure File Service mount on the host and bind mount to the pod.
-* @isObject
-*/
-azureFile?: { readOnly?: boolean; secretName: string; shareName: string };
-/**
 * Represents a Persistent Disk resource in Google Compute Engine.
 
 A GCE PD must exist before mounting to a container. The disk must also be in the same GCE project and zone as the kubelet. A GCE PD can only be mounted as read/write once or read-only many times. GCE PDs support ownership management and SELinux relabeling.
 * @isObject
 */
 gcePersistentDisk?: { fsType?: string; partition?: number; pdName: string; readOnly?: boolean };
+/**
+* Represents a host path mapped into a pod. Host path volumes do not support ownership management or SELinux relabeling.
+* @isObject
+*/
+hostPath?: { path: string; type?: '' | 'BlockDevice' | 'CharDevice' | 'Directory' | 'DirectoryOrCreate' | 'File' | 'FileOrCreate' | 'Socket' };
+/**
+* name of the volume. Must be a DNS_LABEL and unique within the pod. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+* @required
+*/
+name: string;
+/**
+* PersistentVolumeClaimVolumeSource references the user's PVC in the same namespace. This volume finds the bound PV and mounts that volume for the pod. A PersistentVolumeClaimVolumeSource is, essentially, a wrapper around another type of volume that is owned by someone else (the system).
+* @isObject
+*/
+persistentVolumeClaim?: { readOnly?: boolean; claimName: string };
+/**
+* Represents a projected volume source
+* @isObject
+*/
+projected?: { defaultMode?: number; sources?: Array<{ serviceAccountToken?: { path: string; audience?: string; expirationSeconds?: number }; clusterTrustBundle?: { labelSelector?: { matchExpressions?: Array<{ values?: string[]; key: string; operator: string }>; matchLabels?: Record<string, any> }; name?: string; optional?: boolean; path: string; signerName?: string }; configMap?: { optional?: boolean; items?: Array<{ key: string; mode?: number; path: string }>; name?: string }; downwardAPI?: { items?: Array<{ fieldRef?: { apiVersion?: string; fieldPath: string }; mode?: number; path: string; resourceFieldRef?: { containerName?: string; divisor?: string; resource: string } }> }; secret?: { optional?: boolean; items?: Array<{ path: string; key: string; mode?: number }>; name?: string } }> };
+/**
+* ScaleIOVolumeSource represents a persistent ScaleIO volume
+* @isObject
+*/
+scaleIO?: { readOnly?: boolean; storageMode?: string; storagePool?: string; fsType?: string; protectionDomain?: string; secretRef: { name?: string }; sslEnabled?: boolean; system: string; volumeName?: string; gateway: string };
+/**
+* Represents a cinder volume resource in Openstack. A Cinder volume must exist before mounting to a container. The volume must also be in the same region as the kubelet. Cinder volumes support ownership management and SELinux relabeling.
+* @isObject
+*/
+cinder?: { fsType?: string; readOnly?: boolean; secretRef?: { name?: string }; volumeID: string };
+/**
+* FlexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin.
+* @isObject
+*/
+flexVolume?: { secretRef?: { name?: string }; driver: string; fsType?: string; options?: Record<string, any>; readOnly?: boolean };
+/**
+* Represents a Ceph Filesystem mount that lasts the lifetime of a pod Cephfs volumes do not support ownership management or SELinux relabeling.
+* @isObject
+*/
+cephfs?: { path?: string; readOnly?: boolean; secretFile?: string; secretRef?: { name?: string }; user?: string; monitors: string[] };
+/**
+* Adapts a ConfigMap into a volume.
+
+The contents of the target ConfigMap's Data field will be presented in a volume as files using the keys in the Data field as the file names, unless the items element is populated with specific mappings of keys to paths. ConfigMap volumes support ownership management and SELinux relabeling.
+* @isObject
+*/
+configMap?: { defaultMode?: number; items?: Array<{ key: string; mode?: number; path: string }>; name?: string; optional?: boolean };
+/**
+* Represents an empty directory for a pod. Empty directory volumes support ownership management and SELinux relabeling.
+* @isObject
+*/
+emptyDir?: { medium?: string; sizeLimit?: string };
 /**
 * Represents a volume that is populated with the contents of a git repository. Git repo volumes do not support ownership management. Git repo volumes support SELinux relabeling.
 
@@ -39,67 +71,30 @@ DEPRECATED: GitRepo is deprecated. To provision a container with a git repo, mou
 */
 gitRepo?: { directory?: string; repository: string; revision?: string };
 /**
+* AzureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
+* @isObject
+*/
+azureDisk?: { readOnly?: boolean; cachingMode?: 'None' | 'ReadOnly' | 'ReadWrite'; diskName: string; diskURI: string; fsType?: string; kind?: 'Dedicated' | 'Managed' | 'Shared' };
+/**
+* AzureFile represents an Azure File Service mount on the host and bind mount to the pod.
+* @isObject
+*/
+azureFile?: { readOnly?: boolean; secretName: string; shareName: string };
+/**
+* PortworxVolumeSource represents a Portworx volume resource.
+* @isObject
+*/
+portworxVolume?: { fsType?: string; readOnly?: boolean; volumeID: string };
+/**
+* Represents a Flocker volume mounted by the Flocker agent. One and only one of datasetName and datasetUUID should be set. Flocker volumes do not support ownership management or SELinux relabeling.
+* @isObject
+*/
+flocker?: { datasetName?: string; datasetUUID?: string };
+/**
 * Represents a Glusterfs mount that lasts the lifetime of a pod. Glusterfs volumes do not support ownership management or SELinux relabeling.
 * @isObject
 */
 glusterfs?: { endpoints: string; path: string; readOnly?: boolean };
-/**
-* Represents a Quobyte mount that lasts the lifetime of a pod. Quobyte volumes do not support ownership management or SELinux relabeling.
-* @isObject
-*/
-quobyte?: { readOnly?: boolean; registry: string; tenant?: string; user?: string; volume: string; group?: string };
-/**
-* ScaleIOVolumeSource represents a persistent ScaleIO volume
-* @isObject
-*/
-scaleIO?: { secretRef: { name?: string }; system: string; fsType?: string; gateway: string; protectionDomain?: string; readOnly?: boolean; sslEnabled?: boolean; storageMode?: string; storagePool?: string; volumeName?: string };
-/**
-* Adapts a Secret into a volume.
-
-The contents of the target Secret's Data field will be presented in a volume as files using the keys in the Data field as the file names. Secret volumes support ownership management and SELinux relabeling.
-* @isObject
-*/
-secret?: { defaultMode?: number; items?: Array<{ key: string; mode?: number; path: string }>; optional?: boolean; secretName?: string };
-/**
-* AzureDisk represents an Azure Data Disk mount on the host and bind mount to the pod.
-* @isObject
-*/
-azureDisk?: { diskURI: string; fsType?: string; kind?: 'Dedicated' | 'Managed' | 'Shared'; readOnly?: boolean; cachingMode?: 'None' | 'ReadOnly' | 'ReadWrite'; diskName: string };
-/**
-* FlexVolume represents a generic volume resource that is provisioned/attached using an exec based plugin.
-* @isObject
-*/
-flexVolume?: { driver: string; fsType?: string; options?: Record<string, any>; readOnly?: boolean; secretRef?: { name?: string } };
-/**
-* name of the volume. Must be a DNS_LABEL and unique within the pod. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-* @required
-*/
-name: string;
-/**
-* Represents a projected volume source
-* @isObject
-*/
-projected?: { sources?: Array<{ clusterTrustBundle?: { path: string; signerName?: string; labelSelector?: { matchExpressions?: Array<{ values?: string[]; key: string; operator: string }>; matchLabels?: Record<string, any> }; name?: string; optional?: boolean }; configMap?: { optional?: boolean; items?: Array<{ key: string; mode?: number; path: string }>; name?: string }; downwardAPI?: { items?: Array<{ fieldRef?: { apiVersion?: string; fieldPath: string }; mode?: number; path: string; resourceFieldRef?: { containerName?: string; divisor?: string; resource: string } }> }; secret?: { items?: Array<{ mode?: number; path: string; key: string }>; name?: string; optional?: boolean }; serviceAccountToken?: { audience?: string; expirationSeconds?: number; path: string } }>; defaultMode?: number };
-/**
-* Represents a vSphere volume resource.
-* @isObject
-*/
-vsphereVolume?: { fsType?: string; storagePolicyID?: string; storagePolicyName?: string; volumePath: string };
-/**
-* Represents a Ceph Filesystem mount that lasts the lifetime of a pod Cephfs volumes do not support ownership management or SELinux relabeling.
-* @isObject
-*/
-cephfs?: { readOnly?: boolean; secretFile?: string; secretRef?: { name?: string }; user?: string; monitors: string[]; path?: string };
-/**
-* Represents a Fibre Channel volume. Fibre Channel volumes can only be mounted as read/write once. Fibre Channel volumes support ownership management and SELinux relabeling.
-* @isObject
-*/
-fc?: { fsType?: string; lun?: number; readOnly?: boolean; targetWWNs?: string[]; wwids?: string[] };
-/**
-* ImageVolumeSource represents a image volume resource.
-* @isObject
-*/
-image?: { pullPolicy?: 'Always' | 'IfNotPresent' | 'Never'; reference?: string };
 /**
 * Represents a Photon Controller persistent disk resource.
 * @isObject
@@ -111,47 +106,47 @@ photonPersistentDisk?: { fsType?: string; pdID: string };
 */
 rbd?: { fsType?: string; image: string; keyring?: string; monitors: string[]; pool?: string; readOnly?: boolean; secretRef?: { name?: string }; user?: string };
 /**
-* Adapts a ConfigMap into a volume.
-
-The contents of the target ConfigMap's Data field will be presented in a volume as files using the keys in the Data field as the file names, unless the items element is populated with specific mappings of keys to paths. ConfigMap volumes support ownership management and SELinux relabeling.
+* Represents a StorageOS persistent volume resource.
 * @isObject
 */
-configMap?: { defaultMode?: number; items?: Array<{ mode?: number; path: string; key: string }>; name?: string; optional?: boolean };
+storageos?: { volumeName?: string; volumeNamespace?: string; fsType?: string; readOnly?: boolean; secretRef?: { name?: string } };
+/**
+* ImageVolumeSource represents a image volume resource.
+* @isObject
+*/
+image?: { pullPolicy?: 'Always' | 'IfNotPresent' | 'Never'; reference?: string };
+/**
+* Represents an ISCSI disk. ISCSI volumes can only be mounted as read/write once. ISCSI volumes support ownership management and SELinux relabeling.
+* @isObject
+*/
+iscsi?: { initiatorName?: string; iqn: string; iscsiInterface?: string; lun: number; portals?: string[]; readOnly?: boolean; chapAuthDiscovery?: boolean; chapAuthSession?: boolean; fsType?: string; secretRef?: { name?: string }; targetPortal: string };
 /**
 * Represents an ephemeral volume that is handled by a normal storage driver.
 * @isObject
 */
-ephemeral?: { volumeClaimTemplate?: { metadata?: { deletionGracePeriodSeconds?: number; annotations?: Record<string, any>; finalizers?: string[]; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; labels?: Record<string, any>; name?: string; ownerReferences?: Array<{ uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string }>; resourceVersion?: string; selfLink?: string; creationTimestamp?: Date; deletionTimestamp?: Date; generation?: number; uid?: string; generateName?: string; namespace?: string }; spec: { storageClassName?: string; volumeAttributesClassName?: string; volumeMode?: 'Block' | 'Filesystem'; volumeName?: string; dataSource?: { kind: string; name: string; apiGroup?: string }; dataSourceRef?: { name: string; namespace?: string; apiGroup?: string; kind: string }; resources?: { limits?: Record<string, any>; requests?: Record<string, any> }; selector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> }; accessModes?: 'ReadOnlyMany' | 'ReadWriteMany' | 'ReadWriteOnce' | 'ReadWriteOncePod'[] } } };
+ephemeral?: { volumeClaimTemplate?: { metadata?: { uid?: string; creationTimestamp?: Date; name?: string; namespace?: string; selfLink?: string; finalizers?: string[]; generateName?: string; managedFields?: Array<{ manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any> }>; resourceVersion?: string; labels?: Record<string, any>; ownerReferences?: Array<{ kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean }>; annotations?: Record<string, any>; deletionGracePeriodSeconds?: number; deletionTimestamp?: Date; generation?: number }; spec: { accessModes?: 'ReadOnlyMany' | 'ReadWriteMany' | 'ReadWriteOnce' | 'ReadWriteOncePod'[]; dataSourceRef?: { apiGroup?: string; kind: string; name: string; namespace?: string }; resources?: { limits?: Record<string, any>; requests?: Record<string, any> }; storageClassName?: string; volumeAttributesClassName?: string; volumeMode?: 'Block' | 'Filesystem'; dataSource?: { kind: string; name: string; apiGroup?: string }; selector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> }; volumeName?: string } } };
 /**
-* Represents a StorageOS persistent volume resource.
+* Represents a Fibre Channel volume. Fibre Channel volumes can only be mounted as read/write once. Fibre Channel volumes support ownership management and SELinux relabeling.
 * @isObject
 */
-storageos?: { fsType?: string; readOnly?: boolean; secretRef?: { name?: string }; volumeName?: string; volumeNamespace?: string };
+fc?: { fsType?: string; lun?: number; readOnly?: boolean; targetWWNs?: string[]; wwids?: string[] };
 /**
-* DownwardAPIVolumeSource represents a volume containing downward API info. Downward API volumes support ownership management and SELinux relabeling.
+* Represents a vSphere volume resource.
 * @isObject
 */
-downwardAPI?: { defaultMode?: number; items?: Array<{ fieldRef?: { apiVersion?: string; fieldPath: string }; mode?: number; path: string; resourceFieldRef?: { containerName?: string; divisor?: string; resource: string } }> };
+vsphereVolume?: { fsType?: string; storagePolicyID?: string; storagePolicyName?: string; volumePath: string };
 /**
-* Represents a host path mapped into a pod. Host path volumes do not support ownership management or SELinux relabeling.
+* Represents a Quobyte mount that lasts the lifetime of a pod. Quobyte volumes do not support ownership management or SELinux relabeling.
 * @isObject
 */
-hostPath?: { path: string; type?: '' | 'BlockDevice' | 'CharDevice' | 'Directory' | 'DirectoryOrCreate' | 'File' | 'FileOrCreate' | 'Socket' };
+quobyte?: { volume: string; group?: string; readOnly?: boolean; registry: string; tenant?: string; user?: string };
 /**
-* Represents an NFS mount that lasts the lifetime of a pod. NFS volumes do not support ownership management or SELinux relabeling.
+* Adapts a Secret into a volume.
+
+The contents of the target Secret's Data field will be presented in a volume as files using the keys in the Data field as the file names. Secret volumes support ownership management and SELinux relabeling.
 * @isObject
 */
-nfs?: { path: string; readOnly?: boolean; server: string };
-/**
-* PersistentVolumeClaimVolumeSource references the user's PVC in the same namespace. This volume finds the bound PV and mounts that volume for the pod. A PersistentVolumeClaimVolumeSource is, essentially, a wrapper around another type of volume that is owned by someone else (the system).
-* @isObject
-*/
-persistentVolumeClaim?: { claimName: string; readOnly?: boolean };
-/**
-* PortworxVolumeSource represents a Portworx volume resource.
-* @isObject
-*/
-portworxVolume?: { readOnly?: boolean; volumeID: string; fsType?: string };
+secret?: { defaultMode?: number; items?: Array<{ path: string; key: string; mode?: number }>; optional?: boolean; secretName?: string };
 /**
 * Represents a Persistent Disk resource in AWS.
 
@@ -160,15 +155,20 @@ An AWS EBS disk must exist before mounting to a container. The disk must also be
 */
 awsElasticBlockStore?: { fsType?: string; partition?: number; readOnly?: boolean; volumeID: string };
 /**
+* Represents an NFS mount that lasts the lifetime of a pod. NFS volumes do not support ownership management or SELinux relabeling.
+* @isObject
+*/
+nfs?: { path: string; readOnly?: boolean; server: string };
+/**
 * Represents a source location of a volume to mount, managed by an external CSI driver
 * @isObject
 */
 csi?: { driver: string; fsType?: string; nodePublishSecretRef?: { name?: string }; readOnly?: boolean; volumeAttributes?: Record<string, any> };
 /**
-* Represents a cinder volume resource in Openstack. A Cinder volume must exist before mounting to a container. The volume must also be in the same region as the kubelet. Cinder volumes support ownership management and SELinux relabeling.
+* DownwardAPIVolumeSource represents a volume containing downward API info. Downward API volumes support ownership management and SELinux relabeling.
 * @isObject
 */
-cinder?: { fsType?: string; readOnly?: boolean; secretRef?: { name?: string }; volumeID: string };
+downwardAPI?: { defaultMode?: number; items?: Array<{ fieldRef?: { apiVersion?: string; fieldPath: string }; mode?: number; path: string; resourceFieldRef?: { containerName?: string; divisor?: string; resource: string } }> };
 }
 
 /**
@@ -178,36 +178,36 @@ cinder?: { fsType?: string; readOnly?: boolean; secretRef?: { name?: string }; v
 */
 export function createio_k8s_api_core_v1_Volume(data?: Partial<io_k8s_api_core_v1_Volume>): io_k8s_api_core_v1_Volume {
  return {
-   emptyDir: data?.emptyDir !== undefined ? data.emptyDir : {},
-   flocker: data?.flocker !== undefined ? data.flocker : {},
-   iscsi: data?.iscsi !== undefined ? data.iscsi : { iqn: '', lun: 0, targetPortal: '' },
-   azureFile: data?.azureFile !== undefined ? data.azureFile : { secretName: '', shareName: '' },
    gcePersistentDisk: data?.gcePersistentDisk !== undefined ? data.gcePersistentDisk : { pdName: '' },
-   gitRepo: data?.gitRepo !== undefined ? data.gitRepo : { repository: '' },
-   glusterfs: data?.glusterfs !== undefined ? data.glusterfs : { endpoints: '', path: '' },
-   quobyte: data?.quobyte !== undefined ? data.quobyte : { volume: '', registry: '' },
-   scaleIO: data?.scaleIO !== undefined ? data.scaleIO : { secretRef: {}, system: '', gateway: '' },
-   secret: data?.secret !== undefined ? data.secret : {},
-   azureDisk: data?.azureDisk !== undefined ? data.azureDisk : { diskName: '', diskURI: '' },
-   flexVolume: data?.flexVolume !== undefined ? data.flexVolume : { driver: '' },
-   name: data?.name !== undefined ? data.name : '',
-   projected: data?.projected !== undefined ? data.projected : {},
-   vsphereVolume: data?.vsphereVolume !== undefined ? data.vsphereVolume : { volumePath: '' },
-   cephfs: data?.cephfs !== undefined ? data.cephfs : { monitors: [] },
-   fc: data?.fc !== undefined ? data.fc : {},
-   image: data?.image !== undefined ? data.image : {},
-   photonPersistentDisk: data?.photonPersistentDisk !== undefined ? data.photonPersistentDisk : { pdID: '' },
-   rbd: data?.rbd !== undefined ? data.rbd : { image: '', monitors: [] },
-   configMap: data?.configMap !== undefined ? data.configMap : {},
-   ephemeral: data?.ephemeral !== undefined ? data.ephemeral : {},
-   storageos: data?.storageos !== undefined ? data.storageos : {},
-   downwardAPI: data?.downwardAPI !== undefined ? data.downwardAPI : {},
    hostPath: data?.hostPath !== undefined ? data.hostPath : { path: '' },
-   nfs: data?.nfs !== undefined ? data.nfs : { path: '', server: '' },
+   name: data?.name !== undefined ? data.name : '',
    persistentVolumeClaim: data?.persistentVolumeClaim !== undefined ? data.persistentVolumeClaim : { claimName: '' },
-   portworxVolume: data?.portworxVolume !== undefined ? data.portworxVolume : { volumeID: '' },
-   awsElasticBlockStore: data?.awsElasticBlockStore !== undefined ? data.awsElasticBlockStore : { volumeID: '' },
-   csi: data?.csi !== undefined ? data.csi : { driver: '' },
+   projected: data?.projected !== undefined ? data.projected : {},
+   scaleIO: data?.scaleIO !== undefined ? data.scaleIO : { gateway: '', secretRef: {}, system: '' },
    cinder: data?.cinder !== undefined ? data.cinder : { volumeID: '' },
+   flexVolume: data?.flexVolume !== undefined ? data.flexVolume : { driver: '' },
+   cephfs: data?.cephfs !== undefined ? data.cephfs : { monitors: [] },
+   configMap: data?.configMap !== undefined ? data.configMap : {},
+   emptyDir: data?.emptyDir !== undefined ? data.emptyDir : {},
+   gitRepo: data?.gitRepo !== undefined ? data.gitRepo : { repository: '' },
+   azureDisk: data?.azureDisk !== undefined ? data.azureDisk : { diskURI: '', diskName: '' },
+   azureFile: data?.azureFile !== undefined ? data.azureFile : { shareName: '', secretName: '' },
+   portworxVolume: data?.portworxVolume !== undefined ? data.portworxVolume : { volumeID: '' },
+   flocker: data?.flocker !== undefined ? data.flocker : {},
+   glusterfs: data?.glusterfs !== undefined ? data.glusterfs : { endpoints: '', path: '' },
+   photonPersistentDisk: data?.photonPersistentDisk !== undefined ? data.photonPersistentDisk : { pdID: '' },
+   rbd: data?.rbd !== undefined ? data.rbd : { monitors: [], image: '' },
+   storageos: data?.storageos !== undefined ? data.storageos : {},
+   image: data?.image !== undefined ? data.image : {},
+   iscsi: data?.iscsi !== undefined ? data.iscsi : { targetPortal: '', iqn: '', lun: 0 },
+   ephemeral: data?.ephemeral !== undefined ? data.ephemeral : {},
+   fc: data?.fc !== undefined ? data.fc : {},
+   vsphereVolume: data?.vsphereVolume !== undefined ? data.vsphereVolume : { volumePath: '' },
+   quobyte: data?.quobyte !== undefined ? data.quobyte : { volume: '', registry: '' },
+   secret: data?.secret !== undefined ? data.secret : {},
+   awsElasticBlockStore: data?.awsElasticBlockStore !== undefined ? data.awsElasticBlockStore : { volumeID: '' },
+   nfs: data?.nfs !== undefined ? data.nfs : { path: '', server: '' },
+   csi: data?.csi !== undefined ? data.csi : { driver: '' },
+   downwardAPI: data?.downwardAPI !== undefined ? data.downwardAPI : {},
  };
 }

@@ -5,11 +5,29 @@
 */
 export interface io_k8s_api_admissionregistration_v1_ValidatingWebhook {
 /**
+* TimeoutSeconds specifies the timeout for this webhook. After the timeout passes, the webhook call will be ignored or the API call will fail based on the failure policy. The timeout value must be between 1 and 30 seconds. Default to 10 seconds.
+*/
+timeoutSeconds?: number;
+/**
+* AdmissionReviewVersions is an ordered list of preferred `AdmissionReview` versions the Webhook expects. API server will try to use first version in the list which it supports. If none of the versions specified in this list supported by API server, validation will fail for this object. If a persisted webhook configuration specifies allowed versions and does not include any versions known to the API Server, calls to the webhook will fail and be subject to the failure policy.
+* @required
+* @isArray
+*/
+admissionReviewVersions: string[];
+/**
 * WebhookClientConfig contains the information to make a TLS connection with the webhook
 * @required
 * @isObject
 */
-clientConfig: { service?: { port?: number; name: string; namespace: string; path?: string }; url?: string; caBundle?: string };
+clientConfig: { caBundle?: string; service?: { path?: string; port?: number; name: string; namespace: string }; url?: string };
+/**
+* FailurePolicy defines how unrecognized errors from the admission endpoint are handled - allowed values are Ignore or Fail. Defaults to Fail.
+
+Possible enum values:
+ - `"Fail"` means that an error calling the webhook causes the admission to fail.
+ - `"Ignore"` means that an error calling the webhook is ignored.
+*/
+failurePolicy?: 'Fail' | 'Ignore';
 /**
 * matchPolicy defines how the "rules" list is used to match incoming requests. Allowed values are "Exact" or "Equivalent".
 
@@ -25,21 +43,26 @@ Possible enum values:
 */
 matchPolicy?: 'Equivalent' | 'Exact';
 /**
-* A label selector is a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. An empty label selector matches all objects. A null label selector matches no objects.
-* @isObject
+* The name of the admission webhook. Name should be fully qualified, e.g., imagepolicy.kubernetes.io, where "imagepolicy" is the name of the webhook, and kubernetes.io is the name of the organization. Required.
+* @required
 */
-namespaceSelector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> };
+name: string;
 /**
 * A label selector is a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. An empty label selector matches all objects. A null label selector matches no objects.
 * @isObject
 */
 objectSelector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> };
 /**
-* AdmissionReviewVersions is an ordered list of preferred `AdmissionReview` versions the Webhook expects. API server will try to use first version in the list which it supports. If none of the versions specified in this list supported by API server, validation will fail for this object. If a persisted webhook configuration specifies allowed versions and does not include any versions known to the API Server, calls to the webhook will fail and be subject to the failure policy.
+* SideEffects states whether this webhook has side effects. Acceptable values are: None, NoneOnDryRun (webhooks created via v1beta1 may also specify Some or Unknown). Webhooks with side effects MUST implement a reconciliation system, since a request may be rejected by a future step in the admission chain and the side effects therefore need to be undone. Requests with the dryRun attribute will be auto-rejected if they match a webhook with sideEffects == Unknown or Some.
+
+Possible enum values:
+ - `"None"` means that calling the webhook will have no side effects.
+ - `"NoneOnDryRun"` means that calling the webhook will possibly have side effects, but if the request being reviewed has the dry-run attribute, the side effects will be suppressed.
+ - `"Some"` means that calling the webhook will possibly have side effects. If a request with the dry-run attribute would trigger a call to this webhook, the request will instead fail.
+ - `"Unknown"` means that no information is known about the side effects of calling the webhook. If a request with the dry-run attribute would trigger a call to this webhook, the request will instead fail.
 * @required
-* @isArray
 */
-admissionReviewVersions: string[];
+sideEffects: 'None' | 'NoneOnDryRun' | 'Some' | 'Unknown';
 /**
 * MatchConditions is a list of conditions that must be met for a request to be sent to this webhook. Match conditions filter requests that have already been matched by the rules, namespaceSelector, and objectSelector. An empty list of matchConditions matches all requests. There are a maximum of 64 match conditions allowed.
 
@@ -53,38 +76,15 @@ The exact matching logic is (in order):
 */
 matchConditions?: Array<{ expression: string; name: string }>;
 /**
-* The name of the admission webhook. Name should be fully qualified, e.g., imagepolicy.kubernetes.io, where "imagepolicy" is the name of the webhook, and kubernetes.io is the name of the organization. Required.
-* @required
+* A label selector is a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. An empty label selector matches all objects. A null label selector matches no objects.
+* @isObject
 */
-name: string;
+namespaceSelector?: { matchExpressions?: Array<{ values?: string[]; key: string; operator: string }>; matchLabels?: Record<string, any> };
 /**
 * Rules describes what operations on what resources/subresources the webhook cares about. The webhook cares about an operation if it matches _any_ Rule. However, in order to prevent ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks from putting the cluster in a state which cannot be recovered from without completely disabling the plugin, ValidatingAdmissionWebhooks and MutatingAdmissionWebhooks are never called on admission requests for ValidatingWebhookConfiguration and MutatingWebhookConfiguration objects.
 * @isArray
 */
-rules?: Array<{ scope?: string; apiGroups?: string[]; apiVersions?: string[]; operations?: '*' | 'CONNECT' | 'CREATE' | 'DELETE' | 'UPDATE'[]; resources?: string[] }>;
-/**
-* SideEffects states whether this webhook has side effects. Acceptable values are: None, NoneOnDryRun (webhooks created via v1beta1 may also specify Some or Unknown). Webhooks with side effects MUST implement a reconciliation system, since a request may be rejected by a future step in the admission chain and the side effects therefore need to be undone. Requests with the dryRun attribute will be auto-rejected if they match a webhook with sideEffects == Unknown or Some.
-
-Possible enum values:
- - `"None"` means that calling the webhook will have no side effects.
- - `"NoneOnDryRun"` means that calling the webhook will possibly have side effects, but if the request being reviewed has the dry-run attribute, the side effects will be suppressed.
- - `"Some"` means that calling the webhook will possibly have side effects. If a request with the dry-run attribute would trigger a call to this webhook, the request will instead fail.
- - `"Unknown"` means that no information is known about the side effects of calling the webhook. If a request with the dry-run attribute would trigger a call to this webhook, the request will instead fail.
-* @required
-*/
-sideEffects: 'None' | 'NoneOnDryRun' | 'Some' | 'Unknown';
-/**
-* TimeoutSeconds specifies the timeout for this webhook. After the timeout passes, the webhook call will be ignored or the API call will fail based on the failure policy. The timeout value must be between 1 and 30 seconds. Default to 10 seconds.
-*/
-timeoutSeconds?: number;
-/**
-* FailurePolicy defines how unrecognized errors from the admission endpoint are handled - allowed values are Ignore or Fail. Defaults to Fail.
-
-Possible enum values:
- - `"Fail"` means that an error calling the webhook causes the admission to fail.
- - `"Ignore"` means that an error calling the webhook is ignored.
-*/
-failurePolicy?: 'Fail' | 'Ignore';
+rules?: Array<{ apiGroups?: string[]; apiVersions?: string[]; operations?: '*' | 'CONNECT' | 'CREATE' | 'DELETE' | 'UPDATE'[]; resources?: string[]; scope?: string }>;
 }
 
 /**
@@ -94,16 +94,16 @@ failurePolicy?: 'Fail' | 'Ignore';
 */
 export function createio_k8s_api_admissionregistration_v1_ValidatingWebhook(data?: Partial<io_k8s_api_admissionregistration_v1_ValidatingWebhook>): io_k8s_api_admissionregistration_v1_ValidatingWebhook {
  return {
-   clientConfig: data?.clientConfig !== undefined ? data.clientConfig : {},
-   matchPolicy: data?.matchPolicy !== undefined ? data.matchPolicy : '',
-   namespaceSelector: data?.namespaceSelector !== undefined ? data.namespaceSelector : {},
-   objectSelector: data?.objectSelector !== undefined ? data.objectSelector : {},
-   admissionReviewVersions: data?.admissionReviewVersions !== undefined ? data.admissionReviewVersions : [],
-   matchConditions: data?.matchConditions !== undefined ? data.matchConditions : [],
-   name: data?.name !== undefined ? data.name : '',
-   rules: data?.rules !== undefined ? data.rules : [],
-   sideEffects: data?.sideEffects !== undefined ? data.sideEffects : '',
    timeoutSeconds: data?.timeoutSeconds !== undefined ? data.timeoutSeconds : 0,
+   admissionReviewVersions: data?.admissionReviewVersions !== undefined ? data.admissionReviewVersions : [],
+   clientConfig: data?.clientConfig !== undefined ? data.clientConfig : {},
    failurePolicy: data?.failurePolicy !== undefined ? data.failurePolicy : '',
+   matchPolicy: data?.matchPolicy !== undefined ? data.matchPolicy : '',
+   name: data?.name !== undefined ? data.name : '',
+   objectSelector: data?.objectSelector !== undefined ? data.objectSelector : {},
+   sideEffects: data?.sideEffects !== undefined ? data.sideEffects : '',
+   matchConditions: data?.matchConditions !== undefined ? data.matchConditions : [],
+   namespaceSelector: data?.namespaceSelector !== undefined ? data.namespaceSelector : {},
+   rules: data?.rules !== undefined ? data.rules : [],
  };
 }

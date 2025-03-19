@@ -5,6 +5,11 @@
 */
 export interface io_k8s_api_autoscaling_v2_MetricSpec {
 /**
+* PodsMetricSource indicates how to scale on a metric describing each pod in the current scale target (for example, transactions-processed-per-second). The values will be averaged together before being compared to the target value.
+* @isObject
+*/
+pods?: { metric: { name: string; selector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> } }; target: { averageValue?: string; type: string; value?: string; averageUtilization?: number } };
+/**
 * ResourceMetricSource indicates how to scale on a resource metric known to Kubernetes, as specified in requests and limits, describing each pod in the current scale target (e.g. CPU or memory).  The values will be averaged together before being compared to the target.  Such metrics are built in to Kubernetes, and have special scaling options on top of those available to normal per-pod metrics using the "pods" source.  Only one "target" type should be set.
 * @isObject
 */
@@ -23,17 +28,12 @@ containerResource?: { container: string; name: string; target: { averageUtilizat
 * ExternalMetricSource indicates how to scale on a metric not associated with any Kubernetes object (for example length of queue in cloud messaging service, or QPS from loadbalancer running outside of cluster).
 * @isObject
 */
-external?: { metric: { selector?: { matchLabels?: Record<string, any>; matchExpressions?: Array<{ key: string; operator: string; values?: string[] }> }; name: string }; target: { averageUtilization?: number; averageValue?: string; type: string; value?: string } };
+external?: { metric: { name: string; selector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> } }; target: { averageUtilization?: number; averageValue?: string; type: string; value?: string } };
 /**
 * ObjectMetricSource indicates how to scale on a metric describing a kubernetes object (for example, hits-per-second on an Ingress object).
 * @isObject
 */
-object?: { describedObject: { apiVersion?: string; kind: string; name: string }; metric: { selector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> }; name: string }; target: { averageUtilization?: number; averageValue?: string; type: string; value?: string } };
-/**
-* PodsMetricSource indicates how to scale on a metric describing each pod in the current scale target (for example, transactions-processed-per-second). The values will be averaged together before being compared to the target value.
-* @isObject
-*/
-pods?: { metric: { name: string; selector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> } }; target: { averageUtilization?: number; averageValue?: string; type: string; value?: string } };
+object?: { describedObject: { apiVersion?: string; kind: string; name: string }; metric: { name: string; selector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> } }; target: { averageUtilization?: number; averageValue?: string; type: string; value?: string } };
 }
 
 /**
@@ -43,11 +43,11 @@ pods?: { metric: { name: string; selector?: { matchExpressions?: Array<{ key: st
 */
 export function createio_k8s_api_autoscaling_v2_MetricSpec(data?: Partial<io_k8s_api_autoscaling_v2_MetricSpec>): io_k8s_api_autoscaling_v2_MetricSpec {
  return {
+   pods: data?.pods !== undefined ? data.pods : { metric: { name: '' }, target: { type: '' } },
    resource: data?.resource !== undefined ? data.resource : { name: '', target: { type: '' } },
    type: data?.type !== undefined ? data.type : '',
-   containerResource: data?.containerResource !== undefined ? data.containerResource : { name: '', target: { type: '' }, container: '' },
+   containerResource: data?.containerResource !== undefined ? data.containerResource : { container: '', name: '', target: { type: '' } },
    external: data?.external !== undefined ? data.external : { metric: { name: '' }, target: { type: '' } },
-   object: data?.object !== undefined ? data.object : { metric: { name: '' }, target: { type: '' }, describedObject: { kind: '', name: '' } },
-   pods: data?.pods !== undefined ? data.pods : { metric: { name: '' }, target: { type: '' } },
+   object: data?.object !== undefined ? data.object : { describedObject: { kind: '', name: '' }, metric: { name: '' }, target: { type: '' } },
  };
 }

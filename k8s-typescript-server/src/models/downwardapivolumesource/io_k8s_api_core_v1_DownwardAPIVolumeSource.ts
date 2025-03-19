@@ -12,7 +12,7 @@ defaultMode?: number;
 * Items is a list of downward API volume file
 * @isArray
 */
-items?: Array<{ path: string; resourceFieldRef?: { containerName?: string; divisor?: string; resource: string }; fieldRef?: { apiVersion?: string; fieldPath: string }; mode?: number }>;
+items?: Array<{ fieldRef?: { apiVersion?: string; fieldPath: string }; mode?: number; path: string; resourceFieldRef?: { divisor?: string; resource: string; containerName?: string } }>;
 }
 
 /**

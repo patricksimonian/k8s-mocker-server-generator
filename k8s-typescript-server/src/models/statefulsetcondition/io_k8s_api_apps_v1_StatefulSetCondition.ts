@@ -5,6 +5,15 @@
 */
 export interface io_k8s_api_apps_v1_StatefulSetCondition {
 /**
+* The reason for the condition's last transition.
+*/
+reason?: string;
+/**
+* Status of the condition, one of True, False, Unknown.
+* @required
+*/
+status: string;
+/**
 * Type of statefulset condition.
 * @required
 */
@@ -17,15 +26,6 @@ lastTransitionTime?: Date;
 * A human readable message indicating details about the transition.
 */
 message?: string;
-/**
-* The reason for the condition's last transition.
-*/
-reason?: string;
-/**
-* Status of the condition, one of True, False, Unknown.
-* @required
-*/
-status: string;
 }
 
 /**
@@ -35,10 +35,10 @@ status: string;
 */
 export function createio_k8s_api_apps_v1_StatefulSetCondition(data?: Partial<io_k8s_api_apps_v1_StatefulSetCondition>): io_k8s_api_apps_v1_StatefulSetCondition {
  return {
+   reason: data?.reason !== undefined ? data.reason : '',
+   status: data?.status !== undefined ? data.status : '',
    type: data?.type !== undefined ? data.type : '',
    lastTransitionTime: data?.lastTransitionTime !== undefined ? data.lastTransitionTime : '',
    message: data?.message !== undefined ? data.message : '',
-   reason: data?.reason !== undefined ? data.reason : '',
-   status: data?.status !== undefined ? data.status : '',
  };
 }

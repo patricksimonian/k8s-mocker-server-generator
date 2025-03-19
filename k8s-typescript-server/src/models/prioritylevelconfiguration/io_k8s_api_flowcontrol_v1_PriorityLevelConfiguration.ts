@@ -5,11 +5,6 @@
 */
 export interface io_k8s_api_flowcontrol_v1_PriorityLevelConfiguration {
 /**
-* PriorityLevelConfigurationStatus represents the current state of a "request-priority".
-* @isObject
-*/
-status?: { conditions?: Array<{ lastTransitionTime?: Date; message?: string; reason?: string; status?: string; type?: string }> };
-/**
 * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
 */
 apiVersion?: string;
@@ -21,12 +16,17 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { annotations?: Record<string, any>; generation?: number; labels?: Record<string, any>; namespace?: string; resourceVersion?: string; generateName?: string; managedFields?: Array<{ fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string }>; name?: string; ownerReferences?: Array<{ controller?: boolean; kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean }>; selfLink?: string; uid?: string; creationTimestamp?: Date; deletionGracePeriodSeconds?: number; deletionTimestamp?: Date; finalizers?: string[] };
+metadata?: { namespace?: string; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; deletionTimestamp?: Date; name?: string; selfLink?: string; finalizers?: string[]; deletionGracePeriodSeconds?: number; labels?: Record<string, any>; uid?: string; annotations?: Record<string, any>; generateName?: string; generation?: number; managedFields?: Array<{ operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string }>; resourceVersion?: string; creationTimestamp?: Date };
 /**
 * PriorityLevelConfigurationSpec specifies the configuration of a priority level.
 * @isObject
 */
-spec?: { type: string; exempt?: { lendablePercent?: number; nominalConcurrencyShares?: number }; limited?: { borrowingLimitPercent?: number; lendablePercent?: number; limitResponse?: { queuing?: { handSize?: number; queueLengthLimit?: number; queues?: number }; type: string }; nominalConcurrencyShares?: number } };
+spec?: { exempt?: { lendablePercent?: number; nominalConcurrencyShares?: number }; limited?: { borrowingLimitPercent?: number; lendablePercent?: number; limitResponse?: { queuing?: { handSize?: number; queueLengthLimit?: number; queues?: number }; type: string }; nominalConcurrencyShares?: number }; type: string };
+/**
+* PriorityLevelConfigurationStatus represents the current state of a "request-priority".
+* @isObject
+*/
+status?: { conditions?: Array<{ type?: string; lastTransitionTime?: Date; message?: string; reason?: string; status?: string }> };
 }
 
 /**
@@ -36,10 +36,10 @@ spec?: { type: string; exempt?: { lendablePercent?: number; nominalConcurrencySh
 */
 export function createio_k8s_api_flowcontrol_v1_PriorityLevelConfiguration(data?: Partial<io_k8s_api_flowcontrol_v1_PriorityLevelConfiguration>): io_k8s_api_flowcontrol_v1_PriorityLevelConfiguration {
  return {
-   status: data?.status !== undefined ? data.status : {},
    apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
    kind: data?.kind !== undefined ? data.kind : '',
    metadata: data?.metadata !== undefined ? data.metadata : {},
    spec: data?.spec !== undefined ? data.spec : { type: '' },
+   status: data?.status !== undefined ? data.status : {},
  };
 }

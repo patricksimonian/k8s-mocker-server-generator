@@ -11,17 +11,6 @@ This API can be used to request client certificates to authenticate to kube-apis
 */
 export interface io_k8s_api_certificates_v1_CertificateSigningRequest {
 /**
-* CertificateSigningRequestSpec contains the certificate request.
-* @required
-* @isObject
-*/
-spec: { username?: string; expirationSeconds?: number; extra?: Record<string, any>; groups?: string[]; request: string; signerName: string; uid?: string; usages?: 'any' | 'cert sign' | 'client auth' | 'code signing' | 'content commitment' | 'crl sign' | 'data encipherment' | 'decipher only' | 'digital signature' | 'email protection' | 'encipher only' | 'ipsec end system' | 'ipsec tunnel' | 'ipsec user' | 'key agreement' | 'key encipherment' | 'microsoft sgc' | 'netscape sgc' | 'ocsp signing' | 's/mime' | 'server auth' | 'signing' | 'timestamping'[] };
-/**
-* CertificateSigningRequestStatus contains conditions used to indicate approved/denied/failed status of the request, and the issued certificate.
-* @isObject
-*/
-status?: { certificate?: string; conditions?: Array<{ lastTransitionTime?: Date; lastUpdateTime?: Date; message?: string; reason?: string; status: string; type: string }> };
-/**
 * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
 */
 apiVersion?: string;
@@ -33,7 +22,18 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { managedFields?: Array<{ fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string }>; name?: string; namespace?: string; resourceVersion?: string; uid?: string; generateName?: string; generation?: number; labels?: Record<string, any>; deletionGracePeriodSeconds?: number; ownerReferences?: Array<{ name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string }>; selfLink?: string; creationTimestamp?: Date; deletionTimestamp?: Date; finalizers?: string[]; annotations?: Record<string, any> };
+metadata?: { annotations?: Record<string, any>; deletionGracePeriodSeconds?: number; deletionTimestamp?: Date; generation?: number; resourceVersion?: string; finalizers?: string[]; namespace?: string; ownerReferences?: Array<{ controller?: boolean; kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean }>; selfLink?: string; creationTimestamp?: Date; generateName?: string; labels?: Record<string, any>; name?: string; uid?: string; managedFields?: Array<{ fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string }> };
+/**
+* CertificateSigningRequestSpec contains the certificate request.
+* @required
+* @isObject
+*/
+spec: { username?: string; expirationSeconds?: number; extra?: Record<string, any>; groups?: string[]; request: string; signerName: string; uid?: string; usages?: 'any' | 'cert sign' | 'client auth' | 'code signing' | 'content commitment' | 'crl sign' | 'data encipherment' | 'decipher only' | 'digital signature' | 'email protection' | 'encipher only' | 'ipsec end system' | 'ipsec tunnel' | 'ipsec user' | 'key agreement' | 'key encipherment' | 'microsoft sgc' | 'netscape sgc' | 'ocsp signing' | 's/mime' | 'server auth' | 'signing' | 'timestamping'[] };
+/**
+* CertificateSigningRequestStatus contains conditions used to indicate approved/denied/failed status of the request, and the issued certificate.
+* @isObject
+*/
+status?: { certificate?: string; conditions?: Array<{ lastTransitionTime?: Date; lastUpdateTime?: Date; message?: string; reason?: string; status: string; type: string }> };
 }
 
 /**
@@ -43,10 +43,10 @@ metadata?: { managedFields?: Array<{ fieldsV1?: Record<string, any>; manager?: s
 */
 export function createio_k8s_api_certificates_v1_CertificateSigningRequest(data?: Partial<io_k8s_api_certificates_v1_CertificateSigningRequest>): io_k8s_api_certificates_v1_CertificateSigningRequest {
  return {
-   spec: data?.spec !== undefined ? data.spec : { request: '', signerName: '' },
-   status: data?.status !== undefined ? data.status : {},
    apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
    kind: data?.kind !== undefined ? data.kind : '',
    metadata: data?.metadata !== undefined ? data.metadata : {},
+   spec: data?.spec !== undefined ? data.spec : { request: '', signerName: '' },
+   status: data?.status !== undefined ? data.status : {},
  };
 }

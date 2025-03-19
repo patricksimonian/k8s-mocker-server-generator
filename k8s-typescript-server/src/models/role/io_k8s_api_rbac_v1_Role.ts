@@ -16,7 +16,7 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { creationTimestamp?: Date; generation?: number; managedFields?: Array<{ subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string }>; name?: string; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; resourceVersion?: string; uid?: string; deletionTimestamp?: Date; finalizers?: string[]; generateName?: string; annotations?: Record<string, any>; labels?: Record<string, any>; deletionGracePeriodSeconds?: number; namespace?: string; selfLink?: string };
+metadata?: { labels?: Record<string, any>; namespace?: string; finalizers?: string[]; deletionTimestamp?: Date; generation?: number; selfLink?: string; uid?: string; deletionGracePeriodSeconds?: number; managedFields?: Array<{ operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string }>; name?: string; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; resourceVersion?: string; annotations?: Record<string, any>; generateName?: string; creationTimestamp?: Date };
 /**
 * Rules holds all the PolicyRules for this Role
 * @isArray

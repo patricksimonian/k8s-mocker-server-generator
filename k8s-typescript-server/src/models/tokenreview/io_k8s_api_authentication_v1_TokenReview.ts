@@ -5,10 +5,6 @@
 */
 export interface io_k8s_api_authentication_v1_TokenReview {
 /**
-* APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
-*/
-apiVersion?: string;
-/**
 * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 */
 kind?: string;
@@ -16,18 +12,22 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { finalizers?: string[]; generation?: number; managedFields?: Array<{ manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any> }>; deletionGracePeriodSeconds?: number; deletionTimestamp?: Date; resourceVersion?: string; creationTimestamp?: Date; generateName?: string; namespace?: string; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; uid?: string; annotations?: Record<string, any>; labels?: Record<string, any>; name?: string; selfLink?: string };
+metadata?: { finalizers?: string[]; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; annotations?: Record<string, any>; creationTimestamp?: Date; resourceVersion?: string; uid?: string; generateName?: string; labels?: Record<string, any>; name?: string; ownerReferences?: Array<{ controller?: boolean; kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean }>; selfLink?: string; deletionGracePeriodSeconds?: number; deletionTimestamp?: Date; generation?: number; namespace?: string };
 /**
 * TokenReviewSpec is a description of the token authentication request.
 * @required
 * @isObject
 */
-spec: { audiences?: string[]; token?: string };
+spec: { token?: string; audiences?: string[] };
 /**
 * TokenReviewStatus is the result of the token authentication request.
 * @isObject
 */
-status?: { audiences?: string[]; authenticated?: boolean; error?: string; user?: { extra?: Record<string, any>; groups?: string[]; uid?: string; username?: string } };
+status?: { error?: string; user?: { extra?: Record<string, any>; groups?: string[]; uid?: string; username?: string }; audiences?: string[]; authenticated?: boolean };
+/**
+* APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+*/
+apiVersion?: string;
 }
 
 /**
@@ -37,10 +37,10 @@ status?: { audiences?: string[]; authenticated?: boolean; error?: string; user?:
 */
 export function createio_k8s_api_authentication_v1_TokenReview(data?: Partial<io_k8s_api_authentication_v1_TokenReview>): io_k8s_api_authentication_v1_TokenReview {
  return {
-   apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
    kind: data?.kind !== undefined ? data.kind : '',
    metadata: data?.metadata !== undefined ? data.metadata : {},
    spec: data?.spec !== undefined ? data.spec : {},
    status: data?.status !== undefined ? data.status : {},
+   apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
  };
 }

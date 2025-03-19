@@ -7,33 +7,27 @@ StorageClasses are non-namespaced; the name of the storage class according to et
 */
 export interface io_k8s_api_storage_v1_StorageClass {
 /**
-* ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
-* @isObject
+* provisioner indicates the type of the provisioner.
+* @required
 */
-metadata?: { creationTimestamp?: Date; labels?: Record<string, any>; managedFields?: Array<{ operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string }>; generateName?: string; selfLink?: string; generation?: number; namespace?: string; resourceVersion?: string; uid?: string; annotations?: Record<string, any>; deletionGracePeriodSeconds?: number; deletionTimestamp?: Date; finalizers?: string[]; name?: string; ownerReferences?: Array<{ controller?: boolean; kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean }> };
-/**
-* mountOptions controls the mountOptions for dynamically provisioned PersistentVolumes of this storage class. e.g. ["ro", "soft"]. Not validated - mount of the PVs will simply fail if one is invalid.
-* @isArray
-*/
-mountOptions?: string[];
-/**
-* parameters holds the parameters for the provisioner that should create volumes of this storage class.
-*/
-parameters?: Record<string, any>;
+provisioner: string;
 /**
 * allowVolumeExpansion shows whether the storage class allow volume expand.
 */
 allowVolumeExpansion?: boolean;
 /**
-* allowedTopologies restrict the node topologies where volumes can be dynamically provisioned. Each volume plugin defines its own supported topology specifications. An empty TopologySelectorTerm list means there is no topology restriction. This field is only honored by servers that enable the VolumeScheduling feature.
+* APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+*/
+apiVersion?: string;
+/**
+* parameters holds the parameters for the provisioner that should create volumes of this storage class.
+*/
+parameters?: Record<string, any>;
+/**
+* mountOptions controls the mountOptions for dynamically provisioned PersistentVolumes of this storage class. e.g. ["ro", "soft"]. Not validated - mount of the PVs will simply fail if one is invalid.
 * @isArray
 */
-allowedTopologies?: Array<{ matchLabelExpressions?: Array<{ key: string; values: string[] }> }>;
-/**
-* provisioner indicates the type of the provisioner.
-* @required
-*/
-provisioner: string;
+mountOptions?: string[];
 /**
 * reclaimPolicy controls the reclaimPolicy for dynamically provisioned PersistentVolumes of this storage class. Defaults to Delete.
 
@@ -52,13 +46,19 @@ Possible enum values:
 */
 volumeBindingMode?: 'Immediate' | 'WaitForFirstConsumer';
 /**
-* APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+* allowedTopologies restrict the node topologies where volumes can be dynamically provisioned. Each volume plugin defines its own supported topology specifications. An empty TopologySelectorTerm list means there is no topology restriction. This field is only honored by servers that enable the VolumeScheduling feature.
+* @isArray
 */
-apiVersion?: string;
+allowedTopologies?: Array<{ matchLabelExpressions?: Array<{ values: string[]; key: string }> }>;
 /**
 * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 */
 kind?: string;
+/**
+* ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
+* @isObject
+*/
+metadata?: { generation?: number; namespace?: string; resourceVersion?: string; selfLink?: string; deletionTimestamp?: Date; finalizers?: string[]; name?: string; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; annotations?: Record<string, any>; generateName?: string; labels?: Record<string, any>; creationTimestamp?: Date; deletionGracePeriodSeconds?: number; managedFields?: Array<{ subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string }>; uid?: string };
 }
 
 /**
@@ -68,15 +68,15 @@ kind?: string;
 */
 export function createio_k8s_api_storage_v1_StorageClass(data?: Partial<io_k8s_api_storage_v1_StorageClass>): io_k8s_api_storage_v1_StorageClass {
  return {
-   metadata: data?.metadata !== undefined ? data.metadata : {},
-   mountOptions: data?.mountOptions !== undefined ? data.mountOptions : [],
-   parameters: data?.parameters !== undefined ? data.parameters : {},
-   allowVolumeExpansion: data?.allowVolumeExpansion !== undefined ? data.allowVolumeExpansion : false,
-   allowedTopologies: data?.allowedTopologies !== undefined ? data.allowedTopologies : [],
    provisioner: data?.provisioner !== undefined ? data.provisioner : '',
+   allowVolumeExpansion: data?.allowVolumeExpansion !== undefined ? data.allowVolumeExpansion : false,
+   apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
+   parameters: data?.parameters !== undefined ? data.parameters : {},
+   mountOptions: data?.mountOptions !== undefined ? data.mountOptions : [],
    reclaimPolicy: data?.reclaimPolicy !== undefined ? data.reclaimPolicy : '',
    volumeBindingMode: data?.volumeBindingMode !== undefined ? data.volumeBindingMode : '',
-   apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
+   allowedTopologies: data?.allowedTopologies !== undefined ? data.allowedTopologies : [],
    kind: data?.kind !== undefined ? data.kind : '',
+   metadata: data?.metadata !== undefined ? data.metadata : {},
  };
 }

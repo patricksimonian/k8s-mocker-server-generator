@@ -5,10 +5,6 @@
 */
 export interface io_k8s_api_core_v1_PersistentVolumeStatus {
 /**
-* reason is a brief CamelCase string that describes any failure and is meant for machine parsing and tidy display in the CLI.
-*/
-reason?: string;
-/**
 * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
 */
 lastPhaseTransitionTime?: Date;
@@ -27,6 +23,10 @@ Possible enum values:
  - `"Released"` used for PersistentVolumes where the bound PersistentVolumeClaim was deleted released volumes must be recycled before becoming available again this phase is used by the persistent volume claim binder to signal to another process to reclaim the resource
 */
 phase?: 'Available' | 'Bound' | 'Failed' | 'Pending' | 'Released';
+/**
+* reason is a brief CamelCase string that describes any failure and is meant for machine parsing and tidy display in the CLI.
+*/
+reason?: string;
 }
 
 /**
@@ -36,9 +36,9 @@ phase?: 'Available' | 'Bound' | 'Failed' | 'Pending' | 'Released';
 */
 export function createio_k8s_api_core_v1_PersistentVolumeStatus(data?: Partial<io_k8s_api_core_v1_PersistentVolumeStatus>): io_k8s_api_core_v1_PersistentVolumeStatus {
  return {
-   reason: data?.reason !== undefined ? data.reason : '',
    lastPhaseTransitionTime: data?.lastPhaseTransitionTime !== undefined ? data.lastPhaseTransitionTime : '',
    message: data?.message !== undefined ? data.message : '',
    phase: data?.phase !== undefined ? data.phase : '',
+   reason: data?.reason !== undefined ? data.reason : '',
  };
 }

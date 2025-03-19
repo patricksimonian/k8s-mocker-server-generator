@@ -5,6 +5,17 @@
 */
 export interface io_k8s_api_apps_v1_DaemonSetSpec {
 /**
+* PodTemplateSpec describes the data a pod should have when created from a template
+* @required
+* @isObject
+*/
+template: { spec?: Record<string, any>; metadata?: { name?: string; annotations?: Record<string, any>; creationTimestamp?: Date; deletionGracePeriodSeconds?: number; generation?: number; deletionTimestamp?: Date; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; selfLink?: string; finalizers?: string[]; generateName?: string; namespace?: string; labels?: Record<string, any>; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; resourceVersion?: string; uid?: string } };
+/**
+* DaemonSetUpdateStrategy is a struct used to control the update strategy for a DaemonSet.
+* @isObject
+*/
+updateStrategy?: { rollingUpdate?: { maxSurge?: string; maxUnavailable?: string }; type?: 'OnDelete' | 'RollingUpdate' };
+/**
 * The minimum number of seconds for which a newly created DaemonSet pod should be ready without any of its container crashing, for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready).
 */
 minReadySeconds?: number;
@@ -17,18 +28,7 @@ revisionHistoryLimit?: number;
 * @required
 * @isObject
 */
-selector: { matchLabels?: Record<string, any>; matchExpressions?: Array<{ key: string; operator: string; values?: string[] }> };
-/**
-* PodTemplateSpec describes the data a pod should have when created from a template
-* @required
-* @isObject
-*/
-template: { metadata?: { annotations?: Record<string, any>; deletionGracePeriodSeconds?: number; generateName?: string; selfLink?: string; generation?: number; name?: string; namespace?: string; creationTimestamp?: Date; finalizers?: string[]; labels?: Record<string, any>; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; ownerReferences?: Array<{ blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string; apiVersion: string }>; uid?: string; deletionTimestamp?: Date; resourceVersion?: string }; spec?: Record<string, any> };
-/**
-* DaemonSetUpdateStrategy is a struct used to control the update strategy for a DaemonSet.
-* @isObject
-*/
-updateStrategy?: { rollingUpdate?: { maxSurge?: string; maxUnavailable?: string }; type?: 'OnDelete' | 'RollingUpdate' };
+selector: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> };
 }
 
 /**
@@ -38,10 +38,10 @@ updateStrategy?: { rollingUpdate?: { maxSurge?: string; maxUnavailable?: string 
 */
 export function createio_k8s_api_apps_v1_DaemonSetSpec(data?: Partial<io_k8s_api_apps_v1_DaemonSetSpec>): io_k8s_api_apps_v1_DaemonSetSpec {
  return {
+   template: data?.template !== undefined ? data.template : {},
+   updateStrategy: data?.updateStrategy !== undefined ? data.updateStrategy : {},
    minReadySeconds: data?.minReadySeconds !== undefined ? data.minReadySeconds : 0,
    revisionHistoryLimit: data?.revisionHistoryLimit !== undefined ? data.revisionHistoryLimit : 0,
    selector: data?.selector !== undefined ? data.selector : {},
-   template: data?.template !== undefined ? data.template : {},
-   updateStrategy: data?.updateStrategy !== undefined ? data.updateStrategy : {},
  };
 }

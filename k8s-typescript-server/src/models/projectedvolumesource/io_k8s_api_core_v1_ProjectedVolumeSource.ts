@@ -12,7 +12,7 @@ defaultMode?: number;
 * sources is the list of volume projections. Each entry in this list handles one source.
 * @isArray
 */
-sources?: Array<{ clusterTrustBundle?: { labelSelector?: { matchExpressions?: Array<{ values?: string[]; key: string; operator: string }>; matchLabels?: Record<string, any> }; name?: string; optional?: boolean; path: string; signerName?: string }; configMap?: { items?: Array<{ key: string; mode?: number; path: string }>; name?: string; optional?: boolean }; downwardAPI?: { items?: Array<{ fieldRef?: { apiVersion?: string; fieldPath: string }; mode?: number; path: string; resourceFieldRef?: { containerName?: string; divisor?: string; resource: string } }> }; secret?: { items?: Array<{ mode?: number; path: string; key: string }>; name?: string; optional?: boolean }; serviceAccountToken?: { path: string; audience?: string; expirationSeconds?: number } }>;
+sources?: Array<{ secret?: { items?: Array<{ path: string; key: string; mode?: number }>; name?: string; optional?: boolean }; serviceAccountToken?: { expirationSeconds?: number; path: string; audience?: string }; clusterTrustBundle?: { optional?: boolean; path: string; signerName?: string; labelSelector?: { matchExpressions?: Array<{ values?: string[]; key: string; operator: string }>; matchLabels?: Record<string, any> }; name?: string }; configMap?: { items?: Array<{ key: string; mode?: number; path: string }>; name?: string; optional?: boolean }; downwardAPI?: { items?: Array<{ fieldRef?: { apiVersion?: string; fieldPath: string }; mode?: number; path: string; resourceFieldRef?: { containerName?: string; divisor?: string; resource: string } }> } }>;
 }
 
 /**

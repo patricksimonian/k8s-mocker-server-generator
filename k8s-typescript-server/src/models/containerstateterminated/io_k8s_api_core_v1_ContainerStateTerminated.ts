@@ -5,6 +5,14 @@
 */
 export interface io_k8s_api_core_v1_ContainerStateTerminated {
 /**
+* Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
+*/
+finishedAt?: Date;
+/**
+* Message regarding the last termination of the container
+*/
+message?: string;
+/**
 * (brief) reason from the last termination of the container
 */
 reason?: string;
@@ -25,14 +33,6 @@ containerID?: string;
 * @required
 */
 exitCode: number;
-/**
-* Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
-*/
-finishedAt?: Date;
-/**
-* Message regarding the last termination of the container
-*/
-message?: string;
 }
 
 /**
@@ -42,12 +42,12 @@ message?: string;
 */
 export function createio_k8s_api_core_v1_ContainerStateTerminated(data?: Partial<io_k8s_api_core_v1_ContainerStateTerminated>): io_k8s_api_core_v1_ContainerStateTerminated {
  return {
+   finishedAt: data?.finishedAt !== undefined ? data.finishedAt : '',
+   message: data?.message !== undefined ? data.message : '',
    reason: data?.reason !== undefined ? data.reason : '',
    signal: data?.signal !== undefined ? data.signal : 0,
    startedAt: data?.startedAt !== undefined ? data.startedAt : '',
    containerID: data?.containerID !== undefined ? data.containerID : '',
    exitCode: data?.exitCode !== undefined ? data.exitCode : 0,
-   finishedAt: data?.finishedAt !== undefined ? data.finishedAt : '',
-   message: data?.message !== undefined ? data.message : '',
  };
 }

@@ -8,26 +8,26 @@ export interface io_k8s_api_core_v1_VolumeProjection {
 * ClusterTrustBundleProjection describes how to select a set of ClusterTrustBundle objects and project their contents into the pod filesystem.
 * @isObject
 */
-clusterTrustBundle?: { path: string; signerName?: string; labelSelector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> }; name?: string; optional?: boolean };
+clusterTrustBundle?: { labelSelector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> }; name?: string; optional?: boolean; path: string; signerName?: string };
 /**
 * Adapts a ConfigMap into a projected volume.
 
 The contents of the target ConfigMap's Data field will be presented in a projected volume as files using the keys in the Data field as the file names, unless the items element is populated with specific mappings of keys to paths. Note that this is identical to a configmap volume source without the default mode.
 * @isObject
 */
-configMap?: { items?: Array<{ key: string; mode?: number; path: string }>; name?: string; optional?: boolean };
+configMap?: { name?: string; optional?: boolean; items?: Array<{ key: string; mode?: number; path: string }> };
 /**
 * Represents downward API info for projecting into a projected volume. Note that this is identical to a downwardAPI volume source without the default mode.
 * @isObject
 */
-downwardAPI?: { items?: Array<{ mode?: number; path: string; resourceFieldRef?: { containerName?: string; divisor?: string; resource: string }; fieldRef?: { apiVersion?: string; fieldPath: string } }> };
+downwardAPI?: { items?: Array<{ fieldRef?: { apiVersion?: string; fieldPath: string }; mode?: number; path: string; resourceFieldRef?: { containerName?: string; divisor?: string; resource: string } }> };
 /**
 * Adapts a secret into a projected volume.
 
 The contents of the target Secret's Data field will be presented in a projected volume as files using the keys in the Data field as the file names. Note that this is identical to a secret volume source without the default mode.
 * @isObject
 */
-secret?: { name?: string; optional?: boolean; items?: Array<{ key: string; mode?: number; path: string }> };
+secret?: { items?: Array<{ key: string; mode?: number; path: string }>; name?: string; optional?: boolean };
 /**
 * ServiceAccountTokenProjection represents a projected service account token volume. This projection can be used to insert a service account token into the pods runtime filesystem for use against APIs (Kubernetes API Server or otherwise).
 * @isObject

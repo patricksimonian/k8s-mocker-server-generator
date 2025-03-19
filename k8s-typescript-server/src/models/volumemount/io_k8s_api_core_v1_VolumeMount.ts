@@ -5,6 +5,11 @@
 */
 export interface io_k8s_api_core_v1_VolumeMount {
 /**
+* Path within the container at which the volume should be mounted.  Must not contain ':'.
+* @required
+*/
+mountPath: string;
+/**
 * mountPropagation determines how mounts are propagated from the host to container and the other way around. When not set, MountPropagationNone is used. This field is beta in 1.10. When RecursiveReadOnly is set to IfPossible or to Enabled, MountPropagation must be None or unspecified (which defaults to None).
 
 Possible enum values:
@@ -42,11 +47,6 @@ subPath?: string;
 * Expanded path within the volume from which the container's volume should be mounted. Behaves similarly to SubPath but environment variable references $(VAR_NAME) are expanded using the container's environment. Defaults to "" (volume's root). SubPathExpr and SubPath are mutually exclusive.
 */
 subPathExpr?: string;
-/**
-* Path within the container at which the volume should be mounted.  Must not contain ':'.
-* @required
-*/
-mountPath: string;
 }
 
 /**
@@ -56,12 +56,12 @@ mountPath: string;
 */
 export function createio_k8s_api_core_v1_VolumeMount(data?: Partial<io_k8s_api_core_v1_VolumeMount>): io_k8s_api_core_v1_VolumeMount {
  return {
+   mountPath: data?.mountPath !== undefined ? data.mountPath : '',
    mountPropagation: data?.mountPropagation !== undefined ? data.mountPropagation : '',
    name: data?.name !== undefined ? data.name : '',
    readOnly: data?.readOnly !== undefined ? data.readOnly : false,
    recursiveReadOnly: data?.recursiveReadOnly !== undefined ? data.recursiveReadOnly : '',
    subPath: data?.subPath !== undefined ? data.subPath : '',
    subPathExpr: data?.subPathExpr !== undefined ? data.subPathExpr : '',
-   mountPath: data?.mountPath !== undefined ? data.mountPath : '',
  };
 }

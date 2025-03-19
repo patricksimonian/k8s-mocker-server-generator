@@ -5,6 +5,11 @@
 */
 export interface io_k8s_api_core_v1_Node {
 /**
+* NodeStatus is information about the current status of a node.
+* @isObject
+*/
+status?: { config?: { active?: { configMap?: { resourceVersion?: string; uid?: string; kubeletConfigKey: string; name: string; namespace: string } }; assigned?: { configMap?: { name: string; namespace: string; resourceVersion?: string; uid?: string; kubeletConfigKey: string } }; error?: string; lastKnownGood?: { configMap?: { namespace: string; resourceVersion?: string; uid?: string; kubeletConfigKey: string; name: string } } }; images?: Array<{ names?: string[]; sizeBytes?: number }>; nodeInfo?: { containerRuntimeVersion: string; kernelVersion: string; kubeProxyVersion: string; machineID: string; operatingSystem: string; architecture: string; bootID: string; systemUUID: string; kubeletVersion: string; osImage: string }; phase?: 'Pending' | 'Running' | 'Terminated'; volumesAttached?: Array<{ name: string; devicePath: string }>; volumesInUse?: string[]; allocatable?: Record<string, any>; capacity?: Record<string, any>; conditions?: Array<{ lastTransitionTime?: Date; message?: string; reason?: string; status: string; type: string; lastHeartbeatTime?: Date }>; daemonEndpoints?: { kubeletEndpoint?: { Port: number } }; features?: { supplementalGroupsPolicy?: boolean }; runtimeHandlers?: Array<{ features?: { recursiveReadOnlyMounts?: boolean; userNamespaces?: boolean }; name?: string }>; addresses?: Array<{ address: string; type: string }> };
+/**
 * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
 */
 apiVersion?: string;
@@ -16,17 +21,12 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { generation?: number; labels?: Record<string, any>; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; namespace?: string; ownerReferences?: Array<{ kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean }>; selfLink?: string; finalizers?: string[]; deletionGracePeriodSeconds?: number; creationTimestamp?: Date; deletionTimestamp?: Date; resourceVersion?: string; uid?: string; annotations?: Record<string, any>; name?: string; generateName?: string };
+metadata?: { ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; resourceVersion?: string; annotations?: Record<string, any>; finalizers?: string[]; generation?: number; name?: string; uid?: string; deletionGracePeriodSeconds?: number; deletionTimestamp?: Date; labels?: Record<string, any>; namespace?: string; creationTimestamp?: Date; managedFields?: Array<{ operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string }>; selfLink?: string; generateName?: string };
 /**
 * NodeSpec describes the attributes that a node is created with.
 * @isObject
 */
-spec?: { taints?: Array<{ effect: 'NoExecute' | 'NoSchedule' | 'PreferNoSchedule'; key: string; timeAdded?: Date; value?: string }>; unschedulable?: boolean; configSource?: { configMap?: { kubeletConfigKey: string; name: string; namespace: string; resourceVersion?: string; uid?: string } }; externalID?: string; podCIDR?: string; podCIDRs?: string[]; providerID?: string };
-/**
-* NodeStatus is information about the current status of a node.
-* @isObject
-*/
-status?: { features?: { supplementalGroupsPolicy?: boolean }; images?: Array<{ names?: string[]; sizeBytes?: number }>; phase?: 'Pending' | 'Running' | 'Terminated'; runtimeHandlers?: Array<{ name?: string; features?: { recursiveReadOnlyMounts?: boolean; userNamespaces?: boolean } }>; addresses?: Array<{ address: string; type: string }>; capacity?: Record<string, any>; config?: { active?: { configMap?: { kubeletConfigKey: string; name: string; namespace: string; resourceVersion?: string; uid?: string } }; assigned?: { configMap?: { name: string; namespace: string; resourceVersion?: string; uid?: string; kubeletConfigKey: string } }; error?: string; lastKnownGood?: { configMap?: { resourceVersion?: string; uid?: string; kubeletConfigKey: string; name: string; namespace: string } } }; daemonEndpoints?: { kubeletEndpoint?: { Port: number } }; volumesInUse?: string[]; allocatable?: Record<string, any>; conditions?: Array<{ lastTransitionTime?: Date; message?: string; reason?: string; status: string; type: string; lastHeartbeatTime?: Date }>; nodeInfo?: { bootID: string; kernelVersion: string; kubeProxyVersion: string; kubeletVersion: string; osImage: string; systemUUID: string; architecture: string; containerRuntimeVersion: string; machineID: string; operatingSystem: string }; volumesAttached?: Array<{ devicePath: string; name: string }> };
+spec?: { podCIDR?: string; podCIDRs?: string[]; providerID?: string; taints?: Array<{ key: string; timeAdded?: Date; value?: string; effect: 'NoExecute' | 'NoSchedule' | 'PreferNoSchedule' }>; unschedulable?: boolean; configSource?: { configMap?: { namespace: string; resourceVersion?: string; uid?: string; kubeletConfigKey: string; name: string } }; externalID?: string };
 }
 
 /**
@@ -36,10 +36,10 @@ status?: { features?: { supplementalGroupsPolicy?: boolean }; images?: Array<{ n
 */
 export function createio_k8s_api_core_v1_Node(data?: Partial<io_k8s_api_core_v1_Node>): io_k8s_api_core_v1_Node {
  return {
+   status: data?.status !== undefined ? data.status : {},
    apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
    kind: data?.kind !== undefined ? data.kind : '',
    metadata: data?.metadata !== undefined ? data.metadata : {},
    spec: data?.spec !== undefined ? data.spec : {},
-   status: data?.status !== undefined ? data.status : {},
  };
 }

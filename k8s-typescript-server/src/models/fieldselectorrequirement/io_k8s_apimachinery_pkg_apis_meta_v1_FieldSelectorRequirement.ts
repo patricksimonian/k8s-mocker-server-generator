@@ -5,11 +5,6 @@
 */
 export interface io_k8s_apimachinery_pkg_apis_meta_v1_FieldSelectorRequirement {
 /**
-* key is the field selector key that the requirement applies to.
-* @required
-*/
-key: string;
-/**
 * operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists, DoesNotExist. The list of operators may grow in the future.
 * @required
 */
@@ -19,6 +14,11 @@ operator: string;
 * @isArray
 */
 values?: string[];
+/**
+* key is the field selector key that the requirement applies to.
+* @required
+*/
+key: string;
 }
 
 /**
@@ -28,8 +28,8 @@ values?: string[];
 */
 export function createio_k8s_apimachinery_pkg_apis_meta_v1_FieldSelectorRequirement(data?: Partial<io_k8s_apimachinery_pkg_apis_meta_v1_FieldSelectorRequirement>): io_k8s_apimachinery_pkg_apis_meta_v1_FieldSelectorRequirement {
  return {
-   key: data?.key !== undefined ? data.key : '',
    operator: data?.operator !== undefined ? data.operator : '',
    values: data?.values !== undefined ? data.values : [],
+   key: data?.key !== undefined ? data.key : '',
  };
 }

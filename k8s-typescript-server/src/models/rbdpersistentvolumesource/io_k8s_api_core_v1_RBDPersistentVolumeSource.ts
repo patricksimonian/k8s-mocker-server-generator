@@ -5,6 +5,12 @@
 */
 export interface io_k8s_api_core_v1_RBDPersistentVolumeSource {
 /**
+* monitors is a collection of Ceph monitors. More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
+* @required
+* @isArray
+*/
+monitors: string[];
+/**
 * pool is the rados pool name. Default is rbd. More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 */
 pool?: string;
@@ -34,12 +40,6 @@ image: string;
 * keyring is the path to key ring for RBDUser. Default is /etc/ceph/keyring. More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 */
 keyring?: string;
-/**
-* monitors is a collection of Ceph monitors. More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
-* @required
-* @isArray
-*/
-monitors: string[];
 }
 
 /**
@@ -49,6 +49,7 @@ monitors: string[];
 */
 export function createio_k8s_api_core_v1_RBDPersistentVolumeSource(data?: Partial<io_k8s_api_core_v1_RBDPersistentVolumeSource>): io_k8s_api_core_v1_RBDPersistentVolumeSource {
  return {
+   monitors: data?.monitors !== undefined ? data.monitors : [],
    pool: data?.pool !== undefined ? data.pool : '',
    readOnly: data?.readOnly !== undefined ? data.readOnly : false,
    secretRef: data?.secretRef !== undefined ? data.secretRef : {},
@@ -56,6 +57,5 @@ export function createio_k8s_api_core_v1_RBDPersistentVolumeSource(data?: Partia
    fsType: data?.fsType !== undefined ? data.fsType : '',
    image: data?.image !== undefined ? data.image : '',
    keyring: data?.keyring !== undefined ? data.keyring : '',
-   monitors: data?.monitors !== undefined ? data.monitors : [],
  };
 }

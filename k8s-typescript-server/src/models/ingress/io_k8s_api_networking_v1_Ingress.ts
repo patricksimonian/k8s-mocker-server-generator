@@ -16,12 +16,12 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { generateName?: string; generation?: number; namespace?: string; resourceVersion?: string; deletionGracePeriodSeconds?: number; finalizers?: string[]; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; selfLink?: string; deletionTimestamp?: Date; labels?: Record<string, any>; name?: string; annotations?: Record<string, any>; creationTimestamp?: Date; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; uid?: string };
+metadata?: { generation?: number; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; resourceVersion?: string; deletionGracePeriodSeconds?: number; name?: string; ownerReferences?: Array<{ kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean }>; annotations?: Record<string, any>; creationTimestamp?: Date; deletionTimestamp?: Date; generateName?: string; labels?: Record<string, any>; selfLink?: string; finalizers?: string[]; namespace?: string; uid?: string };
 /**
 * IngressSpec describes the Ingress the user wishes to exist.
 * @isObject
 */
-spec?: { defaultBackend?: { resource?: { apiGroup?: string; kind: string; name: string }; service?: { port?: { name?: string; number?: number }; name: string } }; ingressClassName?: string; rules?: Array<{ host?: string; http?: { paths: Array<{ backend: { resource?: { apiGroup?: string; kind: string; name: string }; service?: { name: string; port?: { name?: string; number?: number } } }; path?: string; pathType: 'Exact' | 'ImplementationSpecific' | 'Prefix' }> } }>; tls?: Array<{ hosts?: string[]; secretName?: string }> };
+spec?: { defaultBackend?: { resource?: { apiGroup?: string; kind: string; name: string }; service?: { name: string; port?: { name?: string; number?: number } } }; ingressClassName?: string; rules?: Array<{ host?: string; http?: { paths: Array<{ pathType: 'Exact' | 'ImplementationSpecific' | 'Prefix'; backend: { service?: { name: string; port?: { name?: string; number?: number } }; resource?: { apiGroup?: string; kind: string; name: string } }; path?: string }> } }>; tls?: Array<{ hosts?: string[]; secretName?: string }> };
 /**
 * IngressStatus describe the current state of the Ingress.
 * @isObject

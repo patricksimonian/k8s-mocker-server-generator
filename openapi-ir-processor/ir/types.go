@@ -67,6 +67,7 @@ type Endpoint struct {
 	Tags         []string
 	ResourceType string // New: resource type derived from the path
 	Parameters   []IRParameter
+	Namespaced   bool
 	Responses    map[string]IRResponse
 }
 

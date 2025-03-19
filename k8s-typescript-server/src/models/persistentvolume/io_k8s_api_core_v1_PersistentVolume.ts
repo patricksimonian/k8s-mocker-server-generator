@@ -5,6 +5,10 @@
 */
 export interface io_k8s_api_core_v1_PersistentVolume {
 /**
+* APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+*/
+apiVersion?: string;
+/**
 * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 */
 kind?: string;
@@ -12,7 +16,7 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { generation?: number; uid?: string; resourceVersion?: string; annotations?: Record<string, any>; creationTimestamp?: Date; labels?: Record<string, any>; managedFields?: Array<{ operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string }>; namespace?: string; deletionTimestamp?: Date; name?: string; deletionGracePeriodSeconds?: number; finalizers?: string[]; generateName?: string; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; selfLink?: string };
+metadata?: { deletionGracePeriodSeconds?: number; generation?: number; uid?: string; labels?: Record<string, any>; name?: string; namespace?: string; selfLink?: string; annotations?: Record<string, any>; deletionTimestamp?: Date; finalizers?: string[]; generateName?: string; ownerReferences?: Array<{ name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string }>; creationTimestamp?: Date; managedFields?: Array<{ operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string }>; resourceVersion?: string };
 /**
 * PersistentVolumeSpec is the specification of a persistent volume.
 * @isObject
@@ -22,11 +26,7 @@ spec?: Record<string, any>;
 * PersistentVolumeStatus is the current status of a persistent volume.
 * @isObject
 */
-status?: { message?: string; phase?: 'Available' | 'Bound' | 'Failed' | 'Pending' | 'Released'; reason?: string; lastPhaseTransitionTime?: Date };
-/**
-* APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
-*/
-apiVersion?: string;
+status?: { lastPhaseTransitionTime?: Date; message?: string; phase?: 'Available' | 'Bound' | 'Failed' | 'Pending' | 'Released'; reason?: string };
 }
 
 /**
@@ -36,10 +36,10 @@ apiVersion?: string;
 */
 export function createio_k8s_api_core_v1_PersistentVolume(data?: Partial<io_k8s_api_core_v1_PersistentVolume>): io_k8s_api_core_v1_PersistentVolume {
  return {
+   apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
    kind: data?.kind !== undefined ? data.kind : '',
    metadata: data?.metadata !== undefined ? data.metadata : {},
    spec: data?.spec !== undefined ? data.spec : {},
    status: data?.status !== undefined ? data.status : {},
-   apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
  };
 }

@@ -10,7 +10,7 @@ export interface io_k8s_api_core_v1_EnvFromSource {
 The contents of the target ConfigMap's Data field will represent the key-value pairs as environment variables.
 * @isObject
 */
-configMapRef?: { name?: string; optional?: boolean };
+configMapRef?: { optional?: boolean; name?: string };
 /**
 * An optional identifier to prepend to each key in the ConfigMap. Must be a C_IDENTIFIER.
 */

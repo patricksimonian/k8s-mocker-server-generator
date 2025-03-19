@@ -18,6 +18,6 @@ configMap?: { kubeletConfigKey: string; name: string; namespace: string; resourc
 */
 export function createio_k8s_api_core_v1_NodeConfigSource(data?: Partial<io_k8s_api_core_v1_NodeConfigSource>): io_k8s_api_core_v1_NodeConfigSource {
  return {
-   configMap: data?.configMap !== undefined ? data.configMap : { kubeletConfigKey: '', name: '', namespace: '' },
+   configMap: data?.configMap !== undefined ? data.configMap : { name: '', namespace: '', kubeletConfigKey: '' },
  };
 }

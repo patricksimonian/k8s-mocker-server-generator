@@ -8,7 +8,7 @@ export interface io_k8s_api_flowcontrol_v1_PriorityLevelConfigurationSpec {
 * ExemptPriorityLevelConfiguration describes the configurable aspects of the handling of exempt requests. In the mandatory exempt configuration object the values in the fields here can be modified by authorized users, unlike the rest of the `spec`.
 * @isObject
 */
-exempt?: { lendablePercent?: number; nominalConcurrencyShares?: number };
+exempt?: { nominalConcurrencyShares?: number; lendablePercent?: number };
 /**
 * LimitedPriorityLevelConfiguration specifies how to handle requests that are subject to limits. It addresses two issues:
   - How are requests for this priority level limited?

@@ -1,72 +1,30 @@
+// endpoint-route.ts.tmpl
 import express from 'express';
 import { Storage } from '../storage/Storage';
 import { logger } from '../logger';
-import { 
-fetchResourceList, 
-validateResource, 
-applyPatch, 
-handleResourceError,
-createNotFoundResponse
-} from '../utils';
+import { handleResourceError } from '../utils';
 
-
-
-/**
-* Create routes for selfsubjectrulesreview resources
-* @resourceType selfsubjectrulesreview
-*/
 export function createselfsubjectrulesreviewRoutes(storage: Storage): express.Router {
-const router = express.Router();
+  const router = express.Router();
+  // Create selfsubjectrulesreview
+  router.post('/apis/authorization.k8s.io/v1/selfsubjectrulesreviews', async (req, res, next) => {
+    try {
+      logger.info(`Creating selfsubjectrulesreview`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      const createdResource = await storage.createOrUpdateResource('selfsubjectrulesreview', resource);
+      
+      res.status(201).json(createdResource);
+    } catch (error) {
+      next(error);
+    }
+  });
 
-
-
-/**
- * POST /apis/authorization.k8s.io/v1/selfsubjectrulesreviews
- * create a SelfSubjectRulesReview
- */
-router.post('/apis/authorization.k8s.io/v1/selfsubjectrulesreviews', async (req, res, next) => {
-  try {
-    await handlepostModel_Apis_Authorization_K8s_Io_V1_Selfsubjectrulesreviews(req, res, storage);
-  } catch (error) {
-    next(error);
-  }
-});
-
-
-
-return router;
+  return router;
 }
-
-
-
-/**
-* Handler for POST /apis/authorization.k8s.io/v1/selfsubjectrulesreviews
-* create a SelfSubjectRulesReview
-* @resourceType selfsubjectrulesreview
-*/
-async function handlepostModel_Apis_Authorization_K8s_Io_V1_Selfsubjectrulesreviews(
-req: express.Request, 
-res: express.Response, 
-storage: Storage
-): Promise<void> {
-
-// Create resource
-const namespace = req.params.namespace || 'default';
-const resource = req.body;
-
-logger.info(`Creating selfsubjectrulesreview ${resource.metadata?.name} in namespace ${namespace}`);
-
-try {
-  // Validate the resource
-  await validateResource(resource);
-  
-  // Create the resource in storage
-  const result = await storage.createResource(resource, namespace);
-  res.status(201).json(result);
-} catch (error) {
-  handleResourceError(error, res);
-}
-
-}
-
-

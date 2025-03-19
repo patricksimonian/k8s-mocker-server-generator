@@ -7,14 +7,6 @@ export interface io_k8s_api_coordination_v1_LeaseSpec {
 /**
 * MicroTime is version of Time with microsecond level precision.
 */
-renewTime?: Date;
-/**
-* Strategy indicates the strategy for picking the leader for coordinated leader election. If the field is not specified, there is no active coordination for this lease. (Alpha) Using this field requires the CoordinatedLeaderElection feature gate to be enabled.
-*/
-strategy?: string;
-/**
-* MicroTime is version of Time with microsecond level precision.
-*/
 acquireTime?: Date;
 /**
 * holderIdentity contains the identity of the holder of a current lease. If Coordinated Leader Election is used, the holder identity must be equal to the elected LeaseCandidate.metadata.name field.
@@ -32,6 +24,14 @@ leaseTransitions?: number;
 * PreferredHolder signals to a lease holder that the lease has a more optimal holder and should be given up. This field can only be set if Strategy is also set.
 */
 preferredHolder?: string;
+/**
+* MicroTime is version of Time with microsecond level precision.
+*/
+renewTime?: Date;
+/**
+* Strategy indicates the strategy for picking the leader for coordinated leader election. If the field is not specified, there is no active coordination for this lease. (Alpha) Using this field requires the CoordinatedLeaderElection feature gate to be enabled.
+*/
+strategy?: string;
 }
 
 /**
@@ -41,12 +41,12 @@ preferredHolder?: string;
 */
 export function createio_k8s_api_coordination_v1_LeaseSpec(data?: Partial<io_k8s_api_coordination_v1_LeaseSpec>): io_k8s_api_coordination_v1_LeaseSpec {
  return {
-   renewTime: data?.renewTime !== undefined ? data.renewTime : '',
-   strategy: data?.strategy !== undefined ? data.strategy : '',
    acquireTime: data?.acquireTime !== undefined ? data.acquireTime : '',
    holderIdentity: data?.holderIdentity !== undefined ? data.holderIdentity : '',
    leaseDurationSeconds: data?.leaseDurationSeconds !== undefined ? data.leaseDurationSeconds : 0,
    leaseTransitions: data?.leaseTransitions !== undefined ? data.leaseTransitions : 0,
    preferredHolder: data?.preferredHolder !== undefined ? data.preferredHolder : '',
+   renewTime: data?.renewTime !== undefined ? data.renewTime : '',
+   strategy: data?.strategy !== undefined ? data.strategy : '',
  };
 }

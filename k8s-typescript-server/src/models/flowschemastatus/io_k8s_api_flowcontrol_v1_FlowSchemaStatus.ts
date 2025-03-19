@@ -8,7 +8,7 @@ export interface io_k8s_api_flowcontrol_v1_FlowSchemaStatus {
 * `conditions` is a list of the current states of FlowSchema.
 * @isArray
 */
-conditions?: Array<{ reason?: string; status?: string; type?: string; lastTransitionTime?: Date; message?: string }>;
+conditions?: Array<{ lastTransitionTime?: Date; message?: string; reason?: string; status?: string; type?: string }>;
 }
 
 /**

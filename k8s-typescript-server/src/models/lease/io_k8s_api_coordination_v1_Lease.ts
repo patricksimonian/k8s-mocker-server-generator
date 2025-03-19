@@ -16,12 +16,12 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; ownerReferences?: Array<{ controller?: boolean; kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean }>; annotations?: Record<string, any>; deletionGracePeriodSeconds?: number; deletionTimestamp?: Date; finalizers?: string[]; generateName?: string; uid?: string; creationTimestamp?: Date; generation?: number; labels?: Record<string, any>; namespace?: string; selfLink?: string; resourceVersion?: string; name?: string };
+metadata?: { finalizers?: string[]; labels?: Record<string, any>; managedFields?: Array<{ subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string }>; namespace?: string; annotations?: Record<string, any>; deletionGracePeriodSeconds?: number; generation?: number; ownerReferences?: Array<{ blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string; apiVersion: string }>; deletionTimestamp?: Date; generateName?: string; creationTimestamp?: Date; selfLink?: string; uid?: string; name?: string; resourceVersion?: string };
 /**
 * LeaseSpec is a specification of a Lease.
 * @isObject
 */
-spec?: { strategy?: string; acquireTime?: Date; holderIdentity?: string; leaseDurationSeconds?: number; leaseTransitions?: number; preferredHolder?: string; renewTime?: Date };
+spec?: { acquireTime?: Date; holderIdentity?: string; leaseDurationSeconds?: number; leaseTransitions?: number; preferredHolder?: string; renewTime?: Date; strategy?: string };
 }
 
 /**

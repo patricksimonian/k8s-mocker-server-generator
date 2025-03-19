@@ -13,7 +13,7 @@ postStart?: { exec?: { command?: string[] }; httpGet?: { host?: string; httpHead
 * LifecycleHandler defines a specific action that should be taken in a lifecycle hook. One and only one of the fields, except TCPSocket must be specified.
 * @isObject
 */
-preStop?: { sleep?: { seconds: number }; tcpSocket?: { host?: string; port: string }; exec?: { command?: string[] }; httpGet?: { scheme?: 'HTTP' | 'HTTPS'; host?: string; httpHeaders?: Array<{ name: string; value: string }>; path?: string; port: string } };
+preStop?: { tcpSocket?: { host?: string; port: string }; exec?: { command?: string[] }; httpGet?: { host?: string; httpHeaders?: Array<{ name: string; value: string }>; path?: string; port: string; scheme?: 'HTTP' | 'HTTPS' }; sleep?: { seconds: number } };
 }
 
 /**

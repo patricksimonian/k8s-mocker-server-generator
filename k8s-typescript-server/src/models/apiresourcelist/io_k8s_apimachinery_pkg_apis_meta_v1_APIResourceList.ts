@@ -22,7 +22,7 @@ kind?: string;
 * @required
 * @isArray
 */
-resources: Array<{ namespaced: boolean; shortNames?: string[]; singularName: string; kind: string; name: string; storageVersionHash?: string; verbs: string[]; version?: string; categories?: string[]; group?: string }>;
+resources: Array<{ shortNames?: string[]; singularName: string; storageVersionHash?: string; verbs: string[]; version?: string; kind: string; name: string; namespaced: boolean; categories?: string[]; group?: string }>;
 }
 
 /**

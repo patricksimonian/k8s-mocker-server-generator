@@ -8,12 +8,12 @@ export interface io_k8s_api_authorization_v1_SelfSubjectAccessReviewSpec {
 * NonResourceAttributes includes the authorization attributes available for non-resource requests to the Authorizer interface
 * @isObject
 */
-nonResourceAttributes?: { verb?: string; path?: string };
+nonResourceAttributes?: { path?: string; verb?: string };
 /**
 * ResourceAttributes includes the authorization attributes available for resource requests to the Authorizer interface
 * @isObject
 */
-resourceAttributes?: { subresource?: string; version?: string; name?: string; namespace?: string; resource?: string; verb?: string; fieldSelector?: { rawSelector?: string; requirements?: Array<{ key: string; operator: string; values?: string[] }> }; group?: string; labelSelector?: { rawSelector?: string; requirements?: Array<{ key: string; operator: string; values?: string[] }> } };
+resourceAttributes?: { labelSelector?: { rawSelector?: string; requirements?: Array<{ operator: string; values?: string[]; key: string }> }; resource?: string; verb?: string; version?: string; fieldSelector?: { rawSelector?: string; requirements?: Array<{ key: string; operator: string; values?: string[] }> }; group?: string; name?: string; namespace?: string; subresource?: string };
 }
 
 /**

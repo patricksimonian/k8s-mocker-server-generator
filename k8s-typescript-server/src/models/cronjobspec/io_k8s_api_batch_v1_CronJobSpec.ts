@@ -5,25 +5,6 @@
 */
 export interface io_k8s_api_batch_v1_CronJobSpec {
 /**
-* The number of failed finished jobs to retain. Value must be non-negative integer. Defaults to 1.
-*/
-failedJobsHistoryLimit?: number;
-/**
-* JobTemplateSpec describes the data a Job should have when created from a template
-* @required
-* @isObject
-*/
-jobTemplate: { metadata?: { annotations?: Record<string, any>; creationTimestamp?: Date; generateName?: string; managedFields?: Array<{ fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string }>; generation?: number; labels?: Record<string, any>; name?: string; selfLink?: string; deletionGracePeriodSeconds?: number; deletionTimestamp?: Date; finalizers?: string[]; namespace?: string; ownerReferences?: Array<{ name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string }>; resourceVersion?: string; uid?: string }; spec?: Record<string, any> };
-/**
-* The schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
-* @required
-*/
-schedule: string;
-/**
-* Optional deadline in seconds for starting the job if it misses scheduled time for any reason.  Missed jobs executions will be counted as failed ones.
-*/
-startingDeadlineSeconds?: number;
-/**
 * The number of successful finished jobs to retain. Value must be non-negative integer. Defaults to 3.
 */
 successfulJobsHistoryLimit?: number;
@@ -46,6 +27,25 @@ Possible enum values:
  - `"Replace"` cancels currently running job and replaces it with a new one.
 */
 concurrencyPolicy?: 'Allow' | 'Forbid' | 'Replace';
+/**
+* The number of failed finished jobs to retain. Value must be non-negative integer. Defaults to 1.
+*/
+failedJobsHistoryLimit?: number;
+/**
+* JobTemplateSpec describes the data a Job should have when created from a template
+* @required
+* @isObject
+*/
+jobTemplate: { metadata?: { uid?: string; generateName?: string; generation?: number; labels?: Record<string, any>; namespace?: string; ownerReferences?: Array<{ controller?: boolean; kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean }>; resourceVersion?: string; selfLink?: string; annotations?: Record<string, any>; creationTimestamp?: Date; managedFields?: Array<{ manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any> }>; name?: string; deletionGracePeriodSeconds?: number; deletionTimestamp?: Date; finalizers?: string[] }; spec?: Record<string, any> };
+/**
+* The schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
+* @required
+*/
+schedule: string;
+/**
+* Optional deadline in seconds for starting the job if it misses scheduled time for any reason.  Missed jobs executions will be counted as failed ones.
+*/
+startingDeadlineSeconds?: number;
 }
 
 /**
@@ -55,13 +55,13 @@ concurrencyPolicy?: 'Allow' | 'Forbid' | 'Replace';
 */
 export function createio_k8s_api_batch_v1_CronJobSpec(data?: Partial<io_k8s_api_batch_v1_CronJobSpec>): io_k8s_api_batch_v1_CronJobSpec {
  return {
-   failedJobsHistoryLimit: data?.failedJobsHistoryLimit !== undefined ? data.failedJobsHistoryLimit : 0,
-   jobTemplate: data?.jobTemplate !== undefined ? data.jobTemplate : {},
-   schedule: data?.schedule !== undefined ? data.schedule : '',
-   startingDeadlineSeconds: data?.startingDeadlineSeconds !== undefined ? data.startingDeadlineSeconds : 0,
    successfulJobsHistoryLimit: data?.successfulJobsHistoryLimit !== undefined ? data.successfulJobsHistoryLimit : 0,
    suspend: data?.suspend !== undefined ? data.suspend : false,
    timeZone: data?.timeZone !== undefined ? data.timeZone : '',
    concurrencyPolicy: data?.concurrencyPolicy !== undefined ? data.concurrencyPolicy : '',
+   failedJobsHistoryLimit: data?.failedJobsHistoryLimit !== undefined ? data.failedJobsHistoryLimit : 0,
+   jobTemplate: data?.jobTemplate !== undefined ? data.jobTemplate : {},
+   schedule: data?.schedule !== undefined ? data.schedule : '',
+   startingDeadlineSeconds: data?.startingDeadlineSeconds !== undefined ? data.startingDeadlineSeconds : 0,
  };
 }

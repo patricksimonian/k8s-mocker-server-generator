@@ -13,7 +13,7 @@ apiVersion?: string;
 * @required
 * @isArray
 */
-groups: Array<{ apiVersion?: string; kind?: string; name: string; preferredVersion?: { groupVersion: string; version: string }; serverAddressByClientCIDRs?: Array<{ serverAddress: string; clientCIDR: string }>; versions: Array<{ version: string; groupVersion: string }> }>;
+groups: Array<{ apiVersion?: string; kind?: string; name: string; preferredVersion?: { groupVersion: string; version: string }; serverAddressByClientCIDRs?: Array<{ clientCIDR: string; serverAddress: string }>; versions: Array<{ groupVersion: string; version: string }> }>;
 /**
 * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 */

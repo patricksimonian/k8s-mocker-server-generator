@@ -68,6 +68,7 @@ type Endpoint struct {
 	ResourceType string // New: resource type derived from the path
 	Parameters   []IRParameter
 	Namespaced   bool
+	Operational  bool // the endpoint is operational one of "finalize", "binding", "eviction", "scale", "status", "token", "approval", "log", "exec", "attach", "portforward", "proxy", "redirect", "watch", "connect", "bind", "metrics", "metrics/proxy", "metrics/portforward",
 	Responses    map[string]IRResponse
 }
 

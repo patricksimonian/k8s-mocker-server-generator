@@ -65,6 +65,20 @@ export class InMemoryStorage implements Storage {
  }
 
  /**
+  * delete a collection in a namespace
+  */
+ private deleteCollection( kind: string, namespace?: string): void {
+  
+   const collectionName = `${kind.toLowerCase()}s`;
+    if(namespace && this.data.namespaces[namespace]){
+      delete this.data.namespaces[namespace][collectionName];
+    }else{
+    delete this.data[collectionName];
+    }
+   
+ }
+
+ /**
   * Get a resource by kind, name, and namespace
   */
  async getResource(kind: string, name: string, namespace: string = 'default'): Promise<any> {
@@ -245,6 +259,21 @@ export class InMemoryStorage implements Storage {
    
    // Emit watch event
    this.emitWatchEvent(WatchEventType.DELETED, resource, namespace);
+
+   return true;
+ }
+ 
+ /**
+  * Delete all resources 
+  */
+  async deleteAllResources(kind: string, namespace: string = 'default'): Promise<boolean> {
+    const resources = await this.listResources(kind, namespace);
+    this.deleteCollection(kind, namespace);
+   
+    // Emit watch event
+    for (const resource of resources) {
+      this.emitWatchEvent(WatchEventType.DELETED, resource, namespace);
+    }
 
    return true;
  }

@@ -5,17 +5,17 @@
 */
 export interface io_k8s_api_autoscaling_v2_PodsMetricStatus {
 /**
-* MetricIdentifier defines the name and optionally selector for a metric
-* @required
-* @isObject
-*/
-metric: { name: string; selector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> } };
-/**
 * MetricValueStatus holds the current value for a metric
 * @required
 * @isObject
 */
 current: { value?: string; averageUtilization?: number; averageValue?: string };
+/**
+* MetricIdentifier defines the name and optionally selector for a metric
+* @required
+* @isObject
+*/
+metric: { name: string; selector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> } };
 }
 
 /**
@@ -25,7 +25,7 @@ current: { value?: string; averageUtilization?: number; averageValue?: string };
 */
 export function createio_k8s_api_autoscaling_v2_PodsMetricStatus(data?: Partial<io_k8s_api_autoscaling_v2_PodsMetricStatus>): io_k8s_api_autoscaling_v2_PodsMetricStatus {
  return {
-   metric: data?.metric !== undefined ? data.metric : { name: '' },
    current: data?.current !== undefined ? data.current : {},
+   metric: data?.metric !== undefined ? data.metric : { name: '' },
  };
 }

@@ -6,10 +6,8 @@ import { handleResourceError } from '../utils';
 
 export function createcomponentstatusRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // List componentstatus
+
+//list objects of kind ComponentStatus
   router.get('/api/v1/componentstatuses', async (req, res, next) => {
     try {
       logger.info(`Listing componentstatus`);
@@ -30,10 +28,8 @@ export function createcomponentstatusRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // Get specific componentstatus
+
+//read the specified ComponentStatus
   router.get('/api/v1/componentstatuses/:name', async (req, res, next) => {
     try {
       const name = req.params.name;

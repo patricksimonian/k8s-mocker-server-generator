@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import morgan from 'morgan';
 import { createRoutes } from './routes';
 import { errorHandler } from './middleware/error-handler';
+import { clusterHandler } from './middleware/cluster-handler';
 import { logger } from './logger';
 import config from './config';
 
@@ -17,7 +18,7 @@ export function createServer() {
   app.use(cors());
   app.use(bodyParser.json());
   app.use(morgan('dev'));
-  
+  app.use(clusterHandler);
   // Routes
   app.use(createRoutes());
   

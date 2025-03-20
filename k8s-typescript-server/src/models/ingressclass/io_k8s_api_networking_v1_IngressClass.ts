@@ -5,11 +5,6 @@
 */
 export interface io_k8s_api_networking_v1_IngressClass {
 /**
-* IngressClassSpec provides information about the class of an Ingress.
-* @isObject
-*/
-spec?: { controller?: string; parameters?: { apiGroup?: string; kind: string; name: string; namespace?: string; scope?: string } };
-/**
 * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
 */
 apiVersion?: string;
@@ -21,7 +16,12 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { uid?: string; creationTimestamp?: Date; deletionTimestamp?: Date; finalizers?: string[]; generation?: number; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; namespace?: string; labels?: Record<string, any>; name?: string; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; resourceVersion?: string; deletionGracePeriodSeconds?: number; generateName?: string; annotations?: Record<string, any>; selfLink?: string };
+metadata?: { generation?: number; ownerReferences?: Array<{ blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string; apiVersion: string }>; selfLink?: string; resourceVersion?: string; generateName?: string; managedFields?: Array<{ fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string }>; name?: string; creationTimestamp?: Date; deletionGracePeriodSeconds?: number; labels?: Record<string, any>; namespace?: string; uid?: string; annotations?: Record<string, any>; deletionTimestamp?: Date; finalizers?: string[] };
+/**
+* IngressClassSpec provides information about the class of an Ingress.
+* @isObject
+*/
+spec?: { controller?: string; parameters?: { namespace?: string; scope?: string; apiGroup?: string; kind: string; name: string } };
 }
 
 /**
@@ -31,9 +31,9 @@ metadata?: { uid?: string; creationTimestamp?: Date; deletionTimestamp?: Date; f
 */
 export function createio_k8s_api_networking_v1_IngressClass(data?: Partial<io_k8s_api_networking_v1_IngressClass>): io_k8s_api_networking_v1_IngressClass {
  return {
-   spec: data?.spec !== undefined ? data.spec : {},
    apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
    kind: data?.kind !== undefined ? data.kind : '',
    metadata: data?.metadata !== undefined ? data.metadata : {},
+   spec: data?.spec !== undefined ? data.spec : {},
  };
 }

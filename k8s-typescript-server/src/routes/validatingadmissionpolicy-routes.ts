@@ -6,11 +6,83 @@ import { handleResourceError } from '../utils';
 
 export function createvalidatingadmissionpolicyRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // List validatingadmissionpolicy
-  router.get('/apis/admissionregistration.k8s.io/v1/watch/validatingadmissionpolicies', async (req, res, next) => {
+
+//read the specified ValidatingAdmissionPolicy
+  router.get('/apis/admissionregistration.k8s.io/v1/validatingadmissionpolicies/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Getting validatingadmissionpolicy ${name}`);
+      
+      const resource = await storage.getResource('validatingadmissionpolicy', name);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`validatingadmissionpolicy ${name} not found`), res);
+      }
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//replace the specified ValidatingAdmissionPolicy
+  router.put('/apis/admissionregistration.k8s.io/v1/validatingadmissionpolicies/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Updating validatingadmissionpolicy ${name}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set name in metadata
+      resource.metadata.name = name;
+      
+      const updatedResource = await storage.updateResource('validatingadmissionpolicy', name, resource);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//delete a ValidatingAdmissionPolicy
+  router.delete('/apis/admissionregistration.k8s.io/v1/validatingadmissionpolicies/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Deleting validatingadmissionpolicy ${name}`);
+      
+      try {
+
+        const deleted = await storage.deleteResource('validatingadmissionpolicy', name);
+        
+        if (!deleted) {
+          return handleResourceError(new Error(`validatingadmissionpolicy ${name} not found}`), res);
+        }
+      } catch(e) {
+          return handleResourceError(new Error(`validatingadmissionpolicy ${name} not deleted. Error: ${(e as Error).message}`), res);
+      }
+      
+      res.status(200).json({
+        kind: 'Status',
+        apiVersion: 'v1',
+        metadata: {},
+        status: 'Success',
+        details: {
+          name: name,
+          kind: 'validatingadmissionpolicy'
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//read status of the specified ValidatingAdmissionPolicy
+  router.get('/apis/admissionregistration.k8s.io/v1/validatingadmissionpolicies/:name/status', async (req, res, next) => {
     try {
       logger.info(`Listing validatingadmissionpolicy`);
       
@@ -30,10 +102,50 @@ export function createvalidatingadmissionpolicyRoutes(storage: Storage): express
       next(error);
     }
   });
-    
-  
-  
-  // List validatingadmissionpolicy
+
+//replace status of the specified ValidatingAdmissionPolicy
+  router.put('/apis/admissionregistration.k8s.io/v1/validatingadmissionpolicies/:name/status', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Updating validatingadmissionpolicy ${name}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set name in metadata
+      resource.metadata.name = name;
+      
+      const updatedResource = await storage.updateResource('validatingadmissionpolicy', name, resource);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//watch changes to an object of kind ValidatingAdmissionPolicy. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
+  router.get('/apis/admissionregistration.k8s.io/v1/watch/validatingadmissionpolicies/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Getting validatingadmissionpolicy ${name}`);
+      
+      const resource = await storage.getResource('validatingadmissionpolicy', name);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`validatingadmissionpolicy ${name} not found`), res);
+      }
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//list or watch objects of kind ValidatingAdmissionPolicy
   router.get('/apis/admissionregistration.k8s.io/v1/validatingadmissionpolicies', async (req, res, next) => {
     try {
       logger.info(`Listing validatingadmissionpolicy`);
@@ -54,7 +166,8 @@ export function createvalidatingadmissionpolicyRoutes(storage: Storage): express
       next(error);
     }
   });
-  // Create validatingadmissionpolicy
+
+//create a ValidatingAdmissionPolicy
   router.post('/apis/admissionregistration.k8s.io/v1/validatingadmissionpolicies', async (req, res, next) => {
     try {
       logger.info(`Creating validatingadmissionpolicy`);
@@ -66,28 +179,28 @@ export function createvalidatingadmissionpolicyRoutes(storage: Storage): express
         resource.metadata = {};
       }
       
-      const createdResource = await storage.createOrUpdateResource('validatingadmissionpolicy', resource);
+      const createdResource = await storage.createResource('validatingadmissionpolicy', resource);
       
       res.status(201).json(createdResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete validatingadmissionpolicy
+
+//delete collection of ValidatingAdmissionPolicy
   router.delete('/apis/admissionregistration.k8s.io/v1/validatingadmissionpolicies', async (req, res, next) => {
     try {
-      const name = req.params.name;
-      logger.info(`Deleting validatingadmissionpolicy ${name}`);
+
       
       try {
 
-        const deleted = await storage.deleteResource('validatingadmissionpolicy', name);
+        const deleted = await storage.deleteAllResources('validatingadmissionpolicy');
         
         if (!deleted) {
-          return handleResourceError(new Error(`validatingadmissionpolicy ${name} not found}`), res);
+          return handleResourceError(new Error(`validatingadmissionpolicy not found}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`validatingadmissionpolicy ${name} not deleted. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`validatingadmissionpolicy not deleted. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -96,7 +209,6 @@ export function createvalidatingadmissionpolicyRoutes(storage: Storage): express
         metadata: {},
         status: 'Success',
         details: {
-          name: name,
           kind: 'validatingadmissionpolicy'
         }
       });
@@ -104,96 +216,24 @@ export function createvalidatingadmissionpolicyRoutes(storage: Storage): express
       next(error);
     }
   });
-    
-  
-  
-  // Get specific validatingadmissionpolicy
-  router.get('/apis/admissionregistration.k8s.io/v1/validatingadmissionpolicies/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Getting validatingadmissionpolicy ${name}`);
-      
-      const resource = await storage.getResource('validatingadmissionpolicy', name);
-      
-      if (!resource) {
-        return handleResourceError(new Error(`validatingadmissionpolicy ${name} not found`), res);
-      }
-      
-      res.json(resource);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Update validatingadmissionpolicy
-  router.put('/apis/admissionregistration.k8s.io/v1/validatingadmissionpolicies/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Updating validatingadmissionpolicy ${name}`);
-      
-      const resource = req.body;
-      
-      // Ensure resource has metadata
-      if (!resource.metadata) {
-        resource.metadata = {};
-      }
-      
-      // Set name in metadata
-      resource.metadata.name = name;
-      
-      const updatedResource = await storage.createOrUpdateResource('validatingadmissionpolicy', resource);
-      
-      res.json(updatedResource);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Delete validatingadmissionpolicy
-  router.delete('/apis/admissionregistration.k8s.io/v1/validatingadmissionpolicies/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Deleting validatingadmissionpolicy ${name}`);
-      
-      try {
 
-        const deleted = await storage.deleteResource('validatingadmissionpolicy', name);
-        
-        if (!deleted) {
-          return handleResourceError(new Error(`validatingadmissionpolicy ${name} not found}`), res);
-        }
-      } catch(e) {
-          return handleResourceError(new Error(`validatingadmissionpolicy ${name} not deleted. Error: ${(e as Error).message)}`), res);
-      }
-      
-      res.status(200).json({
-        kind: 'Status',
-        apiVersion: 'v1',
-        metadata: {},
-        status: 'Success',
-        details: {
-          name: name,
-          kind: 'validatingadmissionpolicy'
-        }
-      });
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // Get specific validatingadmissionpolicy
-  router.get('/apis/admissionregistration.k8s.io/v1/watch/validatingadmissionpolicies/:name', async (req, res, next) => {
+//watch individual changes to a list of ValidatingAdmissionPolicy. deprecated: use the 'watch' parameter with a list operation instead.
+  router.get('/apis/admissionregistration.k8s.io/v1/watch/validatingadmissionpolicies', async (req, res, next) => {
     try {
-      const name = req.params.name;
-      logger.info(`Getting validatingadmissionpolicy ${name}`);
+      logger.info(`Listing validatingadmissionpolicy`);
       
-      const resource = await storage.getResource('validatingadmissionpolicy', name);
+      const resources = await storage.listResources('validatingadmissionpolicy');
       
-      if (!resource) {
-        return handleResourceError(new Error(`validatingadmissionpolicy ${name} not found`), res);
-      }
+      const response = {
+        kind: 'ValidatingadmissionpolicyList',
+        apiVersion: 'admissionregistration.k8s.io/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
       
-      res.json(resource);
+      res.json(response);
     } catch (error) {
       next(error);
     }

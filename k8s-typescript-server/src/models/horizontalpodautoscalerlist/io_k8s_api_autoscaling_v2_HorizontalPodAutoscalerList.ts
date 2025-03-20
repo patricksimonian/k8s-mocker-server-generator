@@ -12,9 +12,9 @@ apiVersion?: string;
 * items is the list of horizontal pod autoscaler objects.
 * @required
 * @isArray
-* @references io.k8s.api.autoscaling.v1.HorizontalPodAutoscaler
+* @references io.k8s.api.autoscaling.v2.HorizontalPodAutoscaler
 */
-items: io_k8s_api_autoscaling_v1_HorizontalPodAutoscaler[];
+items: io_k8s_api_autoscaling_v2_HorizontalPodAutoscaler[];
 /**
 * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 */
@@ -23,7 +23,7 @@ kind?: string;
 * ListMeta describes metadata that synthetic resources must have, including lists and various status objects. A resource may have only one of {ObjectMeta, ListMeta}.
 * @isObject
 */
-metadata?: { continue?: string; remainingItemCount?: number; resourceVersion?: string; selfLink?: string };
+metadata?: { selfLink?: string; continue?: string; remainingItemCount?: number; resourceVersion?: string };
 }
 
 /**
@@ -40,4 +40,4 @@ export function createio_k8s_api_autoscaling_v2_HorizontalPodAutoscalerList(data
  };
 }
 // Required imports
-import { io_k8s_api_autoscaling_v1_HorizontalPodAutoscaler, createio_k8s_api_autoscaling_v1_HorizontalPodAutoscaler } from '../horizontalpodautoscaler/io_k8s_api_autoscaling_v1_HorizontalPodAutoscaler';
+import { io_k8s_api_autoscaling_v2_HorizontalPodAutoscaler, createio_k8s_api_autoscaling_v2_HorizontalPodAutoscaler } from '../horizontalpodautoscaler/io_k8s_api_autoscaling_v2_HorizontalPodAutoscaler';

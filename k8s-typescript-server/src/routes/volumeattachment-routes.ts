@@ -6,10 +6,168 @@ import { handleResourceError } from '../utils';
 
 export function createvolumeattachmentRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // List volumeattachment
+
+//delete a VolumeAttachment
+  router.delete('/apis/storage.k8s.io/v1/volumeattachments/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Deleting volumeattachment ${name}`);
+      
+      try {
+
+        const deleted = await storage.deleteResource('volumeattachment', name);
+        
+        if (!deleted) {
+          return handleResourceError(new Error(`volumeattachment ${name} not found}`), res);
+        }
+      } catch(e) {
+          return handleResourceError(new Error(`volumeattachment ${name} not deleted. Error: ${(e as Error).message}`), res);
+      }
+      
+      res.status(200).json({
+        kind: 'Status',
+        apiVersion: 'v1',
+        metadata: {},
+        status: 'Success',
+        details: {
+          name: name,
+          kind: 'volumeattachment'
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//read the specified VolumeAttachment
+  router.get('/apis/storage.k8s.io/v1/volumeattachments/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Getting volumeattachment ${name}`);
+      
+      const resource = await storage.getResource('volumeattachment', name);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`volumeattachment ${name} not found`), res);
+      }
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//replace the specified VolumeAttachment
+  router.put('/apis/storage.k8s.io/v1/volumeattachments/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Updating volumeattachment ${name}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set name in metadata
+      resource.metadata.name = name;
+      
+      const updatedResource = await storage.updateResource('volumeattachment', name, resource);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//watch changes to an object of kind VolumeAttachment. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
+  router.get('/apis/storage.k8s.io/v1/watch/volumeattachments/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Getting volumeattachment ${name}`);
+      
+      const resource = await storage.getResource('volumeattachment', name);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`volumeattachment ${name} not found`), res);
+      }
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//read status of the specified VolumeAttachment
+  router.get('/apis/storage.k8s.io/v1/volumeattachments/:name/status', async (req, res, next) => {
+    try {
+      logger.info(`Listing volumeattachment`);
+      
+      const resources = await storage.listResources('volumeattachment');
+      
+      const response = {
+        kind: 'VolumeattachmentList',
+        apiVersion: 'storage.k8s.io/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//replace status of the specified VolumeAttachment
+  router.put('/apis/storage.k8s.io/v1/volumeattachments/:name/status', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Updating volumeattachment ${name}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set name in metadata
+      resource.metadata.name = name;
+      
+      const updatedResource = await storage.updateResource('volumeattachment', name, resource);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//watch individual changes to a list of VolumeAttachment. deprecated: use the 'watch' parameter with a list operation instead.
+  router.get('/apis/storage.k8s.io/v1/watch/volumeattachments', async (req, res, next) => {
+    try {
+      logger.info(`Listing volumeattachment`);
+      
+      const resources = await storage.listResources('volumeattachment');
+      
+      const response = {
+        kind: 'VolumeattachmentList',
+        apiVersion: 'storage.k8s.io/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//list or watch objects of kind VolumeAttachment
   router.get('/apis/storage.k8s.io/v1/volumeattachments', async (req, res, next) => {
     try {
       logger.info(`Listing volumeattachment`);
@@ -30,7 +188,8 @@ export function createvolumeattachmentRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Create volumeattachment
+
+//create a VolumeAttachment
   router.post('/apis/storage.k8s.io/v1/volumeattachments', async (req, res, next) => {
     try {
       logger.info(`Creating volumeattachment`);
@@ -42,28 +201,28 @@ export function createvolumeattachmentRoutes(storage: Storage): express.Router {
         resource.metadata = {};
       }
       
-      const createdResource = await storage.createOrUpdateResource('volumeattachment', resource);
+      const createdResource = await storage.createResource('volumeattachment', resource);
       
       res.status(201).json(createdResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete volumeattachment
+
+//delete collection of VolumeAttachment
   router.delete('/apis/storage.k8s.io/v1/volumeattachments', async (req, res, next) => {
     try {
-      const name = req.params.name;
-      logger.info(`Deleting volumeattachment ${name}`);
+
       
       try {
 
-        const deleted = await storage.deleteResource('volumeattachment', name);
+        const deleted = await storage.deleteAllResources('volumeattachment');
         
         if (!deleted) {
-          return handleResourceError(new Error(`volumeattachment ${name} not found}`), res);
+          return handleResourceError(new Error(`volumeattachment not found}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`volumeattachment ${name} not deleted. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`volumeattachment not deleted. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -72,128 +231,9 @@ export function createvolumeattachmentRoutes(storage: Storage): express.Router {
         metadata: {},
         status: 'Success',
         details: {
-          name: name,
           kind: 'volumeattachment'
         }
       });
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // Get specific volumeattachment
-  router.get('/apis/storage.k8s.io/v1/watch/volumeattachments/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Getting volumeattachment ${name}`);
-      
-      const resource = await storage.getResource('volumeattachment', name);
-      
-      if (!resource) {
-        return handleResourceError(new Error(`volumeattachment ${name} not found`), res);
-      }
-      
-      res.json(resource);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Delete volumeattachment
-  router.delete('/apis/storage.k8s.io/v1/volumeattachments/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Deleting volumeattachment ${name}`);
-      
-      try {
-
-        const deleted = await storage.deleteResource('volumeattachment', name);
-        
-        if (!deleted) {
-          return handleResourceError(new Error(`volumeattachment ${name} not found}`), res);
-        }
-      } catch(e) {
-          return handleResourceError(new Error(`volumeattachment ${name} not deleted. Error: ${(e as Error).message)}`), res);
-      }
-      
-      res.status(200).json({
-        kind: 'Status',
-        apiVersion: 'v1',
-        metadata: {},
-        status: 'Success',
-        details: {
-          name: name,
-          kind: 'volumeattachment'
-        }
-      });
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // Get specific volumeattachment
-  router.get('/apis/storage.k8s.io/v1/volumeattachments/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Getting volumeattachment ${name}`);
-      
-      const resource = await storage.getResource('volumeattachment', name);
-      
-      if (!resource) {
-        return handleResourceError(new Error(`volumeattachment ${name} not found`), res);
-      }
-      
-      res.json(resource);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Update volumeattachment
-  router.put('/apis/storage.k8s.io/v1/volumeattachments/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Updating volumeattachment ${name}`);
-      
-      const resource = req.body;
-      
-      // Ensure resource has metadata
-      if (!resource.metadata) {
-        resource.metadata = {};
-      }
-      
-      // Set name in metadata
-      resource.metadata.name = name;
-      
-      const updatedResource = await storage.createOrUpdateResource('volumeattachment', resource);
-      
-      res.json(updatedResource);
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // List volumeattachment
-  router.get('/apis/storage.k8s.io/v1/watch/volumeattachments', async (req, res, next) => {
-    try {
-      logger.info(`Listing volumeattachment`);
-      
-      const resources = await storage.listResources('volumeattachment');
-      
-      const response = {
-        kind: 'VolumeattachmentList',
-        apiVersion: 'storage.k8s.io/v1',
-        metadata: {
-          resourceVersion: '1'
-        },
-        items: resources || []
-      };
-      
-      res.json(response);
     } catch (error) {
       next(error);
     }

@@ -6,34 +6,8 @@ import { handleResourceError } from '../utils';
 
 export function createpersistentvolumeclaimRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // List persistentvolumeclaim
-  router.get('/api/v1/persistentvolumeclaims', async (req, res, next) => {
-    try {
-      logger.info(`Listing persistentvolumeclaim`);
-      
-      const resources = await storage.listResources('persistentvolumeclaim');
-      
-      const response = {
-        kind: 'PersistentvolumeclaimList',
-        apiVersion: 'v1',
-        metadata: {
-          resourceVersion: '1'
-        },
-        items: resources || []
-      };
-      
-      res.json(response);
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // List persistentvolumeclaim
+
+//watch individual changes to a list of PersistentVolumeClaim. deprecated: use the 'watch' parameter with a list operation instead.
   router.get('/api/v1/watch/namespaces/:namespace/persistentvolumeclaims', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -55,11 +29,9 @@ export function createpersistentvolumeclaimRoutes(storage: Storage): express.Rou
       next(error);
     }
   });
-    
-  
-  
-  // Get specific persistentvolumeclaim
-  router.get('/api/v1/watch/namespaces/:namespace/persistentvolumeclaims/:name', async (req, res, next) => {
+
+//read the specified PersistentVolumeClaim
+  router.get('/api/v1/namespaces/:namespace/persistentvolumeclaims/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
       const name = req.params.name;
@@ -76,11 +48,13 @@ export function createpersistentvolumeclaimRoutes(storage: Storage): express.Rou
       next(error);
     }
   });
-  // Create persistentvolumeclaim
-  router.post('/api/v1/namespaces/:namespace/persistentvolumeclaims', async (req, res, next) => {
+
+//replace the specified PersistentVolumeClaim
+  router.put('/api/v1/namespaces/:namespace/persistentvolumeclaims/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
-      logger.info(`Creating persistentvolumeclaim in namespace ${namespace}`);
+      const name = req.params.name;
+      logger.info(`Updating persistentvolumeclaim ${name} in namespace ${namespace}`);
       
       const resource = req.body;
       
@@ -89,18 +63,20 @@ export function createpersistentvolumeclaimRoutes(storage: Storage): express.Rou
         resource.metadata = {};
       }
       
-      // Set namespace in metadata
+      // Set name and namespace in metadata
+      resource.metadata.name = name;
       resource.metadata.namespace = namespace;
       
-      const createdResource = await storage.createOrUpdateResource('persistentvolumeclaim', resource);
+      const updatedResource = await storage.updateResource('persistentvolumeclaim', name, resource);
       
-      res.status(201).json(createdResource);
+      res.json(updatedResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete persistentvolumeclaim
-  router.delete('/api/v1/namespaces/:namespace/persistentvolumeclaims', async (req, res, next) => {
+
+//delete a PersistentVolumeClaim
+  router.delete('/api/v1/namespaces/:namespace/persistentvolumeclaims/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
       const name = req.params.name;
@@ -113,7 +89,7 @@ export function createpersistentvolumeclaimRoutes(storage: Storage): express.Rou
           return handleResourceError(new Error(`persistentvolumeclaim ${name} not found in namespace ${namespace}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`persistentvolumeclaim ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`persistentvolumeclaim ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -130,10 +106,57 @@ export function createpersistentvolumeclaimRoutes(storage: Storage): express.Rou
       next(error);
     }
   });
-    
-  
-  
-  // List persistentvolumeclaim
+
+//read status of the specified PersistentVolumeClaim
+  router.get('/api/v1/namespaces/:namespace/persistentvolumeclaims/:name/status', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      logger.info(`Listing persistentvolumeclaim in namespace ${namespace}`);
+      
+      const resources = await storage.listResources('persistentvolumeclaim', namespace);
+      
+      const response = {
+        kind: 'PersistentvolumeclaimList',
+        apiVersion: 'v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//replace status of the specified PersistentVolumeClaim
+  router.put('/api/v1/namespaces/:namespace/persistentvolumeclaims/:name/status', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Updating persistentvolumeclaim ${name} in namespace ${namespace}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set name and namespace in metadata
+      resource.metadata.name = name;
+      resource.metadata.namespace = namespace;
+      
+      const updatedResource = await storage.updateResource('persistentvolumeclaim', name, resource);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//list or watch objects of kind PersistentVolumeClaim
   router.get('/api/v1/namespaces/:namespace/persistentvolumeclaims', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -155,11 +178,63 @@ export function createpersistentvolumeclaimRoutes(storage: Storage): express.Rou
       next(error);
     }
   });
-    
-  
-  
-  // Get specific persistentvolumeclaim
-  router.get('/api/v1/namespaces/:namespace/persistentvolumeclaims/:name', async (req, res, next) => {
+
+//create a PersistentVolumeClaim
+  router.post('/api/v1/namespaces/:namespace/persistentvolumeclaims', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      logger.info(`Creating persistentvolumeclaim in namespace ${namespace}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set namespace in metadata
+      resource.metadata.namespace = namespace;
+      
+      const createdResource = await storage.createResource('persistentvolumeclaim', resource);
+      
+      res.status(201).json(createdResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//delete collection of PersistentVolumeClaim
+  router.delete('/api/v1/namespaces/:namespace/persistentvolumeclaims', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      logger.info(`Deleting all persistentvolumeclaim in namespace ${namespace}`);
+      try {
+
+        const deleted = await storage.deleteAllResources('persistentvolumeclaim', namespace);
+        
+        if (!deleted) {
+          return handleResourceError(new Error(`persistentvolumeclaim not found in namespace ${namespace}`), res);
+        }
+      } catch(e) {
+          return handleResourceError(new Error(`persistentvolumeclaim not deleted in namespace ${namespace}. Error: ${(e as Error).message}`), res);
+      }
+      
+      res.status(200).json({
+        kind: 'Status',
+        apiVersion: 'v1',
+        metadata: {},
+        status: 'Success',
+        details: {
+          kind: 'persistentvolumeclaim'
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//watch changes to an object of kind PersistentVolumeClaim. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
+  router.get('/api/v1/watch/namespaces/:namespace/persistentvolumeclaims/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
       const name = req.params.name;
@@ -176,66 +251,30 @@ export function createpersistentvolumeclaimRoutes(storage: Storage): express.Rou
       next(error);
     }
   });
-  // Update persistentvolumeclaim
-  router.put('/api/v1/namespaces/:namespace/persistentvolumeclaims/:name', async (req, res, next) => {
-    try {
-      const namespace = req.params.namespace;
-      const name = req.params.name;
-      logger.info(`Updating persistentvolumeclaim ${name} in namespace ${namespace}`);
-      
-      const resource = req.body;
-      
-      // Ensure resource has metadata
-      if (!resource.metadata) {
-        resource.metadata = {};
-      }
-      
-      // Set name and namespace in metadata
-      resource.metadata.name = name;
-      resource.metadata.namespace = namespace;
-      
-      const updatedResource = await storage.createOrUpdateResource('persistentvolumeclaim', resource);
-      
-      res.json(updatedResource);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Delete persistentvolumeclaim
-  router.delete('/api/v1/namespaces/:namespace/persistentvolumeclaims/:name', async (req, res, next) => {
-    try {
-      const namespace = req.params.namespace;
-      const name = req.params.name;
-      logger.info(`Deleting persistentvolumeclaim ${name} in namespace ${namespace}`);
-      try {
 
-        const deleted = await storage.deleteResource('persistentvolumeclaim', name, namespace);
-        
-        if (!deleted) {
-          return handleResourceError(new Error(`persistentvolumeclaim ${name} not found in namespace ${namespace}`), res);
-        }
-      } catch(e) {
-          return handleResourceError(new Error(`persistentvolumeclaim ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message)}`), res);
-      }
+//list or watch objects of kind PersistentVolumeClaim
+  router.get('/api/v1/persistentvolumeclaims', async (req, res, next) => {
+    try {
+      logger.info(`Listing persistentvolumeclaim`);
       
-      res.status(200).json({
-        kind: 'Status',
+      const resources = await storage.listResources('persistentvolumeclaim');
+      
+      const response = {
+        kind: 'PersistentvolumeclaimList',
         apiVersion: 'v1',
-        metadata: {},
-        status: 'Success',
-        details: {
-          name: name,
-          kind: 'persistentvolumeclaim'
-        }
-      });
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
     } catch (error) {
       next(error);
     }
   });
-    
-  
-  
-  // List persistentvolumeclaim
+
+//watch individual changes to a list of PersistentVolumeClaim. deprecated: use the 'watch' parameter with a list operation instead.
   router.get('/api/v1/watch/persistentvolumeclaims', async (req, res, next) => {
     try {
       logger.info(`Listing persistentvolumeclaim`);

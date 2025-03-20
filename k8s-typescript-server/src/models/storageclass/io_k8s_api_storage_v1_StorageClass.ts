@@ -7,36 +7,31 @@ StorageClasses are non-namespaced; the name of the storage class according to et
 */
 export interface io_k8s_api_storage_v1_StorageClass {
 /**
-* provisioner indicates the type of the provisioner.
-* @required
+* Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 */
-provisioner: string;
+kind?: string;
 /**
-* allowVolumeExpansion shows whether the storage class allow volume expand.
+* ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
+* @isObject
 */
-allowVolumeExpansion?: boolean;
-/**
-* APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
-*/
-apiVersion?: string;
+metadata?: { creationTimestamp?: Date; deletionTimestamp?: Date; name?: string; namespace?: string; finalizers?: string[]; generateName?: string; annotations?: Record<string, any>; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; selfLink?: string; uid?: string; deletionGracePeriodSeconds?: number; generation?: number; labels?: Record<string, any>; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; resourceVersion?: string };
 /**
 * parameters holds the parameters for the provisioner that should create volumes of this storage class.
 */
 parameters?: Record<string, any>;
 /**
-* mountOptions controls the mountOptions for dynamically provisioned PersistentVolumes of this storage class. e.g. ["ro", "soft"]. Not validated - mount of the PVs will simply fail if one is invalid.
+* allowVolumeExpansion shows whether the storage class allow volume expand.
+*/
+allowVolumeExpansion?: boolean;
+/**
+* allowedTopologies restrict the node topologies where volumes can be dynamically provisioned. Each volume plugin defines its own supported topology specifications. An empty TopologySelectorTerm list means there is no topology restriction. This field is only honored by servers that enable the VolumeScheduling feature.
 * @isArray
 */
-mountOptions?: string[];
+allowedTopologies?: Array<{ matchLabelExpressions?: Array<{ key: string; values: string[] }> }>;
 /**
-* reclaimPolicy controls the reclaimPolicy for dynamically provisioned PersistentVolumes of this storage class. Defaults to Delete.
-
-Possible enum values:
- - `"Delete"` means the volume will be deleted from Kubernetes on release from its claim. The volume plugin must support Deletion.
- - `"Recycle"` means the volume will be recycled back into the pool of unbound persistent volumes on release from its claim. The volume plugin must support Recycling.
- - `"Retain"` means the volume will be left in its current phase (Released) for manual reclamation by the administrator. The default policy is Retain.
+* APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
 */
-reclaimPolicy?: 'Delete' | 'Recycle' | 'Retain';
+apiVersion?: string;
 /**
 * volumeBindingMode indicates how PersistentVolumeClaims should be provisioned and bound.  When unset, VolumeBindingImmediate is used. This field is only honored by servers that enable the VolumeScheduling feature.
 
@@ -46,19 +41,24 @@ Possible enum values:
 */
 volumeBindingMode?: 'Immediate' | 'WaitForFirstConsumer';
 /**
-* allowedTopologies restrict the node topologies where volumes can be dynamically provisioned. Each volume plugin defines its own supported topology specifications. An empty TopologySelectorTerm list means there is no topology restriction. This field is only honored by servers that enable the VolumeScheduling feature.
+* mountOptions controls the mountOptions for dynamically provisioned PersistentVolumes of this storage class. e.g. ["ro", "soft"]. Not validated - mount of the PVs will simply fail if one is invalid.
 * @isArray
 */
-allowedTopologies?: Array<{ matchLabelExpressions?: Array<{ values: string[]; key: string }> }>;
+mountOptions?: string[];
 /**
-* Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+* provisioner indicates the type of the provisioner.
+* @required
 */
-kind?: string;
+provisioner: string;
 /**
-* ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
-* @isObject
+* reclaimPolicy controls the reclaimPolicy for dynamically provisioned PersistentVolumes of this storage class. Defaults to Delete.
+
+Possible enum values:
+ - `"Delete"` means the volume will be deleted from Kubernetes on release from its claim. The volume plugin must support Deletion.
+ - `"Recycle"` means the volume will be recycled back into the pool of unbound persistent volumes on release from its claim. The volume plugin must support Recycling.
+ - `"Retain"` means the volume will be left in its current phase (Released) for manual reclamation by the administrator. The default policy is Retain.
 */
-metadata?: { generation?: number; namespace?: string; resourceVersion?: string; selfLink?: string; deletionTimestamp?: Date; finalizers?: string[]; name?: string; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; annotations?: Record<string, any>; generateName?: string; labels?: Record<string, any>; creationTimestamp?: Date; deletionGracePeriodSeconds?: number; managedFields?: Array<{ subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string }>; uid?: string };
+reclaimPolicy?: 'Delete' | 'Recycle' | 'Retain';
 }
 
 /**
@@ -68,15 +68,15 @@ metadata?: { generation?: number; namespace?: string; resourceVersion?: string; 
 */
 export function createio_k8s_api_storage_v1_StorageClass(data?: Partial<io_k8s_api_storage_v1_StorageClass>): io_k8s_api_storage_v1_StorageClass {
  return {
-   provisioner: data?.provisioner !== undefined ? data.provisioner : '',
-   allowVolumeExpansion: data?.allowVolumeExpansion !== undefined ? data.allowVolumeExpansion : false,
-   apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
-   parameters: data?.parameters !== undefined ? data.parameters : {},
-   mountOptions: data?.mountOptions !== undefined ? data.mountOptions : [],
-   reclaimPolicy: data?.reclaimPolicy !== undefined ? data.reclaimPolicy : '',
-   volumeBindingMode: data?.volumeBindingMode !== undefined ? data.volumeBindingMode : '',
-   allowedTopologies: data?.allowedTopologies !== undefined ? data.allowedTopologies : [],
    kind: data?.kind !== undefined ? data.kind : '',
    metadata: data?.metadata !== undefined ? data.metadata : {},
+   parameters: data?.parameters !== undefined ? data.parameters : {},
+   allowVolumeExpansion: data?.allowVolumeExpansion !== undefined ? data.allowVolumeExpansion : false,
+   allowedTopologies: data?.allowedTopologies !== undefined ? data.allowedTopologies : [],
+   apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
+   volumeBindingMode: data?.volumeBindingMode !== undefined ? data.volumeBindingMode : '',
+   mountOptions: data?.mountOptions !== undefined ? data.mountOptions : [],
+   provisioner: data?.provisioner !== undefined ? data.provisioner : '',
+   reclaimPolicy: data?.reclaimPolicy !== undefined ? data.reclaimPolicy : '',
  };
 }

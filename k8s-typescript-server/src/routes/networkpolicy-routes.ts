@@ -6,56 +6,8 @@ import { handleResourceError } from '../utils';
 
 export function createnetworkpolicyRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // List networkpolicy
-  router.get('/apis/networking.k8s.io/v1/watch/namespaces/:namespace/networkpolicies', async (req, res, next) => {
-    try {
-      const namespace = req.params.namespace;
-      logger.info(`Listing networkpolicy in namespace ${namespace}`);
-      
-      const resources = await storage.listResources('networkpolicy', namespace);
-      
-      const response = {
-        kind: 'NetworkpolicyList',
-        apiVersion: 'networking.k8s.io/v1',
-        metadata: {
-          resourceVersion: '1'
-        },
-        items: resources || []
-      };
-      
-      res.json(response);
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // Get specific networkpolicy
-  router.get('/apis/networking.k8s.io/v1/watch/namespaces/:namespace/networkpolicies/:name', async (req, res, next) => {
-    try {
-      const namespace = req.params.namespace;
-      const name = req.params.name;
-      logger.info(`Getting networkpolicy ${name} in namespace ${namespace}`);
-      
-      const resource = await storage.getResource('networkpolicy', name, namespace);
-      
-      if (!resource) {
-        return handleResourceError(new Error(`networkpolicy ${name} not found in namespace ${namespace}`), res);
-      }
-      
-      res.json(resource);
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // List networkpolicy
+
+//list or watch objects of kind NetworkPolicy
   router.get('/apis/networking.k8s.io/v1/networkpolicies', async (req, res, next) => {
     try {
       logger.info(`Listing networkpolicy`);
@@ -76,10 +28,49 @@ export function createnetworkpolicyRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // List networkpolicy
+
+//watch individual changes to a list of NetworkPolicy. deprecated: use the 'watch' parameter with a list operation instead.
+  router.get('/apis/networking.k8s.io/v1/watch/networkpolicies', async (req, res, next) => {
+    try {
+      logger.info(`Listing networkpolicy`);
+      
+      const resources = await storage.listResources('networkpolicy');
+      
+      const response = {
+        kind: 'NetworkpolicyList',
+        apiVersion: 'networking.k8s.io/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//watch changes to an object of kind NetworkPolicy. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
+  router.get('/apis/networking.k8s.io/v1/watch/namespaces/:namespace/networkpolicies/:name', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Getting networkpolicy ${name} in namespace ${namespace}`);
+      
+      const resource = await storage.getResource('networkpolicy', name, namespace);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`networkpolicy ${name} not found in namespace ${namespace}`), res);
+      }
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//list or watch objects of kind NetworkPolicy
   router.get('/apis/networking.k8s.io/v1/namespaces/:namespace/networkpolicies', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -101,7 +92,8 @@ export function createnetworkpolicyRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Create networkpolicy
+
+//create a NetworkPolicy
   router.post('/apis/networking.k8s.io/v1/namespaces/:namespace/networkpolicies', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -117,28 +109,28 @@ export function createnetworkpolicyRoutes(storage: Storage): express.Router {
       // Set namespace in metadata
       resource.metadata.namespace = namespace;
       
-      const createdResource = await storage.createOrUpdateResource('networkpolicy', resource);
+      const createdResource = await storage.createResource('networkpolicy', resource);
       
       res.status(201).json(createdResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete networkpolicy
+
+//delete collection of NetworkPolicy
   router.delete('/apis/networking.k8s.io/v1/namespaces/:namespace/networkpolicies', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
-      const name = req.params.name;
-      logger.info(`Deleting networkpolicy ${name} in namespace ${namespace}`);
+      logger.info(`Deleting all networkpolicy in namespace ${namespace}`);
       try {
 
-        const deleted = await storage.deleteResource('networkpolicy', name, namespace);
+        const deleted = await storage.deleteAllResources('networkpolicy', namespace);
         
         if (!deleted) {
-          return handleResourceError(new Error(`networkpolicy ${name} not found in namespace ${namespace}`), res);
+          return handleResourceError(new Error(`networkpolicy not found in namespace ${namespace}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`networkpolicy ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`networkpolicy not deleted in namespace ${namespace}. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -147,7 +139,6 @@ export function createnetworkpolicyRoutes(storage: Storage): express.Router {
         metadata: {},
         status: 'Success',
         details: {
-          name: name,
           kind: 'networkpolicy'
         }
       });
@@ -155,10 +146,8 @@ export function createnetworkpolicyRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // Get specific networkpolicy
+
+//read the specified NetworkPolicy
   router.get('/apis/networking.k8s.io/v1/namespaces/:namespace/networkpolicies/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -176,7 +165,8 @@ export function createnetworkpolicyRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Update networkpolicy
+
+//replace the specified NetworkPolicy
   router.put('/apis/networking.k8s.io/v1/namespaces/:namespace/networkpolicies/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -194,14 +184,15 @@ export function createnetworkpolicyRoutes(storage: Storage): express.Router {
       resource.metadata.name = name;
       resource.metadata.namespace = namespace;
       
-      const updatedResource = await storage.createOrUpdateResource('networkpolicy', resource);
+      const updatedResource = await storage.updateResource('networkpolicy', name, resource);
       
       res.json(updatedResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete networkpolicy
+
+//delete a NetworkPolicy
   router.delete('/apis/networking.k8s.io/v1/namespaces/:namespace/networkpolicies/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -215,7 +206,7 @@ export function createnetworkpolicyRoutes(storage: Storage): express.Router {
           return handleResourceError(new Error(`networkpolicy ${name} not found in namespace ${namespace}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`networkpolicy ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`networkpolicy ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -232,15 +223,14 @@ export function createnetworkpolicyRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // List networkpolicy
-  router.get('/apis/networking.k8s.io/v1/watch/networkpolicies', async (req, res, next) => {
+
+//watch individual changes to a list of NetworkPolicy. deprecated: use the 'watch' parameter with a list operation instead.
+  router.get('/apis/networking.k8s.io/v1/watch/namespaces/:namespace/networkpolicies', async (req, res, next) => {
     try {
-      logger.info(`Listing networkpolicy`);
+      const namespace = req.params.namespace;
+      logger.info(`Listing networkpolicy in namespace ${namespace}`);
       
-      const resources = await storage.listResources('networkpolicy');
+      const resources = await storage.listResources('networkpolicy', namespace);
       
       const response = {
         kind: 'NetworkpolicyList',

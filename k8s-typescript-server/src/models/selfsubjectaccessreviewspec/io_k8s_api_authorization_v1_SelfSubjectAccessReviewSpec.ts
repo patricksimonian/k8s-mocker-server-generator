@@ -5,15 +5,15 @@
 */
 export interface io_k8s_api_authorization_v1_SelfSubjectAccessReviewSpec {
 /**
+* ResourceAttributes includes the authorization attributes available for resource requests to the Authorizer interface
+* @isObject
+*/
+resourceAttributes?: { subresource?: string; verb?: string; fieldSelector?: { rawSelector?: string; requirements?: Array<{ values?: string[]; key: string; operator: string }> }; resource?: string; name?: string; namespace?: string; version?: string; group?: string; labelSelector?: { rawSelector?: string; requirements?: Array<{ operator: string; values?: string[]; key: string }> } };
+/**
 * NonResourceAttributes includes the authorization attributes available for non-resource requests to the Authorizer interface
 * @isObject
 */
 nonResourceAttributes?: { path?: string; verb?: string };
-/**
-* ResourceAttributes includes the authorization attributes available for resource requests to the Authorizer interface
-* @isObject
-*/
-resourceAttributes?: { labelSelector?: { rawSelector?: string; requirements?: Array<{ operator: string; values?: string[]; key: string }> }; resource?: string; verb?: string; version?: string; fieldSelector?: { rawSelector?: string; requirements?: Array<{ key: string; operator: string; values?: string[] }> }; group?: string; name?: string; namespace?: string; subresource?: string };
 }
 
 /**
@@ -23,7 +23,7 @@ resourceAttributes?: { labelSelector?: { rawSelector?: string; requirements?: Ar
 */
 export function createio_k8s_api_authorization_v1_SelfSubjectAccessReviewSpec(data?: Partial<io_k8s_api_authorization_v1_SelfSubjectAccessReviewSpec>): io_k8s_api_authorization_v1_SelfSubjectAccessReviewSpec {
  return {
-   nonResourceAttributes: data?.nonResourceAttributes !== undefined ? data.nonResourceAttributes : {},
    resourceAttributes: data?.resourceAttributes !== undefined ? data.resourceAttributes : {},
+   nonResourceAttributes: data?.nonResourceAttributes !== undefined ? data.nonResourceAttributes : {},
  };
 }

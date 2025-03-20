@@ -6,34 +6,82 @@ import { handleResourceError } from '../utils';
 
 export function createcsidriverRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // List csidriver
-  router.get('/apis/storage.k8s.io/v1/watch/csidrivers', async (req, res, next) => {
+
+//read the specified CSIDriver
+  router.get('/apis/storage.k8s.io/v1/csidrivers/:name', async (req, res, next) => {
     try {
-      logger.info(`Listing csidriver`);
+      const name = req.params.name;
+      logger.info(`Getting csidriver ${name}`);
       
-      const resources = await storage.listResources('csidriver');
+      const resource = await storage.getResource('csidriver', name);
       
-      const response = {
-        kind: 'CsidriverList',
-        apiVersion: 'storage.k8s.io/v1',
-        metadata: {
-          resourceVersion: '1'
-        },
-        items: resources || []
-      };
+      if (!resource) {
+        return handleResourceError(new Error(`csidriver ${name} not found`), res);
+      }
       
-      res.json(response);
+      res.json(resource);
     } catch (error) {
       next(error);
     }
   });
-    
-  
-  
-  // Get specific csidriver
+
+//replace the specified CSIDriver
+  router.put('/apis/storage.k8s.io/v1/csidrivers/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Updating csidriver ${name}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set name in metadata
+      resource.metadata.name = name;
+      
+      const updatedResource = await storage.updateResource('csidriver', name, resource);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//delete a CSIDriver
+  router.delete('/apis/storage.k8s.io/v1/csidrivers/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Deleting csidriver ${name}`);
+      
+      try {
+
+        const deleted = await storage.deleteResource('csidriver', name);
+        
+        if (!deleted) {
+          return handleResourceError(new Error(`csidriver ${name} not found}`), res);
+        }
+      } catch(e) {
+          return handleResourceError(new Error(`csidriver ${name} not deleted. Error: ${(e as Error).message}`), res);
+      }
+      
+      res.status(200).json({
+        kind: 'Status',
+        apiVersion: 'v1',
+        metadata: {},
+        status: 'Success',
+        details: {
+          name: name,
+          kind: 'csidriver'
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//watch changes to an object of kind CSIDriver. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
   router.get('/apis/storage.k8s.io/v1/watch/csidrivers/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -50,10 +98,8 @@ export function createcsidriverRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // List csidriver
+
+//list or watch objects of kind CSIDriver
   router.get('/apis/storage.k8s.io/v1/csidrivers', async (req, res, next) => {
     try {
       logger.info(`Listing csidriver`);
@@ -74,7 +120,8 @@ export function createcsidriverRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Create csidriver
+
+//create a CSIDriver
   router.post('/apis/storage.k8s.io/v1/csidrivers', async (req, res, next) => {
     try {
       logger.info(`Creating csidriver`);
@@ -86,28 +133,28 @@ export function createcsidriverRoutes(storage: Storage): express.Router {
         resource.metadata = {};
       }
       
-      const createdResource = await storage.createOrUpdateResource('csidriver', resource);
+      const createdResource = await storage.createResource('csidriver', resource);
       
       res.status(201).json(createdResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete csidriver
+
+//delete collection of CSIDriver
   router.delete('/apis/storage.k8s.io/v1/csidrivers', async (req, res, next) => {
     try {
-      const name = req.params.name;
-      logger.info(`Deleting csidriver ${name}`);
+
       
       try {
 
-        const deleted = await storage.deleteResource('csidriver', name);
+        const deleted = await storage.deleteAllResources('csidriver');
         
         if (!deleted) {
-          return handleResourceError(new Error(`csidriver ${name} not found}`), res);
+          return handleResourceError(new Error(`csidriver not found}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`csidriver ${name} not deleted. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`csidriver not deleted. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -116,7 +163,6 @@ export function createcsidriverRoutes(storage: Storage): express.Router {
         metadata: {},
         status: 'Success',
         details: {
-          name: name,
           kind: 'csidriver'
         }
       });
@@ -124,76 +170,24 @@ export function createcsidriverRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Update csidriver
-  router.put('/apis/storage.k8s.io/v1/csidrivers/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Updating csidriver ${name}`);
-      
-      const resource = req.body;
-      
-      // Ensure resource has metadata
-      if (!resource.metadata) {
-        resource.metadata = {};
-      }
-      
-      // Set name in metadata
-      resource.metadata.name = name;
-      
-      const updatedResource = await storage.createOrUpdateResource('csidriver', resource);
-      
-      res.json(updatedResource);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Delete csidriver
-  router.delete('/apis/storage.k8s.io/v1/csidrivers/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Deleting csidriver ${name}`);
-      
-      try {
 
-        const deleted = await storage.deleteResource('csidriver', name);
-        
-        if (!deleted) {
-          return handleResourceError(new Error(`csidriver ${name} not found}`), res);
-        }
-      } catch(e) {
-          return handleResourceError(new Error(`csidriver ${name} not deleted. Error: ${(e as Error).message)}`), res);
-      }
-      
-      res.status(200).json({
-        kind: 'Status',
-        apiVersion: 'v1',
-        metadata: {},
-        status: 'Success',
-        details: {
-          name: name,
-          kind: 'csidriver'
-        }
-      });
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // Get specific csidriver
-  router.get('/apis/storage.k8s.io/v1/csidrivers/:name', async (req, res, next) => {
+//watch individual changes to a list of CSIDriver. deprecated: use the 'watch' parameter with a list operation instead.
+  router.get('/apis/storage.k8s.io/v1/watch/csidrivers', async (req, res, next) => {
     try {
-      const name = req.params.name;
-      logger.info(`Getting csidriver ${name}`);
+      logger.info(`Listing csidriver`);
       
-      const resource = await storage.getResource('csidriver', name);
+      const resources = await storage.listResources('csidriver');
       
-      if (!resource) {
-        return handleResourceError(new Error(`csidriver ${name} not found`), res);
-      }
+      const response = {
+        kind: 'CsidriverList',
+        apiVersion: 'storage.k8s.io/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
       
-      res.json(resource);
+      res.json(response);
     } catch (error) {
       next(error);
     }

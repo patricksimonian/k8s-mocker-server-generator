@@ -5,30 +5,44 @@
 */
 export interface io_k8s_api_core_v1_Event {
 /**
-* MicroTime is version of Time with microsecond level precision.
+* The number of times this event has occurred.
 */
-eventTime?: Date;
+count?: number;
 /**
 * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
 */
 firstTimestamp?: Date;
 /**
-* A human-readable description of the status of this operation.
+* Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 */
-message?: string;
+kind?: string;
 /**
 * Type of this event (Normal, Warning), new types could be added in the future
 */
 type?: string;
 /**
-* Name of the controller that emitted this Event, e.g. `kubernetes.io/kubelet`.
+* A human-readable description of the status of this operation.
 */
-reportingComponent?: string;
+message?: string;
+/**
+* This should be a short, machine understandable string that gives the reason for the transition into the object's current status.
+*/
+reason?: string;
+/**
+* ObjectReference contains enough information to let you inspect or modify the referred object.
+* @isObject
+*/
+related?: { apiVersion?: string; fieldPath?: string; kind?: string; name?: string; namespace?: string; resourceVersion?: string; uid?: string };
 /**
 * EventSeries contain information on series of events, i.e. thing that was/is happening continuously for some time.
 * @isObject
 */
 series?: { count?: number; lastObservedTime?: Date };
+/**
+* EventSource contains information for an event.
+* @isObject
+*/
+source?: { host?: string; component?: string };
 /**
 * What action was taken/failed regarding to the Regarding object.
 */
@@ -38,47 +52,33 @@ action?: string;
 */
 apiVersion?: string;
 /**
-* Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+* MicroTime is version of Time with microsecond level precision.
 */
-kind?: string;
-/**
-* ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
-* @required
-* @isObject
-*/
-metadata: { deletionGracePeriodSeconds?: number; resourceVersion?: string; selfLink?: string; annotations?: Record<string, any>; labels?: Record<string, any>; ownerReferences?: Array<{ name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string }>; uid?: string; creationTimestamp?: Date; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; namespace?: string; deletionTimestamp?: Date; finalizers?: string[]; generateName?: string; generation?: number; name?: string };
-/**
-* ObjectReference contains enough information to let you inspect or modify the referred object.
-* @isObject
-*/
-related?: { uid?: string; apiVersion?: string; fieldPath?: string; kind?: string; name?: string; namespace?: string; resourceVersion?: string };
-/**
-* EventSource contains information for an event.
-* @isObject
-*/
-source?: { host?: string; component?: string };
-/**
-* The number of times this event has occurred.
-*/
-count?: number;
-/**
-* ObjectReference contains enough information to let you inspect or modify the referred object.
-* @required
-* @isObject
-*/
-involvedObject: { namespace?: string; resourceVersion?: string; uid?: string; apiVersion?: string; fieldPath?: string; kind?: string; name?: string };
+eventTime?: Date;
 /**
 * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
 */
 lastTimestamp?: Date;
 /**
-* This should be a short, machine understandable string that gives the reason for the transition into the object's current status.
-*/
-reason?: string;
-/**
 * ID of the controller instance, e.g. `kubelet-xyzf`.
 */
 reportingInstance?: string;
+/**
+* ObjectReference contains enough information to let you inspect or modify the referred object.
+* @required
+* @isObject
+*/
+involvedObject: { name?: string; namespace?: string; resourceVersion?: string; uid?: string; apiVersion?: string; fieldPath?: string; kind?: string };
+/**
+* ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
+* @required
+* @isObject
+*/
+metadata: { deletionGracePeriodSeconds?: number; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; selfLink?: string; creationTimestamp?: Date; deletionTimestamp?: Date; name?: string; resourceVersion?: string; uid?: string; annotations?: Record<string, any>; managedFields?: Array<{ operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string }>; namespace?: string; finalizers?: string[]; generateName?: string; generation?: number; labels?: Record<string, any> };
+/**
+* Name of the controller that emitted this Event, e.g. `kubernetes.io/kubelet`.
+*/
+reportingComponent?: string;
 }
 
 /**
@@ -88,22 +88,22 @@ reportingInstance?: string;
 */
 export function createio_k8s_api_core_v1_Event(data?: Partial<io_k8s_api_core_v1_Event>): io_k8s_api_core_v1_Event {
  return {
-   eventTime: data?.eventTime !== undefined ? data.eventTime : '',
+   count: data?.count !== undefined ? data.count : 0,
    firstTimestamp: data?.firstTimestamp !== undefined ? data.firstTimestamp : '',
-   message: data?.message !== undefined ? data.message : '',
+   kind: data?.kind !== undefined ? data.kind : '',
    type: data?.type !== undefined ? data.type : '',
-   reportingComponent: data?.reportingComponent !== undefined ? data.reportingComponent : '',
+   message: data?.message !== undefined ? data.message : '',
+   reason: data?.reason !== undefined ? data.reason : '',
+   related: data?.related !== undefined ? data.related : {},
    series: data?.series !== undefined ? data.series : {},
+   source: data?.source !== undefined ? data.source : {},
    action: data?.action !== undefined ? data.action : '',
    apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
-   kind: data?.kind !== undefined ? data.kind : '',
-   metadata: data?.metadata !== undefined ? data.metadata : {},
-   related: data?.related !== undefined ? data.related : {},
-   source: data?.source !== undefined ? data.source : {},
-   count: data?.count !== undefined ? data.count : 0,
-   involvedObject: data?.involvedObject !== undefined ? data.involvedObject : {},
+   eventTime: data?.eventTime !== undefined ? data.eventTime : '',
    lastTimestamp: data?.lastTimestamp !== undefined ? data.lastTimestamp : '',
-   reason: data?.reason !== undefined ? data.reason : '',
    reportingInstance: data?.reportingInstance !== undefined ? data.reportingInstance : '',
+   involvedObject: data?.involvedObject !== undefined ? data.involvedObject : {},
+   metadata: data?.metadata !== undefined ? data.metadata : {},
+   reportingComponent: data?.reportingComponent !== undefined ? data.reportingComponent : '',
  };
 }

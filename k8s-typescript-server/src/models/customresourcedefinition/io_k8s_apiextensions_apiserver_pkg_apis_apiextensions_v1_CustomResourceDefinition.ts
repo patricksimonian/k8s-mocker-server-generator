@@ -16,18 +16,18 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { labels?: Record<string, any>; generation?: number; name?: string; uid?: string; deletionGracePeriodSeconds?: number; deletionTimestamp?: Date; generateName?: string; namespace?: string; resourceVersion?: string; selfLink?: string; creationTimestamp?: Date; finalizers?: string[]; managedFields?: Array<{ manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any> }>; ownerReferences?: Array<{ controller?: boolean; kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean }>; annotations?: Record<string, any> };
+metadata?: { namespace?: string; ownerReferences?: Array<{ name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string }>; resourceVersion?: string; uid?: string; labels?: Record<string, any>; name?: string; finalizers?: string[]; generateName?: string; annotations?: Record<string, any>; deletionGracePeriodSeconds?: number; deletionTimestamp?: Date; managedFields?: Array<{ operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string }>; selfLink?: string; creationTimestamp?: Date; generation?: number };
 /**
 * CustomResourceDefinitionSpec describes how a user wants their resource to appear
 * @required
 * @isObject
 */
-spec: { conversion?: { strategy: string; webhook?: { clientConfig?: { url?: string; caBundle?: string; service?: { name: string; namespace: string; path?: string; port?: number } }; conversionReviewVersions: string[] } }; group: string; names: { listKind?: string; plural: string; shortNames?: string[]; singular?: string; categories?: string[]; kind: string }; preserveUnknownFields?: boolean; scope: string; versions: Array<{ additionalPrinterColumns?: Array<{ description?: string; format?: string; jsonPath: string; name: string; priority?: number; type: string }>; name: string; schema?: { openAPIV3Schema?: Record<string, any> }; selectableFields?: Array<{ jsonPath: string }>; served: boolean; deprecated?: boolean; deprecationWarning?: string; storage: boolean; subresources?: { scale?: { specReplicasPath: string; statusReplicasPath: string; labelSelectorPath?: string }; status?: Record<string, any> } }> };
+spec: { conversion?: { strategy: string; webhook?: { clientConfig?: { caBundle?: string; service?: { name: string; namespace: string; path?: string; port?: number }; url?: string }; conversionReviewVersions: string[] } }; group: string; names: { shortNames?: string[]; singular?: string; categories?: string[]; kind: string; listKind?: string; plural: string }; preserveUnknownFields?: boolean; scope: string; versions: Array<{ additionalPrinterColumns?: Array<{ priority?: number; type: string; description?: string; format?: string; jsonPath: string; name: string }>; deprecated?: boolean; selectableFields?: Array<{ jsonPath: string }>; subresources?: { status?: Record<string, any>; scale?: { labelSelectorPath?: string; specReplicasPath: string; statusReplicasPath: string } }; deprecationWarning?: string; name: string; schema?: { openAPIV3Schema?: Record<string, any> }; served: boolean; storage: boolean }> };
 /**
 * CustomResourceDefinitionStatus indicates the state of the CustomResourceDefinition
 * @isObject
 */
-status?: { acceptedNames?: { categories?: string[]; kind: string; listKind?: string; plural: string; shortNames?: string[]; singular?: string }; conditions?: Array<{ status: string; type: string; lastTransitionTime?: Date; message?: string; reason?: string }>; storedVersions?: string[] };
+status?: { acceptedNames?: { plural: string; shortNames?: string[]; singular?: string; categories?: string[]; kind: string; listKind?: string }; conditions?: Array<{ reason?: string; status: string; type: string; lastTransitionTime?: Date; message?: string }>; storedVersions?: string[] };
 }
 
 /**
@@ -40,7 +40,7 @@ export function createio_k8s_apiextensions_apiserver_pkg_apis_apiextensions_v1_C
    apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
    kind: data?.kind !== undefined ? data.kind : '',
    metadata: data?.metadata !== undefined ? data.metadata : {},
-   spec: data?.spec !== undefined ? data.spec : { scope: '', versions: [], group: '', names: { plural: '', kind: '' } },
+   spec: data?.spec !== undefined ? data.spec : { scope: '', versions: [], group: '', names: { kind: '', plural: '' } },
    status: data?.status !== undefined ? data.status : {},
  };
 }

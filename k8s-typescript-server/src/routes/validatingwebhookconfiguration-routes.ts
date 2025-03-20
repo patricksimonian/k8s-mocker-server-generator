@@ -6,10 +6,8 @@ import { handleResourceError } from '../utils';
 
 export function createvalidatingwebhookconfigurationRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // Get specific validatingwebhookconfiguration
+
+//read the specified ValidatingWebhookConfiguration
   router.get('/apis/admissionregistration.k8s.io/v1/validatingwebhookconfigurations/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -26,7 +24,8 @@ export function createvalidatingwebhookconfigurationRoutes(storage: Storage): ex
       next(error);
     }
   });
-  // Update validatingwebhookconfiguration
+
+//replace the specified ValidatingWebhookConfiguration
   router.put('/apis/admissionregistration.k8s.io/v1/validatingwebhookconfigurations/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -42,14 +41,15 @@ export function createvalidatingwebhookconfigurationRoutes(storage: Storage): ex
       // Set name in metadata
       resource.metadata.name = name;
       
-      const updatedResource = await storage.createOrUpdateResource('validatingwebhookconfiguration', resource);
+      const updatedResource = await storage.updateResource('validatingwebhookconfiguration', name, resource);
       
       res.json(updatedResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete validatingwebhookconfiguration
+
+//delete a ValidatingWebhookConfiguration
   router.delete('/apis/admissionregistration.k8s.io/v1/validatingwebhookconfigurations/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -63,7 +63,7 @@ export function createvalidatingwebhookconfigurationRoutes(storage: Storage): ex
           return handleResourceError(new Error(`validatingwebhookconfiguration ${name} not found}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`validatingwebhookconfiguration ${name} not deleted. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`validatingwebhookconfiguration ${name} not deleted. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -80,10 +80,8 @@ export function createvalidatingwebhookconfigurationRoutes(storage: Storage): ex
       next(error);
     }
   });
-    
-  
-  
-  // Get specific validatingwebhookconfiguration
+
+//watch changes to an object of kind ValidatingWebhookConfiguration. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
   router.get('/apis/admissionregistration.k8s.io/v1/watch/validatingwebhookconfigurations/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -100,10 +98,30 @@ export function createvalidatingwebhookconfigurationRoutes(storage: Storage): ex
       next(error);
     }
   });
-    
-  
-  
-  // List validatingwebhookconfiguration
+
+//watch individual changes to a list of ValidatingWebhookConfiguration. deprecated: use the 'watch' parameter with a list operation instead.
+  router.get('/apis/admissionregistration.k8s.io/v1/watch/validatingwebhookconfigurations', async (req, res, next) => {
+    try {
+      logger.info(`Listing validatingwebhookconfiguration`);
+      
+      const resources = await storage.listResources('validatingwebhookconfiguration');
+      
+      const response = {
+        kind: 'ValidatingwebhookconfigurationList',
+        apiVersion: 'admissionregistration.k8s.io/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//list or watch objects of kind ValidatingWebhookConfiguration
   router.get('/apis/admissionregistration.k8s.io/v1/validatingwebhookconfigurations', async (req, res, next) => {
     try {
       logger.info(`Listing validatingwebhookconfiguration`);
@@ -124,7 +142,8 @@ export function createvalidatingwebhookconfigurationRoutes(storage: Storage): ex
       next(error);
     }
   });
-  // Create validatingwebhookconfiguration
+
+//create a ValidatingWebhookConfiguration
   router.post('/apis/admissionregistration.k8s.io/v1/validatingwebhookconfigurations', async (req, res, next) => {
     try {
       logger.info(`Creating validatingwebhookconfiguration`);
@@ -136,28 +155,28 @@ export function createvalidatingwebhookconfigurationRoutes(storage: Storage): ex
         resource.metadata = {};
       }
       
-      const createdResource = await storage.createOrUpdateResource('validatingwebhookconfiguration', resource);
+      const createdResource = await storage.createResource('validatingwebhookconfiguration', resource);
       
       res.status(201).json(createdResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete validatingwebhookconfiguration
+
+//delete collection of ValidatingWebhookConfiguration
   router.delete('/apis/admissionregistration.k8s.io/v1/validatingwebhookconfigurations', async (req, res, next) => {
     try {
-      const name = req.params.name;
-      logger.info(`Deleting validatingwebhookconfiguration ${name}`);
+
       
       try {
 
-        const deleted = await storage.deleteResource('validatingwebhookconfiguration', name);
+        const deleted = await storage.deleteAllResources('validatingwebhookconfiguration');
         
         if (!deleted) {
-          return handleResourceError(new Error(`validatingwebhookconfiguration ${name} not found}`), res);
+          return handleResourceError(new Error(`validatingwebhookconfiguration not found}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`validatingwebhookconfiguration ${name} not deleted. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`validatingwebhookconfiguration not deleted. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -166,34 +185,9 @@ export function createvalidatingwebhookconfigurationRoutes(storage: Storage): ex
         metadata: {},
         status: 'Success',
         details: {
-          name: name,
           kind: 'validatingwebhookconfiguration'
         }
       });
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // List validatingwebhookconfiguration
-  router.get('/apis/admissionregistration.k8s.io/v1/watch/validatingwebhookconfigurations', async (req, res, next) => {
-    try {
-      logger.info(`Listing validatingwebhookconfiguration`);
-      
-      const resources = await storage.listResources('validatingwebhookconfiguration');
-      
-      const response = {
-        kind: 'ValidatingwebhookconfigurationList',
-        apiVersion: 'admissionregistration.k8s.io/v1',
-        metadata: {
-          resourceVersion: '1'
-        },
-        items: resources || []
-      };
-      
-      res.json(response);
     } catch (error) {
       next(error);
     }

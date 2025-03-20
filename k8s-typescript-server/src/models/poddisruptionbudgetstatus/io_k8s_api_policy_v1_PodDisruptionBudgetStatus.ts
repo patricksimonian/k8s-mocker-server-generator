@@ -5,11 +5,6 @@
 */
 export interface io_k8s_api_policy_v1_PodDisruptionBudgetStatus {
 /**
-* total number of pods counted by this disruption budget
-* @required
-*/
-expectedPods: number;
-/**
 * Most recent generation observed when updating this PDB status. DisruptionsAllowed and other status information is valid only if observedGeneration equals to PDB's object generation.
 */
 observedGeneration?: number;
@@ -25,7 +20,7 @@ observedGeneration?: number;
                   disruptions are provided by the disruptionsAllowed property.
 * @isArray
 */
-conditions?: Array<{ message: string; observedGeneration?: number; reason: string; status: string; type: string; lastTransitionTime: Date }>;
+conditions?: Array<{ status: string; type: string; lastTransitionTime: Date; message: string; observedGeneration?: number; reason: string }>;
 /**
 * current number of healthy pods
 * @required
@@ -45,6 +40,11 @@ disruptedPods?: Record<string, any>;
 * @required
 */
 disruptionsAllowed: number;
+/**
+* total number of pods counted by this disruption budget
+* @required
+*/
+expectedPods: number;
 }
 
 /**
@@ -54,12 +54,12 @@ disruptionsAllowed: number;
 */
 export function createio_k8s_api_policy_v1_PodDisruptionBudgetStatus(data?: Partial<io_k8s_api_policy_v1_PodDisruptionBudgetStatus>): io_k8s_api_policy_v1_PodDisruptionBudgetStatus {
  return {
-   expectedPods: data?.expectedPods !== undefined ? data.expectedPods : 0,
    observedGeneration: data?.observedGeneration !== undefined ? data.observedGeneration : 0,
    conditions: data?.conditions !== undefined ? data.conditions : [],
    currentHealthy: data?.currentHealthy !== undefined ? data.currentHealthy : 0,
    desiredHealthy: data?.desiredHealthy !== undefined ? data.desiredHealthy : 0,
    disruptedPods: data?.disruptedPods !== undefined ? data.disruptedPods : {},
    disruptionsAllowed: data?.disruptionsAllowed !== undefined ? data.disruptionsAllowed : 0,
+   expectedPods: data?.expectedPods !== undefined ? data.expectedPods : 0,
  };
 }

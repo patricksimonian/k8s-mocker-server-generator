@@ -8,7 +8,7 @@ export interface io_k8s_api_core_v1_EnvVarSource {
 * Selects a key from a ConfigMap.
 * @isObject
 */
-configMapKeyRef?: { key: string; name?: string; optional?: boolean };
+configMapKeyRef?: { optional?: boolean; key: string; name?: string };
 /**
 * ObjectFieldSelector selects an APIVersioned field of an object.
 * @isObject

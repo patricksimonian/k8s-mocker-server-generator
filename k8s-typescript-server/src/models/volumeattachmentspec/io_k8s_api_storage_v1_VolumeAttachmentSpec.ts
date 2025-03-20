@@ -19,7 +19,7 @@ nodeName: string;
 * @required
 * @isObject
 */
-source: { persistentVolumeName?: string; inlineVolumeSpec?: Record<string, any> };
+source: { inlineVolumeSpec?: Record<string, any>; persistentVolumeName?: string };
 }
 
 /**

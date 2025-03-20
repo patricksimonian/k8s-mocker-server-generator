@@ -6,40 +6,21 @@ import { handleResourceError } from '../utils';
 
 export function createnodeRoutes(storage: Storage): express.Router {
   const router = express.Router();
-  // Create node
-  router.post('/api/v1/nodes', async (req, res, next) => {
+
+//connect DELETE requests to proxy of Node
+  router.delete('/api/v1/nodes/:name/proxy', async (req, res, next) => {
     try {
-      logger.info(`Creating node`);
-      
-      const resource = req.body;
-      
-      // Ensure resource has metadata
-      if (!resource.metadata) {
-        resource.metadata = {};
-      }
-      
-      const createdResource = await storage.createOrUpdateResource('node', resource);
-      
-      res.status(201).json(createdResource);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Delete node
-  router.delete('/api/v1/nodes', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Deleting node ${name}`);
+
       
       try {
 
-        const deleted = await storage.deleteResource('node', name);
+        const deleted = await storage.deleteAllResources('node');
         
         if (!deleted) {
-          return handleResourceError(new Error(`node ${name} not found}`), res);
+          return handleResourceError(new Error(`node not found}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`node ${name} not deleted. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`node not deleted. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -48,7 +29,6 @@ export function createnodeRoutes(storage: Storage): express.Router {
         metadata: {},
         status: 'Success',
         details: {
-          name: name,
           kind: 'node'
         }
       });
@@ -56,11 +36,9 @@ export function createnodeRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // List node
-  router.get('/api/v1/nodes', async (req, res, next) => {
+
+//connect GET requests to proxy of Node
+  router.get('/api/v1/nodes/:name/proxy', async (req, res, next) => {
     try {
       logger.info(`Listing node`);
       
@@ -80,10 +58,52 @@ export function createnodeRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // List node
+
+//connect PUT requests to proxy of Node
+  router.put('/api/v1/nodes/:name/proxy', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Updating node ${name}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set name in metadata
+      resource.metadata.name = name;
+      
+      const updatedResource = await storage.updateResource('node', name, resource);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//connect POST requests to proxy of Node
+  router.post('/api/v1/nodes/:name/proxy', async (req, res, next) => {
+    try {
+      logger.info(`Creating node`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      const createdResource = await storage.createResource('node', resource);
+      
+      res.status(201).json(createdResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//watch individual changes to a list of Node. deprecated: use the 'watch' parameter with a list operation instead.
   router.get('/api/v1/watch/nodes', async (req, res, next) => {
     try {
       logger.info(`Listing node`);
@@ -104,10 +124,8 @@ export function createnodeRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // Get specific node
+
+//watch changes to an object of kind Node. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
   router.get('/api/v1/watch/nodes/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -124,41 +142,8 @@ export function createnodeRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Delete node
-  router.delete('/api/v1/nodes/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Deleting node ${name}`);
-      
-      try {
 
-        const deleted = await storage.deleteResource('node', name);
-        
-        if (!deleted) {
-          return handleResourceError(new Error(`node ${name} not found}`), res);
-        }
-      } catch(e) {
-          return handleResourceError(new Error(`node ${name} not deleted. Error: ${(e as Error).message)}`), res);
-      }
-      
-      res.status(200).json({
-        kind: 'Status',
-        apiVersion: 'v1',
-        metadata: {},
-        status: 'Success',
-        details: {
-          name: name,
-          kind: 'node'
-        }
-      });
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // Get specific node
+//read the specified Node
   router.get('/api/v1/nodes/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -175,7 +160,8 @@ export function createnodeRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Update node
+
+//replace the specified Node
   router.put('/api/v1/nodes/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -191,7 +177,157 @@ export function createnodeRoutes(storage: Storage): express.Router {
       // Set name in metadata
       resource.metadata.name = name;
       
-      const updatedResource = await storage.createOrUpdateResource('node', resource);
+      const updatedResource = await storage.updateResource('node', name, resource);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//delete a Node
+  router.delete('/api/v1/nodes/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Deleting node ${name}`);
+      
+      try {
+
+        const deleted = await storage.deleteResource('node', name);
+        
+        if (!deleted) {
+          return handleResourceError(new Error(`node ${name} not found}`), res);
+        }
+      } catch(e) {
+          return handleResourceError(new Error(`node ${name} not deleted. Error: ${(e as Error).message}`), res);
+      }
+      
+      res.status(200).json({
+        kind: 'Status',
+        apiVersion: 'v1',
+        metadata: {},
+        status: 'Success',
+        details: {
+          name: name,
+          kind: 'node'
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//list or watch objects of kind Node
+  router.get('/api/v1/nodes', async (req, res, next) => {
+    try {
+      logger.info(`Listing node`);
+      
+      const resources = await storage.listResources('node');
+      
+      const response = {
+        kind: 'NodeList',
+        apiVersion: 'v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//create a Node
+  router.post('/api/v1/nodes', async (req, res, next) => {
+    try {
+      logger.info(`Creating node`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      const createdResource = await storage.createResource('node', resource);
+      
+      res.status(201).json(createdResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//delete collection of Node
+  router.delete('/api/v1/nodes', async (req, res, next) => {
+    try {
+
+      
+      try {
+
+        const deleted = await storage.deleteAllResources('node');
+        
+        if (!deleted) {
+          return handleResourceError(new Error(`node not found}`), res);
+        }
+      } catch(e) {
+          return handleResourceError(new Error(`node not deleted. Error: ${(e as Error).message}`), res);
+      }
+      
+      res.status(200).json({
+        kind: 'Status',
+        apiVersion: 'v1',
+        metadata: {},
+        status: 'Success',
+        details: {
+          kind: 'node'
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//read status of the specified Node
+  router.get('/api/v1/nodes/:name/status', async (req, res, next) => {
+    try {
+      logger.info(`Listing node`);
+      
+      const resources = await storage.listResources('node');
+      
+      const response = {
+        kind: 'NodeList',
+        apiVersion: 'v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//replace status of the specified Node
+  router.put('/api/v1/nodes/:name/status', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Updating node ${name}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set name in metadata
+      resource.metadata.name = name;
+      
+      const updatedResource = await storage.updateResource('node', name, resource);
       
       res.json(updatedResource);
     } catch (error) {

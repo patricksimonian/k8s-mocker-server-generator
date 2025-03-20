@@ -8,7 +8,7 @@ export interface io_k8s_apiextensions_apiserver_pkg_apis_apiextensions_v1_Custom
 * CustomResourceDefinitionNames indicates the names to serve this CustomResourceDefinition
 * @isObject
 */
-acceptedNames?: { listKind?: string; plural: string; shortNames?: string[]; singular?: string; categories?: string[]; kind: string };
+acceptedNames?: { shortNames?: string[]; singular?: string; categories?: string[]; kind: string; listKind?: string; plural: string };
 /**
 * conditions indicate state for particular aspects of a CustomResourceDefinition
 * @isArray

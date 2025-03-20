@@ -6,10 +6,8 @@ import { handleResourceError } from '../utils';
 
 export function createephemeralcontainerRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // List ephemeralcontainer
+
+//read ephemeralcontainers of the specified Pod
   router.get('/api/v1/namespaces/:namespace/pods/:name/ephemeralcontainers', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -31,7 +29,8 @@ export function createephemeralcontainerRoutes(storage: Storage): express.Router
       next(error);
     }
   });
-  // Update ephemeralcontainer
+
+//replace ephemeralcontainers of the specified Pod
   router.put('/api/v1/namespaces/:namespace/pods/:name/ephemeralcontainers', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -49,7 +48,7 @@ export function createephemeralcontainerRoutes(storage: Storage): express.Router
       resource.metadata.name = name;
       resource.metadata.namespace = namespace;
       
-      const updatedResource = await storage.createOrUpdateResource('ephemeralcontainer', resource);
+      const updatedResource = await storage.updateResource('ephemeralcontainer', name, resource);
       
       res.json(updatedResource);
     } catch (error) {

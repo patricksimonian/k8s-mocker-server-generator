@@ -13,7 +13,7 @@ exec?: { command?: string[] };
 * HTTPGetAction describes an action based on HTTP Get requests.
 * @isObject
 */
-httpGet?: { path?: string; port: string; scheme?: 'HTTP' | 'HTTPS'; host?: string; httpHeaders?: Array<{ name: string; value: string }> };
+httpGet?: { port: string; scheme?: 'HTTP' | 'HTTPS'; host?: string; httpHeaders?: Array<{ name: string; value: string }>; path?: string };
 /**
 * SleepAction describes a "sleep" action.
 * @isObject

@@ -68,6 +68,14 @@ export interface Storage {
  deleteResource(kind: string, name: string, namespace?: string): Promise<boolean>;
  
  /**
+  * Delete all resources of a specific kind
+  * 
+  * @param kind Kind of the resource
+  * @param namespace Namespace of the resource
+  */
+ deleteAllResources(kind: string, namespace?: string): Promise<boolean>;
+ 
+ /**
   * Watch resources of a specific kind in a namespace
   * 
   * @param kind Kind of the resources to watch

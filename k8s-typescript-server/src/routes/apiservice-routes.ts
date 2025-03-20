@@ -6,104 +6,8 @@ import { handleResourceError } from '../utils';
 
 export function createapiserviceRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // Get specific apiservice
-  router.get('/apis/apiregistration.k8s.io/v1/watch/apiservices/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Getting apiservice ${name}`);
-      
-      const resource = await storage.getResource('apiservice', name);
-      
-      if (!resource) {
-        return handleResourceError(new Error(`apiservice ${name} not found`), res);
-      }
-      
-      res.json(resource);
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // List apiservice
-  router.get('/apis/apiregistration.k8s.io/v1/apiservices', async (req, res, next) => {
-    try {
-      logger.info(`Listing apiservice`);
-      
-      const resources = await storage.listResources('apiservice');
-      
-      const response = {
-        kind: 'ApiserviceList',
-        apiVersion: 'apiregistration.k8s.io/v1',
-        metadata: {
-          resourceVersion: '1'
-        },
-        items: resources || []
-      };
-      
-      res.json(response);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Create apiservice
-  router.post('/apis/apiregistration.k8s.io/v1/apiservices', async (req, res, next) => {
-    try {
-      logger.info(`Creating apiservice`);
-      
-      const resource = req.body;
-      
-      // Ensure resource has metadata
-      if (!resource.metadata) {
-        resource.metadata = {};
-      }
-      
-      const createdResource = await storage.createOrUpdateResource('apiservice', resource);
-      
-      res.status(201).json(createdResource);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Delete apiservice
-  router.delete('/apis/apiregistration.k8s.io/v1/apiservices', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Deleting apiservice ${name}`);
-      
-      try {
 
-        const deleted = await storage.deleteResource('apiservice', name);
-        
-        if (!deleted) {
-          return handleResourceError(new Error(`apiservice ${name} not found}`), res);
-        }
-      } catch(e) {
-          return handleResourceError(new Error(`apiservice ${name} not deleted. Error: ${(e as Error).message)}`), res);
-      }
-      
-      res.status(200).json({
-        kind: 'Status',
-        apiVersion: 'v1',
-        metadata: {},
-        status: 'Success',
-        details: {
-          name: name,
-          kind: 'apiservice'
-        }
-      });
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // List apiservice
+//watch individual changes to a list of APIService. deprecated: use the 'watch' parameter with a list operation instead.
   router.get('/apis/apiregistration.k8s.io/v1/watch/apiservices', async (req, res, next) => {
     try {
       logger.info(`Listing apiservice`);
@@ -124,11 +28,9 @@ export function createapiserviceRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // Get specific apiservice
-  router.get('/apis/apiregistration.k8s.io/v1/apiservices/:name', async (req, res, next) => {
+
+//watch changes to an object of kind APIService. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
+  router.get('/apis/apiregistration.k8s.io/v1/watch/apiservices/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
       logger.info(`Getting apiservice ${name}`);
@@ -144,7 +46,126 @@ export function createapiserviceRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Update apiservice
+
+//list or watch objects of kind APIService
+  router.get('/apis/apiregistration.k8s.io/v1/apiservices', async (req, res, next) => {
+    try {
+      logger.info(`Listing apiservice`);
+      
+      const resources = await storage.listResources('apiservice');
+      
+      const response = {
+        kind: 'ApiserviceList',
+        apiVersion: 'apiregistration.k8s.io/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//create an APIService
+  router.post('/apis/apiregistration.k8s.io/v1/apiservices', async (req, res, next) => {
+    try {
+      logger.info(`Creating apiservice`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      const createdResource = await storage.createResource('apiservice', resource);
+      
+      res.status(201).json(createdResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//delete collection of APIService
+  router.delete('/apis/apiregistration.k8s.io/v1/apiservices', async (req, res, next) => {
+    try {
+
+      
+      try {
+
+        const deleted = await storage.deleteAllResources('apiservice');
+        
+        if (!deleted) {
+          return handleResourceError(new Error(`apiservice not found}`), res);
+        }
+      } catch(e) {
+          return handleResourceError(new Error(`apiservice not deleted. Error: ${(e as Error).message}`), res);
+      }
+      
+      res.status(200).json({
+        kind: 'Status',
+        apiVersion: 'v1',
+        metadata: {},
+        status: 'Success',
+        details: {
+          kind: 'apiservice'
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//read status of the specified APIService
+  router.get('/apis/apiregistration.k8s.io/v1/apiservices/:name/status', async (req, res, next) => {
+    try {
+      logger.info(`Listing apiservice`);
+      
+      const resources = await storage.listResources('apiservice');
+      
+      const response = {
+        kind: 'ApiserviceList',
+        apiVersion: 'apiregistration.k8s.io/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//replace status of the specified APIService
+  router.put('/apis/apiregistration.k8s.io/v1/apiservices/:name/status', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Updating apiservice ${name}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set name in metadata
+      resource.metadata.name = name;
+      
+      const updatedResource = await storage.updateResource('apiservice', name, resource);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//replace the specified APIService
   router.put('/apis/apiregistration.k8s.io/v1/apiservices/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -160,14 +181,15 @@ export function createapiserviceRoutes(storage: Storage): express.Router {
       // Set name in metadata
       resource.metadata.name = name;
       
-      const updatedResource = await storage.createOrUpdateResource('apiservice', resource);
+      const updatedResource = await storage.updateResource('apiservice', name, resource);
       
       res.json(updatedResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete apiservice
+
+//delete an APIService
   router.delete('/apis/apiregistration.k8s.io/v1/apiservices/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -181,7 +203,7 @@ export function createapiserviceRoutes(storage: Storage): express.Router {
           return handleResourceError(new Error(`apiservice ${name} not found}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`apiservice ${name} not deleted. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`apiservice ${name} not deleted. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -194,6 +216,24 @@ export function createapiserviceRoutes(storage: Storage): express.Router {
           kind: 'apiservice'
         }
       });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//read the specified APIService
+  router.get('/apis/apiregistration.k8s.io/v1/apiservices/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Getting apiservice ${name}`);
+      
+      const resource = await storage.getResource('apiservice', name);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`apiservice ${name} not found`), res);
+      }
+      
+      res.json(resource);
     } catch (error) {
       next(error);
     }

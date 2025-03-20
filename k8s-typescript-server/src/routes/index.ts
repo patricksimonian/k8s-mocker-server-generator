@@ -8,8 +8,6 @@ import storage from '../storage';
 
 // Import route handlers
 import { createapiserviceRoutes } from './apiservice-routes';
-import { createapprovalRoutes } from './approval-routes';
-import { createattachRoutes } from './attach-routes';
 import { createbindingRoutes } from './binding-routes';
 import { createcertificatesigningrequestRoutes } from './certificatesigningrequest-routes';
 import { createclusterroleRoutes } from './clusterrole-routes';
@@ -28,9 +26,6 @@ import { createendpointRoutes } from './endpoint-routes';
 import { createendpointsliceRoutes } from './endpointslice-routes';
 import { createephemeralcontainerRoutes } from './ephemeralcontainer-routes';
 import { createeventRoutes } from './event-routes';
-import { createevictionRoutes } from './eviction-routes';
-import { createexecRoutes } from './exec-routes';
-import { createfinalizeRoutes } from './finalize-routes';
 import { createflowschemaRoutes } from './flowschema-routes';
 import { createhorizontalpodautoscalerRoutes } from './horizontalpodautoscaler-routes';
 import { createingressRoutes } from './ingress-routes';
@@ -40,7 +35,6 @@ import { createjwkRoutes } from './jwk-routes';
 import { createleaseRoutes } from './lease-routes';
 import { createlimitrangeRoutes } from './limitrange-routes';
 import { createlocalsubjectaccessreviewRoutes } from './localsubjectaccessreview-routes';
-import { createlogRoutes } from './log-routes';
 import { createmutatingwebhookconfigurationRoutes } from './mutatingwebhookconfiguration-routes';
 import { createnamespaceRoutes } from './namespace-routes';
 import { createnetworkpolicyRoutes } from './networkpolicy-routes';
@@ -50,7 +44,6 @@ import { createpersistentvolumeclaimRoutes } from './persistentvolumeclaim-route
 import { createpodRoutes } from './pod-routes';
 import { createpoddisruptionbudgetRoutes } from './poddisruptionbudget-routes';
 import { createpodtemplateRoutes } from './podtemplate-routes';
-import { createportforwardRoutes } from './portforward-routes';
 import { createpriorityclassRoutes } from './priorityclass-routes';
 import { createprioritylevelconfigurationRoutes } from './prioritylevelconfiguration-routes';
 import { createproxyRoutes } from './proxy-routes';
@@ -60,7 +53,6 @@ import { createresourcequotaRoutes } from './resourcequota-routes';
 import { createroleRoutes } from './role-routes';
 import { createrolebindingRoutes } from './rolebinding-routes';
 import { createruntimeclassRoutes } from './runtimeclass-routes';
-import { createscaleRoutes } from './scale-routes';
 import { createsecretRoutes } from './secret-routes';
 import { createselfsubjectaccessreviewRoutes } from './selfsubjectaccessreview-routes';
 import { createselfsubjectreviewRoutes } from './selfsubjectreview-routes';
@@ -68,10 +60,8 @@ import { createselfsubjectrulesreviewRoutes } from './selfsubjectrulesreview-rou
 import { createserviceRoutes } from './service-routes';
 import { createserviceaccountRoutes } from './serviceaccount-routes';
 import { createstatefulsetRoutes } from './statefulset-routes';
-import { createstatusRoutes } from './status-routes';
 import { createstorageclassRoutes } from './storageclass-routes';
 import { createsubjectaccessreviewRoutes } from './subjectaccessreview-routes';
-import { createtokenRoutes } from './token-routes';
 import { createtokenreviewRoutes } from './tokenreview-routes';
 import { createvalidatingadmissionpolicyRoutes } from './validatingadmissionpolicy-routes';
 import { createvalidatingadmissionpolicybindingRoutes } from './validatingadmissionpolicybinding-routes';
@@ -89,8 +79,6 @@ export function createRoutes(): express.Router {
  
  // Add resource routes
  router.use('/', createapiserviceRoutes(storage));
- router.use('/', createapprovalRoutes(storage));
- router.use('/', createattachRoutes(storage));
  router.use('/', createbindingRoutes(storage));
  router.use('/', createcertificatesigningrequestRoutes(storage));
  router.use('/', createclusterroleRoutes(storage));
@@ -109,9 +97,6 @@ export function createRoutes(): express.Router {
  router.use('/', createendpointsliceRoutes(storage));
  router.use('/', createephemeralcontainerRoutes(storage));
  router.use('/', createeventRoutes(storage));
- router.use('/', createevictionRoutes(storage));
- router.use('/', createexecRoutes(storage));
- router.use('/', createfinalizeRoutes(storage));
  router.use('/', createflowschemaRoutes(storage));
  router.use('/', createhorizontalpodautoscalerRoutes(storage));
  router.use('/', createingressRoutes(storage));
@@ -121,7 +106,6 @@ export function createRoutes(): express.Router {
  router.use('/', createleaseRoutes(storage));
  router.use('/', createlimitrangeRoutes(storage));
  router.use('/', createlocalsubjectaccessreviewRoutes(storage));
- router.use('/', createlogRoutes(storage));
  router.use('/', createmutatingwebhookconfigurationRoutes(storage));
  router.use('/', createnamespaceRoutes(storage));
  router.use('/', createnetworkpolicyRoutes(storage));
@@ -131,7 +115,6 @@ export function createRoutes(): express.Router {
  router.use('/', createpodRoutes(storage));
  router.use('/', createpoddisruptionbudgetRoutes(storage));
  router.use('/', createpodtemplateRoutes(storage));
- router.use('/', createportforwardRoutes(storage));
  router.use('/', createpriorityclassRoutes(storage));
  router.use('/', createprioritylevelconfigurationRoutes(storage));
  router.use('/', createproxyRoutes(storage));
@@ -141,7 +124,6 @@ export function createRoutes(): express.Router {
  router.use('/', createroleRoutes(storage));
  router.use('/', createrolebindingRoutes(storage));
  router.use('/', createruntimeclassRoutes(storage));
- router.use('/', createscaleRoutes(storage));
  router.use('/', createsecretRoutes(storage));
  router.use('/', createselfsubjectaccessreviewRoutes(storage));
  router.use('/', createselfsubjectreviewRoutes(storage));
@@ -149,10 +131,8 @@ export function createRoutes(): express.Router {
  router.use('/', createserviceRoutes(storage));
  router.use('/', createserviceaccountRoutes(storage));
  router.use('/', createstatefulsetRoutes(storage));
- router.use('/', createstatusRoutes(storage));
  router.use('/', createstorageclassRoutes(storage));
  router.use('/', createsubjectaccessreviewRoutes(storage));
- router.use('/', createtokenRoutes(storage));
  router.use('/', createtokenreviewRoutes(storage));
  router.use('/', createvalidatingadmissionpolicyRoutes(storage));
  router.use('/', createvalidatingadmissionpolicybindingRoutes(storage));

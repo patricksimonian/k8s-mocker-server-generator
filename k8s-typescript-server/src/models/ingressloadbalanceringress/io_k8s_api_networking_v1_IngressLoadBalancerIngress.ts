@@ -5,11 +5,6 @@
 */
 export interface io_k8s_api_networking_v1_IngressLoadBalancerIngress {
 /**
-* ports provides information about the ports exposed by this LoadBalancer.
-* @isArray
-*/
-ports?: Array<{ protocol: 'SCTP' | 'TCP' | 'UDP'; error?: string; port: number }>;
-/**
 * hostname is set for load-balancer ingress points that are DNS based.
 */
 hostname?: string;
@@ -17,6 +12,11 @@ hostname?: string;
 * ip is set for load-balancer ingress points that are IP based.
 */
 ip?: string;
+/**
+* ports provides information about the ports exposed by this LoadBalancer.
+* @isArray
+*/
+ports?: Array<{ error?: string; port: number; protocol: 'SCTP' | 'TCP' | 'UDP' }>;
 }
 
 /**
@@ -26,8 +26,8 @@ ip?: string;
 */
 export function createio_k8s_api_networking_v1_IngressLoadBalancerIngress(data?: Partial<io_k8s_api_networking_v1_IngressLoadBalancerIngress>): io_k8s_api_networking_v1_IngressLoadBalancerIngress {
  return {
-   ports: data?.ports !== undefined ? data.ports : [],
    hostname: data?.hostname !== undefined ? data.hostname : '',
    ip: data?.ip !== undefined ? data.ip : '',
+   ports: data?.ports !== undefined ? data.ports : [],
  };
 }

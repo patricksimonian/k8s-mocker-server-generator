@@ -28,12 +28,12 @@ containerResource?: { container: string; current: { averageUtilization?: number;
 * ExternalMetricStatus indicates the current value of a global metric not associated with any Kubernetes object.
 * @isObject
 */
-external?: { metric: { name: string; selector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> } }; current: { averageUtilization?: number; averageValue?: string; value?: string } };
+external?: { current: { averageUtilization?: number; averageValue?: string; value?: string }; metric: { name: string; selector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> } } };
 /**
 * ObjectMetricStatus indicates the current value of a metric describing a kubernetes object (for example, hits-per-second on an Ingress object).
 * @isObject
 */
-object?: { current: { averageUtilization?: number; averageValue?: string; value?: string }; describedObject: { apiVersion?: string; kind: string; name: string }; metric: { name: string; selector?: { matchExpressions?: Array<{ values?: string[]; key: string; operator: string }>; matchLabels?: Record<string, any> } } };
+object?: { metric: { selector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> }; name: string }; current: { averageUtilization?: number; averageValue?: string; value?: string }; describedObject: { apiVersion?: string; kind: string; name: string } };
 }
 
 /**
@@ -47,7 +47,7 @@ export function createio_k8s_api_autoscaling_v2_MetricStatus(data?: Partial<io_k
    resource: data?.resource !== undefined ? data.resource : { current: {}, name: '' },
    type: data?.type !== undefined ? data.type : '',
    containerResource: data?.containerResource !== undefined ? data.containerResource : { container: '', current: {}, name: '' },
-   external: data?.external !== undefined ? data.external : { current: {}, metric: { name: '' } },
-   object: data?.object !== undefined ? data.object : { current: {}, describedObject: { kind: '', name: '' }, metric: { name: '' } },
+   external: data?.external !== undefined ? data.external : { metric: { name: '' }, current: {} },
+   object: data?.object !== undefined ? data.object : { metric: { name: '' }, current: {}, describedObject: { kind: '', name: '' } },
  };
 }

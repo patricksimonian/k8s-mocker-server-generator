@@ -5,39 +5,6 @@
 */
 export interface io_k8s_api_core_v1_PodStatus {
 /**
-* Statuses of containers in this pod. Each container in the pod should have at most one status in this list, and all statuses should be for containers in the pod. However this is not enforced. If a status for a non-existent container is present in the list, or the list has duplicate names, the behavior of various Kubernetes components is not defined and those statuses might be ignored. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
-* @isArray
-*/
-containerStatuses?: Array<{ allocatedResourcesStatus?: Array<{ name: string; resources?: Array<{ health?: string; resourceID: string }> }>; resources?: { claims?: Array<{ request?: string; name: string }>; limits?: Record<string, any>; requests?: Record<string, any> }; image: string; name: string; state?: { terminated?: { exitCode: number; finishedAt?: Date; message?: string; reason?: string; signal?: number; startedAt?: Date; containerID?: string }; waiting?: { message?: string; reason?: string }; running?: { startedAt?: Date } }; allocatedResources?: Record<string, any>; lastState?: { running?: { startedAt?: Date }; terminated?: { finishedAt?: Date; message?: string; reason?: string; signal?: number; startedAt?: Date; containerID?: string; exitCode: number }; waiting?: { message?: string; reason?: string } }; ready: boolean; started?: boolean; user?: { linux?: { gid: number; supplementalGroups?: number[]; uid: number } }; containerID?: string; imageID: string; restartCount: number; volumeMounts?: Array<{ mountPath: string; name: string; readOnly?: boolean; recursiveReadOnly?: string }> }>;
-/**
-* Statuses for any ephemeral containers that have run in this pod. Each ephemeral container in the pod should have at most one status in this list, and all statuses should be for containers in the pod. However this is not enforced. If a status for a non-existent container is present in the list, or the list has duplicate names, the behavior of various Kubernetes components is not defined and those statuses might be ignored. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
-* @isArray
-*/
-ephemeralContainerStatuses?: Array<{ allocatedResourcesStatus?: Array<{ name: string; resources?: Array<{ health?: string; resourceID: string }> }>; image: string; ready: boolean; user?: { linux?: { gid: number; supplementalGroups?: number[]; uid: number } }; allocatedResources?: Record<string, any>; containerID?: string; started?: boolean; resources?: { claims?: Array<{ name: string; request?: string }>; limits?: Record<string, any>; requests?: Record<string, any> }; volumeMounts?: Array<{ mountPath: string; name: string; readOnly?: boolean; recursiveReadOnly?: string }>; imageID: string; lastState?: { running?: { startedAt?: Date }; terminated?: { containerID?: string; exitCode: number; finishedAt?: Date; message?: string; reason?: string; signal?: number; startedAt?: Date }; waiting?: { message?: string; reason?: string } }; name: string; restartCount: number; state?: { waiting?: { message?: string; reason?: string }; running?: { startedAt?: Date }; terminated?: { signal?: number; startedAt?: Date; containerID?: string; exitCode: number; finishedAt?: Date; message?: string; reason?: string } } }>;
-/**
-* The Quality of Service (QOS) classification assigned to the pod based on resource requirements See PodQOSClass type for available QOS classes More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/#quality-of-service-classes
-
-Possible enum values:
- - `"BestEffort"` is the BestEffort qos class.
- - `"Burstable"` is the Burstable qos class.
- - `"Guaranteed"` is the Guaranteed qos class.
-*/
-qosClass?: 'BestEffort' | 'Burstable' | 'Guaranteed';
-/**
-* Status of resource claims.
-* @isArray
-*/
-resourceClaimStatuses?: Array<{ name: string; resourceClaimName?: string }>;
-/**
-* Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
-*/
-startTime?: Date;
-/**
-* hostIPs holds the IP addresses allocated to the host. If this field is specified, the first entry must match the hostIP field. This list is empty if the pod has not started yet. A pod can be assigned to a node that has a problem in kubelet which in turns means that HostIPs will not be updated even if there is a node is assigned to this pod.
-* @isArray
-*/
-hostIPs?: Array<{ ip: string }>;
-/**
 * A human readable message indicating details about why the pod is in this condition.
 */
 message?: string;
@@ -46,23 +13,19 @@ message?: string;
 */
 podIP?: string;
 /**
-* A brief CamelCase message indicating details about why the pod is in this state. e.g. 'Evicted'
-*/
-reason?: string;
-/**
-* Status of resources resize desired for pod's containers. It is empty if no resources resize is pending. Any changes to container resources will automatically set this to "Proposed"
-*/
-resize?: string;
-/**
 * Current service state of pod. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-conditions
 * @isArray
 */
-conditions?: Array<{ lastProbeTime?: Date; lastTransitionTime?: Date; message?: string; reason?: string; status: string; type: string }>;
+conditions?: Array<{ lastTransitionTime?: Date; message?: string; reason?: string; status: string; type: string; lastProbeTime?: Date }>;
 /**
 * Statuses of init containers in this pod. The most recent successful non-restartable init container will have ready = true, the most recently started container will have startTime set. Each init container in the pod should have at most one status in this list, and all statuses should be for containers in the pod. However this is not enforced. If a status for a non-existent container is present in the list, or the list has duplicate names, the behavior of various Kubernetes components is not defined and those statuses might be ignored. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-and-container-status
 * @isArray
 */
-initContainerStatuses?: Array<{ lastState?: { running?: { startedAt?: Date }; terminated?: { signal?: number; startedAt?: Date; containerID?: string; exitCode: number; finishedAt?: Date; message?: string; reason?: string }; waiting?: { message?: string; reason?: string } }; resources?: { claims?: Array<{ name: string; request?: string }>; limits?: Record<string, any>; requests?: Record<string, any> }; restartCount: number; started?: boolean; state?: { running?: { startedAt?: Date }; terminated?: { containerID?: string; exitCode: number; finishedAt?: Date; message?: string; reason?: string; signal?: number; startedAt?: Date }; waiting?: { message?: string; reason?: string } }; allocatedResourcesStatus?: Array<{ name: string; resources?: Array<{ health?: string; resourceID: string }> }>; containerID?: string; ready: boolean; allocatedResources?: Record<string, any>; image: string; imageID: string; name: string; user?: { linux?: { gid: number; supplementalGroups?: number[]; uid: number } }; volumeMounts?: Array<{ name: string; readOnly?: boolean; recursiveReadOnly?: string; mountPath: string }> }>;
+initContainerStatuses?: Array<{ image: string; lastState?: { running?: { startedAt?: Date }; terminated?: { reason?: string; signal?: number; startedAt?: Date; containerID?: string; exitCode: number; finishedAt?: Date; message?: string }; waiting?: { message?: string; reason?: string } }; restartCount: number; imageID: string; name: string; ready: boolean; user?: { linux?: { gid: number; supplementalGroups?: number[]; uid: number } }; volumeMounts?: Array<{ name: string; readOnly?: boolean; recursiveReadOnly?: string; mountPath: string }>; allocatedResources?: Record<string, any>; containerID?: string; resources?: { claims?: Array<{ name: string; request?: string }>; limits?: Record<string, any>; requests?: Record<string, any> }; started?: boolean; allocatedResourcesStatus?: Array<{ resources?: Array<{ health?: string; resourceID: string }>; name: string }>; state?: { waiting?: { message?: string; reason?: string }; running?: { startedAt?: Date }; terminated?: { containerID?: string; exitCode: number; finishedAt?: Date; message?: string; reason?: string; signal?: number; startedAt?: Date } } }>;
+/**
+* nominatedNodeName is set only when this pod preempts other pods on the node, but it cannot be scheduled right away as preemption victims receive their graceful termination periods. This field does not guarantee that the pod will be scheduled on this node. Scheduler may decide to place the pod elsewhere if other nodes become available sooner. Scheduler may also decide to give the resources on this node to a higher priority pod that is created after preemption. As a result, this field may be different than PodSpec.nodeName when the pod is scheduled.
+*/
+nominatedNodeName?: string;
 /**
 * The phase of a Pod is a simple, high-level summary of where the Pod is in its lifecycle. The conditions array, the reason and message fields, and the individual container status arrays contain more detail about the pod's status. There are five possible phase values:
 
@@ -79,18 +42,55 @@ Possible enum values:
 */
 phase?: 'Failed' | 'Pending' | 'Running' | 'Succeeded' | 'Unknown';
 /**
+* Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
+*/
+startTime?: Date;
+/**
+* Statuses for any ephemeral containers that have run in this pod. Each ephemeral container in the pod should have at most one status in this list, and all statuses should be for containers in the pod. However this is not enforced. If a status for a non-existent container is present in the list, or the list has duplicate names, the behavior of various Kubernetes components is not defined and those statuses might be ignored. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
+* @isArray
+*/
+ephemeralContainerStatuses?: Array<{ user?: { linux?: { supplementalGroups?: number[]; uid: number; gid: number } }; containerID?: string; imageID: string; ready: boolean; started?: boolean; allocatedResourcesStatus?: Array<{ name: string; resources?: Array<{ health?: string; resourceID: string }> }>; volumeMounts?: Array<{ mountPath: string; name: string; readOnly?: boolean; recursiveReadOnly?: string }>; resources?: { claims?: Array<{ name: string; request?: string }>; limits?: Record<string, any>; requests?: Record<string, any> }; restartCount: number; state?: { running?: { startedAt?: Date }; terminated?: { containerID?: string; exitCode: number; finishedAt?: Date; message?: string; reason?: string; signal?: number; startedAt?: Date }; waiting?: { reason?: string; message?: string } }; allocatedResources?: Record<string, any>; image: string; lastState?: { waiting?: { message?: string; reason?: string }; running?: { startedAt?: Date }; terminated?: { message?: string; reason?: string; signal?: number; startedAt?: Date; containerID?: string; exitCode: number; finishedAt?: Date } }; name: string }>;
+/**
 * hostIP holds the IP address of the host to which the pod is assigned. Empty if the pod has not started yet. A pod can be assigned to a node that has a problem in kubelet which in turns mean that HostIP will not be updated even if there is a node is assigned to pod
 */
 hostIP?: string;
 /**
-* nominatedNodeName is set only when this pod preempts other pods on the node, but it cannot be scheduled right away as preemption victims receive their graceful termination periods. This field does not guarantee that the pod will be scheduled on this node. Scheduler may decide to place the pod elsewhere if other nodes become available sooner. Scheduler may also decide to give the resources on this node to a higher priority pod that is created after preemption. As a result, this field may be different than PodSpec.nodeName when the pod is scheduled.
+* hostIPs holds the IP addresses allocated to the host. If this field is specified, the first entry must match the hostIP field. This list is empty if the pod has not started yet. A pod can be assigned to a node that has a problem in kubelet which in turns means that HostIPs will not be updated even if there is a node is assigned to this pod.
+* @isArray
 */
-nominatedNodeName?: string;
+hostIPs?: Array<{ ip: string }>;
 /**
 * podIPs holds the IP addresses allocated to the pod. If this field is specified, the 0th entry must match the podIP field. Pods may be allocated at most 1 value for each of IPv4 and IPv6. This list is empty if no IPs have been allocated yet.
 * @isArray
 */
 podIPs?: Array<{ ip: string }>;
+/**
+* The Quality of Service (QOS) classification assigned to the pod based on resource requirements See PodQOSClass type for available QOS classes More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-qos/#quality-of-service-classes
+
+Possible enum values:
+ - `"BestEffort"` is the BestEffort qos class.
+ - `"Burstable"` is the Burstable qos class.
+ - `"Guaranteed"` is the Guaranteed qos class.
+*/
+qosClass?: 'BestEffort' | 'Burstable' | 'Guaranteed';
+/**
+* A brief CamelCase message indicating details about why the pod is in this state. e.g. 'Evicted'
+*/
+reason?: string;
+/**
+* Status of resources resize desired for pod's containers. It is empty if no resources resize is pending. Any changes to container resources will automatically set this to "Proposed"
+*/
+resize?: string;
+/**
+* Statuses of containers in this pod. Each container in the pod should have at most one status in this list, and all statuses should be for containers in the pod. However this is not enforced. If a status for a non-existent container is present in the list, or the list has duplicate names, the behavior of various Kubernetes components is not defined and those statuses might be ignored. More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#pod-and-container-status
+* @isArray
+*/
+containerStatuses?: Array<{ image: string; imageID: string; state?: { running?: { startedAt?: Date }; terminated?: { signal?: number; startedAt?: Date; containerID?: string; exitCode: number; finishedAt?: Date; message?: string; reason?: string }; waiting?: { reason?: string; message?: string } }; allocatedResourcesStatus?: Array<{ name: string; resources?: Array<{ health?: string; resourceID: string }> }>; resources?: { requests?: Record<string, any>; claims?: Array<{ name: string; request?: string }>; limits?: Record<string, any> }; volumeMounts?: Array<{ mountPath: string; name: string; readOnly?: boolean; recursiveReadOnly?: string }>; lastState?: { running?: { startedAt?: Date }; terminated?: { startedAt?: Date; containerID?: string; exitCode: number; finishedAt?: Date; message?: string; reason?: string; signal?: number }; waiting?: { message?: string; reason?: string } }; ready: boolean; user?: { linux?: { gid: number; supplementalGroups?: number[]; uid: number } }; allocatedResources?: Record<string, any>; containerID?: string; name: string; restartCount: number; started?: boolean }>;
+/**
+* Status of resource claims.
+* @isArray
+*/
+resourceClaimStatuses?: Array<{ resourceClaimName?: string; name: string }>;
 }
 
 /**
@@ -100,21 +100,21 @@ podIPs?: Array<{ ip: string }>;
 */
 export function createio_k8s_api_core_v1_PodStatus(data?: Partial<io_k8s_api_core_v1_PodStatus>): io_k8s_api_core_v1_PodStatus {
  return {
-   containerStatuses: data?.containerStatuses !== undefined ? data.containerStatuses : [],
-   ephemeralContainerStatuses: data?.ephemeralContainerStatuses !== undefined ? data.ephemeralContainerStatuses : [],
-   qosClass: data?.qosClass !== undefined ? data.qosClass : '',
-   resourceClaimStatuses: data?.resourceClaimStatuses !== undefined ? data.resourceClaimStatuses : [],
-   startTime: data?.startTime !== undefined ? data.startTime : '',
-   hostIPs: data?.hostIPs !== undefined ? data.hostIPs : [],
    message: data?.message !== undefined ? data.message : '',
    podIP: data?.podIP !== undefined ? data.podIP : '',
-   reason: data?.reason !== undefined ? data.reason : '',
-   resize: data?.resize !== undefined ? data.resize : '',
    conditions: data?.conditions !== undefined ? data.conditions : [],
    initContainerStatuses: data?.initContainerStatuses !== undefined ? data.initContainerStatuses : [],
-   phase: data?.phase !== undefined ? data.phase : '',
-   hostIP: data?.hostIP !== undefined ? data.hostIP : '',
    nominatedNodeName: data?.nominatedNodeName !== undefined ? data.nominatedNodeName : '',
+   phase: data?.phase !== undefined ? data.phase : '',
+   startTime: data?.startTime !== undefined ? data.startTime : '',
+   ephemeralContainerStatuses: data?.ephemeralContainerStatuses !== undefined ? data.ephemeralContainerStatuses : [],
+   hostIP: data?.hostIP !== undefined ? data.hostIP : '',
+   hostIPs: data?.hostIPs !== undefined ? data.hostIPs : [],
    podIPs: data?.podIPs !== undefined ? data.podIPs : [],
+   qosClass: data?.qosClass !== undefined ? data.qosClass : '',
+   reason: data?.reason !== undefined ? data.reason : '',
+   resize: data?.resize !== undefined ? data.resize : '',
+   containerStatuses: data?.containerStatuses !== undefined ? data.containerStatuses : [],
+   resourceClaimStatuses: data?.resourceClaimStatuses !== undefined ? data.resourceClaimStatuses : [],
  };
 }

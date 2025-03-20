@@ -5,10 +5,6 @@
 */
 export interface io_k8s_api_core_v1_Pod {
 /**
-* APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
-*/
-apiVersion?: string;
-/**
 * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 */
 kind?: string;
@@ -16,7 +12,7 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { creationTimestamp?: Date; deletionGracePeriodSeconds?: number; deletionTimestamp?: Date; annotations?: Record<string, any>; labels?: Record<string, any>; uid?: string; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; selfLink?: string; generateName?: string; generation?: number; namespace?: string; resourceVersion?: string; finalizers?: string[]; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; name?: string };
+metadata?: { namespace?: string; ownerReferences?: Array<{ controller?: boolean; kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean }>; deletionTimestamp?: Date; labels?: Record<string, any>; managedFields?: Array<{ fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string }>; uid?: string; annotations?: Record<string, any>; deletionGracePeriodSeconds?: number; generateName?: string; selfLink?: string; creationTimestamp?: Date; finalizers?: string[]; resourceVersion?: string; generation?: number; name?: string };
 /**
 * PodSpec is a description of a pod.
 * @isObject
@@ -27,6 +23,10 @@ spec?: Record<string, any>;
 * @isObject
 */
 status?: Record<string, any>;
+/**
+* APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+*/
+apiVersion?: string;
 }
 
 /**
@@ -36,10 +36,10 @@ status?: Record<string, any>;
 */
 export function createio_k8s_api_core_v1_Pod(data?: Partial<io_k8s_api_core_v1_Pod>): io_k8s_api_core_v1_Pod {
  return {
-   apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
    kind: data?.kind !== undefined ? data.kind : '',
    metadata: data?.metadata !== undefined ? data.metadata : {},
    spec: data?.spec !== undefined ? data.spec : { containers: [] },
    status: data?.status !== undefined ? data.status : {},
+   apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
  };
 }

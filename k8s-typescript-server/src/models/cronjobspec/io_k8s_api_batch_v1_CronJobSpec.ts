@@ -36,7 +36,7 @@ failedJobsHistoryLimit?: number;
 * @required
 * @isObject
 */
-jobTemplate: { metadata?: { uid?: string; generateName?: string; generation?: number; labels?: Record<string, any>; namespace?: string; ownerReferences?: Array<{ controller?: boolean; kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean }>; resourceVersion?: string; selfLink?: string; annotations?: Record<string, any>; creationTimestamp?: Date; managedFields?: Array<{ manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any> }>; name?: string; deletionGracePeriodSeconds?: number; deletionTimestamp?: Date; finalizers?: string[] }; spec?: Record<string, any> };
+jobTemplate: { metadata?: { generateName?: string; generation?: number; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; uid?: string; deletionGracePeriodSeconds?: number; finalizers?: string[]; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; name?: string; namespace?: string; selfLink?: string; annotations?: Record<string, any>; creationTimestamp?: Date; deletionTimestamp?: Date; labels?: Record<string, any>; resourceVersion?: string }; spec?: Record<string, any> };
 /**
 * The schedule in Cron format, see https://en.wikipedia.org/wiki/Cron.
 * @required

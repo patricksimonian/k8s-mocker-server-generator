@@ -5,15 +5,6 @@
 */
 export interface io_k8s_api_authorization_v1_SelfSubjectRulesReview {
 /**
-* Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-*/
-kind?: string;
-/**
-* ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
-* @isObject
-*/
-metadata?: { deletionTimestamp?: Date; name?: string; resourceVersion?: string; annotations?: Record<string, any>; labels?: Record<string, any>; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; namespace?: string; selfLink?: string; uid?: string; generation?: number; ownerReferences?: Array<{ kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean }>; creationTimestamp?: Date; deletionGracePeriodSeconds?: number; finalizers?: string[]; generateName?: string };
-/**
 * SelfSubjectRulesReviewSpec defines the specification for SelfSubjectRulesReview.
 * @required
 * @isObject
@@ -28,6 +19,15 @@ status?: { evaluationError?: string; incomplete: boolean; nonResourceRules: Arra
 * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
 */
 apiVersion?: string;
+/**
+* Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+*/
+kind?: string;
+/**
+* ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
+* @isObject
+*/
+metadata?: { annotations?: Record<string, any>; deletionTimestamp?: Date; creationTimestamp?: Date; generation?: number; managedFields?: Array<{ time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string }>; resourceVersion?: string; finalizers?: string[]; generateName?: string; labels?: Record<string, any>; name?: string; namespace?: string; selfLink?: string; deletionGracePeriodSeconds?: number; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; uid?: string };
 }
 
 /**
@@ -37,10 +37,10 @@ apiVersion?: string;
 */
 export function createio_k8s_api_authorization_v1_SelfSubjectRulesReview(data?: Partial<io_k8s_api_authorization_v1_SelfSubjectRulesReview>): io_k8s_api_authorization_v1_SelfSubjectRulesReview {
  return {
+   spec: data?.spec !== undefined ? data.spec : {},
+   status: data?.status !== undefined ? data.status : { resourceRules: [], incomplete: false, nonResourceRules: [] },
+   apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
    kind: data?.kind !== undefined ? data.kind : '',
    metadata: data?.metadata !== undefined ? data.metadata : {},
-   spec: data?.spec !== undefined ? data.spec : {},
-   status: data?.status !== undefined ? data.status : { incomplete: false, nonResourceRules: [], resourceRules: [] },
-   apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
  };
 }

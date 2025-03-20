@@ -6,10 +6,27 @@ import { handleResourceError } from '../utils';
 
 export function createconfigmapRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // List configmap
+
+//watch changes to an object of kind ConfigMap. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
+  router.get('/api/v1/watch/namespaces/:namespace/configmaps/:name', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Getting configmap ${name} in namespace ${namespace}`);
+      
+      const resource = await storage.getResource('configmap', name, namespace);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`configmap ${name} not found in namespace ${namespace}`), res);
+      }
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//watch individual changes to a list of ConfigMap. deprecated: use the 'watch' parameter with a list operation instead.
   router.get('/api/v1/watch/configmaps', async (req, res, next) => {
     try {
       logger.info(`Listing configmap`);
@@ -30,10 +47,8 @@ export function createconfigmapRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // List configmap
+
+//list or watch objects of kind ConfigMap
   router.get('/api/v1/configmaps', async (req, res, next) => {
     try {
       logger.info(`Listing configmap`);
@@ -54,10 +69,85 @@ export function createconfigmapRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // List configmap
+
+//read the specified ConfigMap
+  router.get('/api/v1/namespaces/:namespace/configmaps/:name', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Getting configmap ${name} in namespace ${namespace}`);
+      
+      const resource = await storage.getResource('configmap', name, namespace);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`configmap ${name} not found in namespace ${namespace}`), res);
+      }
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//replace the specified ConfigMap
+  router.put('/api/v1/namespaces/:namespace/configmaps/:name', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Updating configmap ${name} in namespace ${namespace}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set name and namespace in metadata
+      resource.metadata.name = name;
+      resource.metadata.namespace = namespace;
+      
+      const updatedResource = await storage.updateResource('configmap', name, resource);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//delete a ConfigMap
+  router.delete('/api/v1/namespaces/:namespace/configmaps/:name', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Deleting configmap ${name} in namespace ${namespace}`);
+      try {
+
+        const deleted = await storage.deleteResource('configmap', name, namespace);
+        
+        if (!deleted) {
+          return handleResourceError(new Error(`configmap ${name} not found in namespace ${namespace}`), res);
+        }
+      } catch(e) {
+          return handleResourceError(new Error(`configmap ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message}`), res);
+      }
+      
+      res.status(200).json({
+        kind: 'Status',
+        apiVersion: 'v1',
+        metadata: {},
+        status: 'Success',
+        details: {
+          name: name,
+          kind: 'configmap'
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//watch individual changes to a list of ConfigMap. deprecated: use the 'watch' parameter with a list operation instead.
   router.get('/api/v1/watch/namespaces/:namespace/configmaps', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -79,108 +169,8 @@ export function createconfigmapRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // Get specific configmap
-  router.get('/api/v1/watch/namespaces/:namespace/configmaps/:name', async (req, res, next) => {
-    try {
-      const namespace = req.params.namespace;
-      const name = req.params.name;
-      logger.info(`Getting configmap ${name} in namespace ${namespace}`);
-      
-      const resource = await storage.getResource('configmap', name, namespace);
-      
-      if (!resource) {
-        return handleResourceError(new Error(`configmap ${name} not found in namespace ${namespace}`), res);
-      }
-      
-      res.json(resource);
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // Get specific configmap
-  router.get('/api/v1/namespaces/:namespace/configmaps/:name', async (req, res, next) => {
-    try {
-      const namespace = req.params.namespace;
-      const name = req.params.name;
-      logger.info(`Getting configmap ${name} in namespace ${namespace}`);
-      
-      const resource = await storage.getResource('configmap', name, namespace);
-      
-      if (!resource) {
-        return handleResourceError(new Error(`configmap ${name} not found in namespace ${namespace}`), res);
-      }
-      
-      res.json(resource);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Update configmap
-  router.put('/api/v1/namespaces/:namespace/configmaps/:name', async (req, res, next) => {
-    try {
-      const namespace = req.params.namespace;
-      const name = req.params.name;
-      logger.info(`Updating configmap ${name} in namespace ${namespace}`);
-      
-      const resource = req.body;
-      
-      // Ensure resource has metadata
-      if (!resource.metadata) {
-        resource.metadata = {};
-      }
-      
-      // Set name and namespace in metadata
-      resource.metadata.name = name;
-      resource.metadata.namespace = namespace;
-      
-      const updatedResource = await storage.createOrUpdateResource('configmap', resource);
-      
-      res.json(updatedResource);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Delete configmap
-  router.delete('/api/v1/namespaces/:namespace/configmaps/:name', async (req, res, next) => {
-    try {
-      const namespace = req.params.namespace;
-      const name = req.params.name;
-      logger.info(`Deleting configmap ${name} in namespace ${namespace}`);
-      try {
 
-        const deleted = await storage.deleteResource('configmap', name, namespace);
-        
-        if (!deleted) {
-          return handleResourceError(new Error(`configmap ${name} not found in namespace ${namespace}`), res);
-        }
-      } catch(e) {
-          return handleResourceError(new Error(`configmap ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message)}`), res);
-      }
-      
-      res.status(200).json({
-        kind: 'Status',
-        apiVersion: 'v1',
-        metadata: {},
-        status: 'Success',
-        details: {
-          name: name,
-          kind: 'configmap'
-        }
-      });
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // List configmap
+//list or watch objects of kind ConfigMap
   router.get('/api/v1/namespaces/:namespace/configmaps', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -202,7 +192,8 @@ export function createconfigmapRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Create configmap
+
+//create a ConfigMap
   router.post('/api/v1/namespaces/:namespace/configmaps', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -218,28 +209,28 @@ export function createconfigmapRoutes(storage: Storage): express.Router {
       // Set namespace in metadata
       resource.metadata.namespace = namespace;
       
-      const createdResource = await storage.createOrUpdateResource('configmap', resource);
+      const createdResource = await storage.createResource('configmap', resource);
       
       res.status(201).json(createdResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete configmap
+
+//delete collection of ConfigMap
   router.delete('/api/v1/namespaces/:namespace/configmaps', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
-      const name = req.params.name;
-      logger.info(`Deleting configmap ${name} in namespace ${namespace}`);
+      logger.info(`Deleting all configmap in namespace ${namespace}`);
       try {
 
-        const deleted = await storage.deleteResource('configmap', name, namespace);
+        const deleted = await storage.deleteAllResources('configmap', namespace);
         
         if (!deleted) {
-          return handleResourceError(new Error(`configmap ${name} not found in namespace ${namespace}`), res);
+          return handleResourceError(new Error(`configmap not found in namespace ${namespace}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`configmap ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`configmap not deleted in namespace ${namespace}. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -248,7 +239,6 @@ export function createconfigmapRoutes(storage: Storage): express.Router {
         metadata: {},
         status: 'Success',
         details: {
-          name: name,
           kind: 'configmap'
         }
       });

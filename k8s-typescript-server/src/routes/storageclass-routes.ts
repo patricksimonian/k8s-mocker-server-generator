@@ -6,10 +6,100 @@ import { handleResourceError } from '../utils';
 
 export function createstorageclassRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // List storageclass
+
+//read the specified StorageClass
+  router.get('/apis/storage.k8s.io/v1/storageclasses/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Getting storageclass ${name}`);
+      
+      const resource = await storage.getResource('storageclass', name);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`storageclass ${name} not found`), res);
+      }
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//replace the specified StorageClass
+  router.put('/apis/storage.k8s.io/v1/storageclasses/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Updating storageclass ${name}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set name in metadata
+      resource.metadata.name = name;
+      
+      const updatedResource = await storage.updateResource('storageclass', name, resource);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//delete a StorageClass
+  router.delete('/apis/storage.k8s.io/v1/storageclasses/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Deleting storageclass ${name}`);
+      
+      try {
+
+        const deleted = await storage.deleteResource('storageclass', name);
+        
+        if (!deleted) {
+          return handleResourceError(new Error(`storageclass ${name} not found}`), res);
+        }
+      } catch(e) {
+          return handleResourceError(new Error(`storageclass ${name} not deleted. Error: ${(e as Error).message}`), res);
+      }
+      
+      res.status(200).json({
+        kind: 'Status',
+        apiVersion: 'v1',
+        metadata: {},
+        status: 'Success',
+        details: {
+          name: name,
+          kind: 'storageclass'
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//watch changes to an object of kind StorageClass. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
+  router.get('/apis/storage.k8s.io/v1/watch/storageclasses/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Getting storageclass ${name}`);
+      
+      const resource = await storage.getResource('storageclass', name);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`storageclass ${name} not found`), res);
+      }
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//watch individual changes to a list of StorageClass. deprecated: use the 'watch' parameter with a list operation instead.
   router.get('/apis/storage.k8s.io/v1/watch/storageclasses', async (req, res, next) => {
     try {
       logger.info(`Listing storageclass`);
@@ -30,44 +120,21 @@ export function createstorageclassRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Update storageclass
-  router.put('/apis/storage.k8s.io/v1/storageclasses/:name', async (req, res, next) => {
+
+//delete collection of StorageClass
+  router.delete('/apis/storage.k8s.io/v1/storageclasses', async (req, res, next) => {
     try {
-      const name = req.params.name;
-      logger.info(`Updating storageclass ${name}`);
-      
-      const resource = req.body;
-      
-      // Ensure resource has metadata
-      if (!resource.metadata) {
-        resource.metadata = {};
-      }
-      
-      // Set name in metadata
-      resource.metadata.name = name;
-      
-      const updatedResource = await storage.createOrUpdateResource('storageclass', resource);
-      
-      res.json(updatedResource);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Delete storageclass
-  router.delete('/apis/storage.k8s.io/v1/storageclasses/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Deleting storageclass ${name}`);
+
       
       try {
 
-        const deleted = await storage.deleteResource('storageclass', name);
+        const deleted = await storage.deleteAllResources('storageclass');
         
         if (!deleted) {
-          return handleResourceError(new Error(`storageclass ${name} not found}`), res);
+          return handleResourceError(new Error(`storageclass not found}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`storageclass ${name} not deleted. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`storageclass not deleted. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -76,7 +143,6 @@ export function createstorageclassRoutes(storage: Storage): express.Router {
         metadata: {},
         status: 'Success',
         details: {
-          name: name,
           kind: 'storageclass'
         }
       });
@@ -84,50 +150,8 @@ export function createstorageclassRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // Get specific storageclass
-  router.get('/apis/storage.k8s.io/v1/storageclasses/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Getting storageclass ${name}`);
-      
-      const resource = await storage.getResource('storageclass', name);
-      
-      if (!resource) {
-        return handleResourceError(new Error(`storageclass ${name} not found`), res);
-      }
-      
-      res.json(resource);
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // Get specific storageclass
-  router.get('/apis/storage.k8s.io/v1/watch/storageclasses/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Getting storageclass ${name}`);
-      
-      const resource = await storage.getResource('storageclass', name);
-      
-      if (!resource) {
-        return handleResourceError(new Error(`storageclass ${name} not found`), res);
-      }
-      
-      res.json(resource);
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // List storageclass
+
+//list or watch objects of kind StorageClass
   router.get('/apis/storage.k8s.io/v1/storageclasses', async (req, res, next) => {
     try {
       logger.info(`Listing storageclass`);
@@ -148,7 +172,8 @@ export function createstorageclassRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Create storageclass
+
+//create a StorageClass
   router.post('/apis/storage.k8s.io/v1/storageclasses', async (req, res, next) => {
     try {
       logger.info(`Creating storageclass`);
@@ -160,40 +185,9 @@ export function createstorageclassRoutes(storage: Storage): express.Router {
         resource.metadata = {};
       }
       
-      const createdResource = await storage.createOrUpdateResource('storageclass', resource);
+      const createdResource = await storage.createResource('storageclass', resource);
       
       res.status(201).json(createdResource);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Delete storageclass
-  router.delete('/apis/storage.k8s.io/v1/storageclasses', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Deleting storageclass ${name}`);
-      
-      try {
-
-        const deleted = await storage.deleteResource('storageclass', name);
-        
-        if (!deleted) {
-          return handleResourceError(new Error(`storageclass ${name} not found}`), res);
-        }
-      } catch(e) {
-          return handleResourceError(new Error(`storageclass ${name} not deleted. Error: ${(e as Error).message)}`), res);
-      }
-      
-      res.status(200).json({
-        kind: 'Status',
-        apiVersion: 'v1',
-        metadata: {},
-        status: 'Success',
-        details: {
-          name: name,
-          kind: 'storageclass'
-        }
-      });
     } catch (error) {
       next(error);
     }

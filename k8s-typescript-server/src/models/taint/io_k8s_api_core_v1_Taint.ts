@@ -5,6 +5,15 @@
 */
 export interface io_k8s_api_core_v1_Taint {
 /**
+* Required. The taint key to be applied to a node.
+* @required
+*/
+key: string;
+/**
+* Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
+*/
+timeAdded?: Date;
+/**
 * The taint value corresponding to the taint key.
 */
 value?: string;
@@ -18,15 +27,6 @@ Possible enum values:
 * @required
 */
 effect: 'NoExecute' | 'NoSchedule' | 'PreferNoSchedule';
-/**
-* Required. The taint key to be applied to a node.
-* @required
-*/
-key: string;
-/**
-* Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
-*/
-timeAdded?: Date;
 }
 
 /**
@@ -36,9 +36,9 @@ timeAdded?: Date;
 */
 export function createio_k8s_api_core_v1_Taint(data?: Partial<io_k8s_api_core_v1_Taint>): io_k8s_api_core_v1_Taint {
  return {
-   value: data?.value !== undefined ? data.value : '',
-   effect: data?.effect !== undefined ? data.effect : '',
    key: data?.key !== undefined ? data.key : '',
    timeAdded: data?.timeAdded !== undefined ? data.timeAdded : '',
+   value: data?.value !== undefined ? data.value : '',
+   effect: data?.effect !== undefined ? data.effect : '',
  };
 }

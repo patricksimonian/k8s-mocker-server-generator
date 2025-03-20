@@ -6,10 +6,8 @@ import { handleResourceError } from '../utils';
 
 export function createpriorityclassRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // List priorityclass
+
+//watch individual changes to a list of PriorityClass. deprecated: use the 'watch' parameter with a list operation instead.
   router.get('/apis/scheduling.k8s.io/v1/watch/priorityclasses', async (req, res, next) => {
     try {
       logger.info(`Listing priorityclass`);
@@ -30,47 +28,8 @@ export function createpriorityclassRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // Get specific priorityclass
-  router.get('/apis/scheduling.k8s.io/v1/watch/priorityclasses/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Getting priorityclass ${name}`);
-      
-      const resource = await storage.getResource('priorityclass', name);
-      
-      if (!resource) {
-        return handleResourceError(new Error(`priorityclass ${name} not found`), res);
-      }
-      
-      res.json(resource);
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // Get specific priorityclass
-  router.get('/apis/scheduling.k8s.io/v1/priorityclasses/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Getting priorityclass ${name}`);
-      
-      const resource = await storage.getResource('priorityclass', name);
-      
-      if (!resource) {
-        return handleResourceError(new Error(`priorityclass ${name} not found`), res);
-      }
-      
-      res.json(resource);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Update priorityclass
+
+//replace the specified PriorityClass
   router.put('/apis/scheduling.k8s.io/v1/priorityclasses/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -86,14 +45,15 @@ export function createpriorityclassRoutes(storage: Storage): express.Router {
       // Set name in metadata
       resource.metadata.name = name;
       
-      const updatedResource = await storage.createOrUpdateResource('priorityclass', resource);
+      const updatedResource = await storage.updateResource('priorityclass', name, resource);
       
       res.json(updatedResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete priorityclass
+
+//delete a PriorityClass
   router.delete('/apis/scheduling.k8s.io/v1/priorityclasses/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -107,7 +67,7 @@ export function createpriorityclassRoutes(storage: Storage): express.Router {
           return handleResourceError(new Error(`priorityclass ${name} not found}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`priorityclass ${name} not deleted. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`priorityclass ${name} not deleted. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -124,10 +84,74 @@ export function createpriorityclassRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // List priorityclass
+
+//read the specified PriorityClass
+  router.get('/apis/scheduling.k8s.io/v1/priorityclasses/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Getting priorityclass ${name}`);
+      
+      const resource = await storage.getResource('priorityclass', name);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`priorityclass ${name} not found`), res);
+      }
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//watch changes to an object of kind PriorityClass. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
+  router.get('/apis/scheduling.k8s.io/v1/watch/priorityclasses/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Getting priorityclass ${name}`);
+      
+      const resource = await storage.getResource('priorityclass', name);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`priorityclass ${name} not found`), res);
+      }
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//delete collection of PriorityClass
+  router.delete('/apis/scheduling.k8s.io/v1/priorityclasses', async (req, res, next) => {
+    try {
+
+      
+      try {
+
+        const deleted = await storage.deleteAllResources('priorityclass');
+        
+        if (!deleted) {
+          return handleResourceError(new Error(`priorityclass not found}`), res);
+        }
+      } catch(e) {
+          return handleResourceError(new Error(`priorityclass not deleted. Error: ${(e as Error).message}`), res);
+      }
+      
+      res.status(200).json({
+        kind: 'Status',
+        apiVersion: 'v1',
+        metadata: {},
+        status: 'Success',
+        details: {
+          kind: 'priorityclass'
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//list or watch objects of kind PriorityClass
   router.get('/apis/scheduling.k8s.io/v1/priorityclasses', async (req, res, next) => {
     try {
       logger.info(`Listing priorityclass`);
@@ -148,7 +172,8 @@ export function createpriorityclassRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Create priorityclass
+
+//create a PriorityClass
   router.post('/apis/scheduling.k8s.io/v1/priorityclasses', async (req, res, next) => {
     try {
       logger.info(`Creating priorityclass`);
@@ -160,40 +185,9 @@ export function createpriorityclassRoutes(storage: Storage): express.Router {
         resource.metadata = {};
       }
       
-      const createdResource = await storage.createOrUpdateResource('priorityclass', resource);
+      const createdResource = await storage.createResource('priorityclass', resource);
       
       res.status(201).json(createdResource);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Delete priorityclass
-  router.delete('/apis/scheduling.k8s.io/v1/priorityclasses', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Deleting priorityclass ${name}`);
-      
-      try {
-
-        const deleted = await storage.deleteResource('priorityclass', name);
-        
-        if (!deleted) {
-          return handleResourceError(new Error(`priorityclass ${name} not found}`), res);
-        }
-      } catch(e) {
-          return handleResourceError(new Error(`priorityclass ${name} not deleted. Error: ${(e as Error).message)}`), res);
-      }
-      
-      res.status(200).json({
-        kind: 'Status',
-        apiVersion: 'v1',
-        metadata: {},
-        status: 'Success',
-        details: {
-          name: name,
-          kind: 'priorityclass'
-        }
-      });
     } catch (error) {
       next(error);
     }

@@ -9,7 +9,7 @@ export interface io_k8s_api_autoscaling_v2_ExternalMetricStatus {
 * @required
 * @isObject
 */
-current: { averageValue?: string; value?: string; averageUtilization?: number };
+current: { value?: string; averageUtilization?: number; averageValue?: string };
 /**
 * MetricIdentifier defines the name and optionally selector for a metric
 * @required

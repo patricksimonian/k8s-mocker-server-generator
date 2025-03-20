@@ -5,11 +5,6 @@
 */
 export interface io_k8s_apiextensions_apiserver_pkg_apis_apiextensions_v1_CustomResourceDefinitionSpec {
 /**
-* CustomResourceConversion describes how to convert different versions of a CR.
-* @isObject
-*/
-conversion?: { strategy: string; webhook?: { clientConfig?: { caBundle?: string; service?: { name: string; namespace: string; path?: string; port?: number }; url?: string }; conversionReviewVersions: string[] } };
-/**
 * group is the API group of the defined custom resource. The custom resources are served under `/apis/<group>/...`. Must match the name of the CustomResourceDefinition (in the form `<names.plural>.<group>`).
 * @required
 */
@@ -19,7 +14,7 @@ group: string;
 * @required
 * @isObject
 */
-names: { kind: string; listKind?: string; plural: string; shortNames?: string[]; singular?: string; categories?: string[] };
+names: { plural: string; shortNames?: string[]; singular?: string; categories?: string[]; kind: string; listKind?: string };
 /**
 * preserveUnknownFields indicates that object fields which are not specified in the OpenAPI schema should be preserved when persisting to storage. apiVersion, kind, metadata and known fields inside metadata are always preserved. This field is deprecated in favor of setting `x-preserve-unknown-fields` to true in `spec.versions[*].schema.openAPIV3Schema`. See https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/#field-pruning for details.
 */
@@ -34,7 +29,12 @@ scope: string;
 * @required
 * @isArray
 */
-versions: Array<{ selectableFields?: Array<{ jsonPath: string }>; served: boolean; storage: boolean; deprecated?: boolean; deprecationWarning?: string; name: string; additionalPrinterColumns?: Array<{ description?: string; format?: string; jsonPath: string; name: string; priority?: number; type: string }>; schema?: { openAPIV3Schema?: Record<string, any> }; subresources?: { scale?: { labelSelectorPath?: string; specReplicasPath: string; statusReplicasPath: string }; status?: Record<string, any> } }>;
+versions: Array<{ deprecated?: boolean; name: string; schema?: { openAPIV3Schema?: Record<string, any> }; additionalPrinterColumns?: Array<{ jsonPath: string; name: string; priority?: number; type: string; description?: string; format?: string }>; deprecationWarning?: string; selectableFields?: Array<{ jsonPath: string }>; served: boolean; storage: boolean; subresources?: { scale?: { specReplicasPath: string; statusReplicasPath: string; labelSelectorPath?: string }; status?: Record<string, any> } }>;
+/**
+* CustomResourceConversion describes how to convert different versions of a CR.
+* @isObject
+*/
+conversion?: { strategy: string; webhook?: { clientConfig?: { caBundle?: string; service?: { name: string; namespace: string; path?: string; port?: number }; url?: string }; conversionReviewVersions: string[] } };
 }
 
 /**
@@ -44,11 +44,11 @@ versions: Array<{ selectableFields?: Array<{ jsonPath: string }>; served: boolea
 */
 export function createio_k8s_apiextensions_apiserver_pkg_apis_apiextensions_v1_CustomResourceDefinitionSpec(data?: Partial<io_k8s_apiextensions_apiserver_pkg_apis_apiextensions_v1_CustomResourceDefinitionSpec>): io_k8s_apiextensions_apiserver_pkg_apis_apiextensions_v1_CustomResourceDefinitionSpec {
  return {
-   conversion: data?.conversion !== undefined ? data.conversion : { strategy: '' },
    group: data?.group !== undefined ? data.group : '',
-   names: data?.names !== undefined ? data.names : { kind: '', plural: '' },
+   names: data?.names !== undefined ? data.names : { plural: '', kind: '' },
    preserveUnknownFields: data?.preserveUnknownFields !== undefined ? data.preserveUnknownFields : false,
    scope: data?.scope !== undefined ? data.scope : '',
    versions: data?.versions !== undefined ? data.versions : [],
+   conversion: data?.conversion !== undefined ? data.conversion : { strategy: '' },
  };
 }

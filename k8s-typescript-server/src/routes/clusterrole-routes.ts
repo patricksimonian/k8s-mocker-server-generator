@@ -6,10 +6,8 @@ import { handleResourceError } from '../utils';
 
 export function createclusterroleRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // List clusterrole
+
+//list or watch objects of kind ClusterRole
   router.get('/apis/rbac.authorization.k8s.io/v1/clusterroles', async (req, res, next) => {
     try {
       logger.info(`Listing clusterrole`);
@@ -30,7 +28,8 @@ export function createclusterroleRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Create clusterrole
+
+//create a ClusterRole
   router.post('/apis/rbac.authorization.k8s.io/v1/clusterroles', async (req, res, next) => {
     try {
       logger.info(`Creating clusterrole`);
@@ -42,28 +41,28 @@ export function createclusterroleRoutes(storage: Storage): express.Router {
         resource.metadata = {};
       }
       
-      const createdResource = await storage.createOrUpdateResource('clusterrole', resource);
+      const createdResource = await storage.createResource('clusterrole', resource);
       
       res.status(201).json(createdResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete clusterrole
+
+//delete collection of ClusterRole
   router.delete('/apis/rbac.authorization.k8s.io/v1/clusterroles', async (req, res, next) => {
     try {
-      const name = req.params.name;
-      logger.info(`Deleting clusterrole ${name}`);
+
       
       try {
 
-        const deleted = await storage.deleteResource('clusterrole', name);
+        const deleted = await storage.deleteAllResources('clusterrole');
         
         if (!deleted) {
-          return handleResourceError(new Error(`clusterrole ${name} not found}`), res);
+          return handleResourceError(new Error(`clusterrole not found}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`clusterrole ${name} not deleted. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`clusterrole not deleted. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -72,7 +71,6 @@ export function createclusterroleRoutes(storage: Storage): express.Router {
         metadata: {},
         status: 'Success',
         details: {
-          name: name,
           kind: 'clusterrole'
         }
       });
@@ -80,10 +78,8 @@ export function createclusterroleRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // Get specific clusterrole
+
+//watch changes to an object of kind ClusterRole. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
   router.get('/apis/rbac.authorization.k8s.io/v1/watch/clusterroles/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -100,10 +96,8 @@ export function createclusterroleRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // List clusterrole
+
+//watch individual changes to a list of ClusterRole. deprecated: use the 'watch' parameter with a list operation instead.
   router.get('/apis/rbac.authorization.k8s.io/v1/watch/clusterroles', async (req, res, next) => {
     try {
       logger.info(`Listing clusterrole`);
@@ -124,10 +118,8 @@ export function createclusterroleRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // Get specific clusterrole
+
+//read the specified ClusterRole
   router.get('/apis/rbac.authorization.k8s.io/v1/clusterroles/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -144,7 +136,8 @@ export function createclusterroleRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Update clusterrole
+
+//replace the specified ClusterRole
   router.put('/apis/rbac.authorization.k8s.io/v1/clusterroles/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -160,14 +153,15 @@ export function createclusterroleRoutes(storage: Storage): express.Router {
       // Set name in metadata
       resource.metadata.name = name;
       
-      const updatedResource = await storage.createOrUpdateResource('clusterrole', resource);
+      const updatedResource = await storage.updateResource('clusterrole', name, resource);
       
       res.json(updatedResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete clusterrole
+
+//delete a ClusterRole
   router.delete('/apis/rbac.authorization.k8s.io/v1/clusterroles/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -181,7 +175,7 @@ export function createclusterroleRoutes(storage: Storage): express.Router {
           return handleResourceError(new Error(`clusterrole ${name} not found}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`clusterrole ${name} not deleted. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`clusterrole ${name} not deleted. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({

@@ -5,10 +5,6 @@
 */
 export interface io_k8s_api_networking_v1_NetworkPolicyList {
 /**
-* Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-*/
-kind?: string;
-/**
 * ListMeta describes metadata that synthetic resources must have, including lists and various status objects. A resource may have only one of {ObjectMeta, ListMeta}.
 * @isObject
 */
@@ -24,6 +20,10 @@ apiVersion?: string;
 * @references io.k8s.api.networking.v1.NetworkPolicy
 */
 items: io_k8s_api_networking_v1_NetworkPolicy[];
+/**
+* Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+*/
+kind?: string;
 }
 
 /**
@@ -33,10 +33,10 @@ items: io_k8s_api_networking_v1_NetworkPolicy[];
 */
 export function createio_k8s_api_networking_v1_NetworkPolicyList(data?: Partial<io_k8s_api_networking_v1_NetworkPolicyList>): io_k8s_api_networking_v1_NetworkPolicyList {
  return {
-   kind: data?.kind !== undefined ? data.kind : '',
    metadata: data?.metadata !== undefined ? data.metadata : {},
    apiVersion: data?.apiVersion !== undefined ? data.apiVersion : '',
    items: data?.items !== undefined ? data.items : ,
+   kind: data?.kind !== undefined ? data.kind : '',
  };
 }
 // Required imports

@@ -19,7 +19,7 @@ container: string;
 * @required
 * @isObject
 */
-current: { averageUtilization?: number; averageValue?: string; value?: string };
+current: { value?: string; averageUtilization?: number; averageValue?: string };
 }
 
 /**

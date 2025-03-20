@@ -16,7 +16,7 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { deletionGracePeriodSeconds?: number; generation?: number; uid?: string; labels?: Record<string, any>; name?: string; namespace?: string; selfLink?: string; annotations?: Record<string, any>; deletionTimestamp?: Date; finalizers?: string[]; generateName?: string; ownerReferences?: Array<{ name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string }>; creationTimestamp?: Date; managedFields?: Array<{ operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string }>; resourceVersion?: string };
+metadata?: { namespace?: string; creationTimestamp?: Date; finalizers?: string[]; generateName?: string; generation?: number; name?: string; deletionGracePeriodSeconds?: number; deletionTimestamp?: Date; managedFields?: Array<{ time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string }>; resourceVersion?: string; selfLink?: string; labels?: Record<string, any>; annotations?: Record<string, any>; ownerReferences?: Array<{ name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string }>; uid?: string };
 /**
 * PersistentVolumeSpec is the specification of a persistent volume.
 * @isObject
@@ -26,7 +26,7 @@ spec?: Record<string, any>;
 * PersistentVolumeStatus is the current status of a persistent volume.
 * @isObject
 */
-status?: { lastPhaseTransitionTime?: Date; message?: string; phase?: 'Available' | 'Bound' | 'Failed' | 'Pending' | 'Released'; reason?: string };
+status?: { message?: string; phase?: 'Available' | 'Bound' | 'Failed' | 'Pending' | 'Released'; reason?: string; lastPhaseTransitionTime?: Date };
 }
 
 /**

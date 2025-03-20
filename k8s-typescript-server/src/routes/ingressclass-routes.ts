@@ -6,10 +6,8 @@ import { handleResourceError } from '../utils';
 
 export function createingressclassRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // Get specific ingressclass
+
+//watch changes to an object of kind IngressClass. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
   router.get('/apis/networking.k8s.io/v1/watch/ingressclasses/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -26,10 +24,8 @@ export function createingressclassRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // List ingressclass
+
+//list or watch objects of kind IngressClass
   router.get('/apis/networking.k8s.io/v1/ingressclasses', async (req, res, next) => {
     try {
       logger.info(`Listing ingressclass`);
@@ -50,7 +46,8 @@ export function createingressclassRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Create ingressclass
+
+//create an IngressClass
   router.post('/apis/networking.k8s.io/v1/ingressclasses', async (req, res, next) => {
     try {
       logger.info(`Creating ingressclass`);
@@ -62,28 +59,28 @@ export function createingressclassRoutes(storage: Storage): express.Router {
         resource.metadata = {};
       }
       
-      const createdResource = await storage.createOrUpdateResource('ingressclass', resource);
+      const createdResource = await storage.createResource('ingressclass', resource);
       
       res.status(201).json(createdResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete ingressclass
+
+//delete collection of IngressClass
   router.delete('/apis/networking.k8s.io/v1/ingressclasses', async (req, res, next) => {
     try {
-      const name = req.params.name;
-      logger.info(`Deleting ingressclass ${name}`);
+
       
       try {
 
-        const deleted = await storage.deleteResource('ingressclass', name);
+        const deleted = await storage.deleteAllResources('ingressclass');
         
         if (!deleted) {
-          return handleResourceError(new Error(`ingressclass ${name} not found}`), res);
+          return handleResourceError(new Error(`ingressclass not found}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`ingressclass ${name} not deleted. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`ingressclass not deleted. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -92,7 +89,6 @@ export function createingressclassRoutes(storage: Storage): express.Router {
         metadata: {},
         status: 'Success',
         details: {
-          name: name,
           kind: 'ingressclass'
         }
       });
@@ -100,84 +96,8 @@ export function createingressclassRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Delete ingressclass
-  router.delete('/apis/networking.k8s.io/v1/ingressclasses/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Deleting ingressclass ${name}`);
-      
-      try {
 
-        const deleted = await storage.deleteResource('ingressclass', name);
-        
-        if (!deleted) {
-          return handleResourceError(new Error(`ingressclass ${name} not found}`), res);
-        }
-      } catch(e) {
-          return handleResourceError(new Error(`ingressclass ${name} not deleted. Error: ${(e as Error).message)}`), res);
-      }
-      
-      res.status(200).json({
-        kind: 'Status',
-        apiVersion: 'v1',
-        metadata: {},
-        status: 'Success',
-        details: {
-          name: name,
-          kind: 'ingressclass'
-        }
-      });
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // Get specific ingressclass
-  router.get('/apis/networking.k8s.io/v1/ingressclasses/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Getting ingressclass ${name}`);
-      
-      const resource = await storage.getResource('ingressclass', name);
-      
-      if (!resource) {
-        return handleResourceError(new Error(`ingressclass ${name} not found`), res);
-      }
-      
-      res.json(resource);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Update ingressclass
-  router.put('/apis/networking.k8s.io/v1/ingressclasses/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Updating ingressclass ${name}`);
-      
-      const resource = req.body;
-      
-      // Ensure resource has metadata
-      if (!resource.metadata) {
-        resource.metadata = {};
-      }
-      
-      // Set name in metadata
-      resource.metadata.name = name;
-      
-      const updatedResource = await storage.createOrUpdateResource('ingressclass', resource);
-      
-      res.json(updatedResource);
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // List ingressclass
+//watch individual changes to a list of IngressClass. deprecated: use the 'watch' parameter with a list operation instead.
   router.get('/apis/networking.k8s.io/v1/watch/ingressclasses', async (req, res, next) => {
     try {
       logger.info(`Listing ingressclass`);
@@ -194,6 +114,80 @@ export function createingressclassRoutes(storage: Storage): express.Router {
       };
       
       res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//read the specified IngressClass
+  router.get('/apis/networking.k8s.io/v1/ingressclasses/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Getting ingressclass ${name}`);
+      
+      const resource = await storage.getResource('ingressclass', name);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`ingressclass ${name} not found`), res);
+      }
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//replace the specified IngressClass
+  router.put('/apis/networking.k8s.io/v1/ingressclasses/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Updating ingressclass ${name}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set name in metadata
+      resource.metadata.name = name;
+      
+      const updatedResource = await storage.updateResource('ingressclass', name, resource);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//delete an IngressClass
+  router.delete('/apis/networking.k8s.io/v1/ingressclasses/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Deleting ingressclass ${name}`);
+      
+      try {
+
+        const deleted = await storage.deleteResource('ingressclass', name);
+        
+        if (!deleted) {
+          return handleResourceError(new Error(`ingressclass ${name} not found}`), res);
+        }
+      } catch(e) {
+          return handleResourceError(new Error(`ingressclass ${name} not deleted. Error: ${(e as Error).message}`), res);
+      }
+      
+      res.status(200).json({
+        kind: 'Status',
+        apiVersion: 'v1',
+        metadata: {},
+        status: 'Success',
+        details: {
+          name: name,
+          kind: 'ingressclass'
+        }
+      });
     } catch (error) {
       next(error);
     }

@@ -5,18 +5,18 @@
 */
 export interface io_k8s_api_batch_v1_CronJobStatus {
 /**
-* Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
-*/
-lastSuccessfulTime?: Date;
-/**
 * A list of pointers to currently running jobs.
 * @isArray
 */
-active?: Array<{ fieldPath?: string; kind?: string; name?: string; namespace?: string; resourceVersion?: string; uid?: string; apiVersion?: string }>;
+active?: Array<{ apiVersion?: string; fieldPath?: string; kind?: string; name?: string; namespace?: string; resourceVersion?: string; uid?: string }>;
 /**
 * Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
 */
 lastScheduleTime?: Date;
+/**
+* Time is a wrapper around time.Time which supports correct marshaling to YAML and JSON.  Wrappers are provided for many of the factory methods that the time package offers.
+*/
+lastSuccessfulTime?: Date;
 }
 
 /**
@@ -26,8 +26,8 @@ lastScheduleTime?: Date;
 */
 export function createio_k8s_api_batch_v1_CronJobStatus(data?: Partial<io_k8s_api_batch_v1_CronJobStatus>): io_k8s_api_batch_v1_CronJobStatus {
  return {
-   lastSuccessfulTime: data?.lastSuccessfulTime !== undefined ? data.lastSuccessfulTime : '',
    active: data?.active !== undefined ? data.active : [],
    lastScheduleTime: data?.lastScheduleTime !== undefined ? data.lastScheduleTime : '',
+   lastSuccessfulTime: data?.lastSuccessfulTime !== undefined ? data.lastSuccessfulTime : '',
  };
 }

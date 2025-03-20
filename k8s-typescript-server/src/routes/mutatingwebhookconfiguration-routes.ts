@@ -6,50 +6,8 @@ import { handleResourceError } from '../utils';
 
 export function createmutatingwebhookconfigurationRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // Get specific mutatingwebhookconfiguration
-  router.get('/apis/admissionregistration.k8s.io/v1/mutatingwebhookconfigurations/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Getting mutatingwebhookconfiguration ${name}`);
-      
-      const resource = await storage.getResource('mutatingwebhookconfiguration', name);
-      
-      if (!resource) {
-        return handleResourceError(new Error(`mutatingwebhookconfiguration ${name} not found`), res);
-      }
-      
-      res.json(resource);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Update mutatingwebhookconfiguration
-  router.put('/apis/admissionregistration.k8s.io/v1/mutatingwebhookconfigurations/:name', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Updating mutatingwebhookconfiguration ${name}`);
-      
-      const resource = req.body;
-      
-      // Ensure resource has metadata
-      if (!resource.metadata) {
-        resource.metadata = {};
-      }
-      
-      // Set name in metadata
-      resource.metadata.name = name;
-      
-      const updatedResource = await storage.createOrUpdateResource('mutatingwebhookconfiguration', resource);
-      
-      res.json(updatedResource);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Delete mutatingwebhookconfiguration
+
+//delete a MutatingWebhookConfiguration
   router.delete('/apis/admissionregistration.k8s.io/v1/mutatingwebhookconfigurations/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -63,7 +21,7 @@ export function createmutatingwebhookconfigurationRoutes(storage: Storage): expr
           return handleResourceError(new Error(`mutatingwebhookconfiguration ${name} not found}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`mutatingwebhookconfiguration ${name} not deleted. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`mutatingwebhookconfiguration ${name} not deleted. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -80,10 +38,80 @@ export function createmutatingwebhookconfigurationRoutes(storage: Storage): expr
       next(error);
     }
   });
-    
-  
-  
-  // List mutatingwebhookconfiguration
+
+//read the specified MutatingWebhookConfiguration
+  router.get('/apis/admissionregistration.k8s.io/v1/mutatingwebhookconfigurations/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Getting mutatingwebhookconfiguration ${name}`);
+      
+      const resource = await storage.getResource('mutatingwebhookconfiguration', name);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`mutatingwebhookconfiguration ${name} not found`), res);
+      }
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//replace the specified MutatingWebhookConfiguration
+  router.put('/apis/admissionregistration.k8s.io/v1/mutatingwebhookconfigurations/:name', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Updating mutatingwebhookconfiguration ${name}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set name in metadata
+      resource.metadata.name = name;
+      
+      const updatedResource = await storage.updateResource('mutatingwebhookconfiguration', name, resource);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//delete collection of MutatingWebhookConfiguration
+  router.delete('/apis/admissionregistration.k8s.io/v1/mutatingwebhookconfigurations', async (req, res, next) => {
+    try {
+
+      
+      try {
+
+        const deleted = await storage.deleteAllResources('mutatingwebhookconfiguration');
+        
+        if (!deleted) {
+          return handleResourceError(new Error(`mutatingwebhookconfiguration not found}`), res);
+        }
+      } catch(e) {
+          return handleResourceError(new Error(`mutatingwebhookconfiguration not deleted. Error: ${(e as Error).message}`), res);
+      }
+      
+      res.status(200).json({
+        kind: 'Status',
+        apiVersion: 'v1',
+        metadata: {},
+        status: 'Success',
+        details: {
+          kind: 'mutatingwebhookconfiguration'
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//list or watch objects of kind MutatingWebhookConfiguration
   router.get('/apis/admissionregistration.k8s.io/v1/mutatingwebhookconfigurations', async (req, res, next) => {
     try {
       logger.info(`Listing mutatingwebhookconfiguration`);
@@ -104,7 +132,8 @@ export function createmutatingwebhookconfigurationRoutes(storage: Storage): expr
       next(error);
     }
   });
-  // Create mutatingwebhookconfiguration
+
+//create a MutatingWebhookConfiguration
   router.post('/apis/admissionregistration.k8s.io/v1/mutatingwebhookconfigurations', async (req, res, next) => {
     try {
       logger.info(`Creating mutatingwebhookconfiguration`);
@@ -116,48 +145,15 @@ export function createmutatingwebhookconfigurationRoutes(storage: Storage): expr
         resource.metadata = {};
       }
       
-      const createdResource = await storage.createOrUpdateResource('mutatingwebhookconfiguration', resource);
+      const createdResource = await storage.createResource('mutatingwebhookconfiguration', resource);
       
       res.status(201).json(createdResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete mutatingwebhookconfiguration
-  router.delete('/apis/admissionregistration.k8s.io/v1/mutatingwebhookconfigurations', async (req, res, next) => {
-    try {
-      const name = req.params.name;
-      logger.info(`Deleting mutatingwebhookconfiguration ${name}`);
-      
-      try {
 
-        const deleted = await storage.deleteResource('mutatingwebhookconfiguration', name);
-        
-        if (!deleted) {
-          return handleResourceError(new Error(`mutatingwebhookconfiguration ${name} not found}`), res);
-        }
-      } catch(e) {
-          return handleResourceError(new Error(`mutatingwebhookconfiguration ${name} not deleted. Error: ${(e as Error).message)}`), res);
-      }
-      
-      res.status(200).json({
-        kind: 'Status',
-        apiVersion: 'v1',
-        metadata: {},
-        status: 'Success',
-        details: {
-          name: name,
-          kind: 'mutatingwebhookconfiguration'
-        }
-      });
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // Get specific mutatingwebhookconfiguration
+//watch changes to an object of kind MutatingWebhookConfiguration. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
   router.get('/apis/admissionregistration.k8s.io/v1/watch/mutatingwebhookconfigurations/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -174,10 +170,8 @@ export function createmutatingwebhookconfigurationRoutes(storage: Storage): expr
       next(error);
     }
   });
-    
-  
-  
-  // List mutatingwebhookconfiguration
+
+//watch individual changes to a list of MutatingWebhookConfiguration. deprecated: use the 'watch' parameter with a list operation instead.
   router.get('/apis/admissionregistration.k8s.io/v1/watch/mutatingwebhookconfigurations', async (req, res, next) => {
     try {
       logger.info(`Listing mutatingwebhookconfiguration`);

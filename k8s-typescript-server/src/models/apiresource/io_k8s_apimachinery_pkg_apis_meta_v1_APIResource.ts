@@ -5,39 +5,23 @@
 */
 export interface io_k8s_apimachinery_pkg_apis_meta_v1_APIResource {
 /**
-* name is the plural name of the resource.
-* @required
+* version is the preferred version of the resource.  Empty implies the version of the containing resource list For subresources, this may have a different value, for example: v1 (while inside a v1beta1 version of the core resource's group)".
 */
-name: string;
-/**
-* namespaced indicates if a resource is namespaced or not.
-* @required
-*/
-namespaced: boolean;
+version?: string;
 /**
 * categories is a list of the grouped resources this resource belongs to (e.g. 'all')
 * @isArray
 */
 categories?: string[];
 /**
-* group is the preferred group of the resource.  Empty implies the group of the containing resource list. For subresources, this may have a different value, for example: Scale".
-*/
-group?: string;
-/**
-* kind is the kind for the resource (e.g. 'Foo' is the kind for a resource 'foo')
+* name is the plural name of the resource.
 * @required
 */
-kind: string;
+name: string;
 /**
-* verbs is a list of supported kube verbs (this includes get, list, watch, create, update, patch, delete, deletecollection, and proxy)
-* @required
-* @isArray
+* The hash value of the storage version, the version this resource is converted to when written to the data store. Value must be treated as opaque by clients. Only equality comparison on the value is valid. This is an alpha feature and may change or be removed in the future. The field is populated by the apiserver only if the StorageVersionHash feature gate is enabled. This field will remain optional even if it graduates.
 */
-verbs: string[];
-/**
-* version is the preferred version of the resource.  Empty implies the version of the containing resource list For subresources, this may have a different value, for example: v1 (while inside a v1beta1 version of the core resource's group)".
-*/
-version?: string;
+storageVersionHash?: string;
 /**
 * shortNames is a list of suggested short names of the resource.
 * @isArray
@@ -49,9 +33,25 @@ shortNames?: string[];
 */
 singularName: string;
 /**
-* The hash value of the storage version, the version this resource is converted to when written to the data store. Value must be treated as opaque by clients. Only equality comparison on the value is valid. This is an alpha feature and may change or be removed in the future. The field is populated by the apiserver only if the StorageVersionHash feature gate is enabled. This field will remain optional even if it graduates.
+* verbs is a list of supported kube verbs (this includes get, list, watch, create, update, patch, delete, deletecollection, and proxy)
+* @required
+* @isArray
 */
-storageVersionHash?: string;
+verbs: string[];
+/**
+* group is the preferred group of the resource.  Empty implies the group of the containing resource list. For subresources, this may have a different value, for example: Scale".
+*/
+group?: string;
+/**
+* kind is the kind for the resource (e.g. 'Foo' is the kind for a resource 'foo')
+* @required
+*/
+kind: string;
+/**
+* namespaced indicates if a resource is namespaced or not.
+* @required
+*/
+namespaced: boolean;
 }
 
 /**
@@ -61,15 +61,15 @@ storageVersionHash?: string;
 */
 export function createio_k8s_apimachinery_pkg_apis_meta_v1_APIResource(data?: Partial<io_k8s_apimachinery_pkg_apis_meta_v1_APIResource>): io_k8s_apimachinery_pkg_apis_meta_v1_APIResource {
  return {
-   name: data?.name !== undefined ? data.name : '',
-   namespaced: data?.namespaced !== undefined ? data.namespaced : false,
-   categories: data?.categories !== undefined ? data.categories : [],
-   group: data?.group !== undefined ? data.group : '',
-   kind: data?.kind !== undefined ? data.kind : '',
-   verbs: data?.verbs !== undefined ? data.verbs : [],
    version: data?.version !== undefined ? data.version : '',
+   categories: data?.categories !== undefined ? data.categories : [],
+   name: data?.name !== undefined ? data.name : '',
+   storageVersionHash: data?.storageVersionHash !== undefined ? data.storageVersionHash : '',
    shortNames: data?.shortNames !== undefined ? data.shortNames : [],
    singularName: data?.singularName !== undefined ? data.singularName : '',
-   storageVersionHash: data?.storageVersionHash !== undefined ? data.storageVersionHash : '',
+   verbs: data?.verbs !== undefined ? data.verbs : [],
+   group: data?.group !== undefined ? data.group : '',
+   kind: data?.kind !== undefined ? data.kind : '',
+   namespaced: data?.namespaced !== undefined ? data.namespaced : false,
  };
 }

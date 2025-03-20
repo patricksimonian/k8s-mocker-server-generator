@@ -6,7 +6,8 @@ import { handleResourceError } from '../utils';
 
 export function createselfsubjectrulesreviewRoutes(storage: Storage): express.Router {
   const router = express.Router();
-  // Create selfsubjectrulesreview
+
+//create a SelfSubjectRulesReview
   router.post('/apis/authorization.k8s.io/v1/selfsubjectrulesreviews', async (req, res, next) => {
     try {
       logger.info(`Creating selfsubjectrulesreview`);
@@ -18,7 +19,7 @@ export function createselfsubjectrulesreviewRoutes(storage: Storage): express.Ro
         resource.metadata = {};
       }
       
-      const createdResource = await storage.createOrUpdateResource('selfsubjectrulesreview', resource);
+      const createdResource = await storage.createResource('selfsubjectrulesreview', resource);
       
       res.status(201).json(createdResource);
     } catch (error) {

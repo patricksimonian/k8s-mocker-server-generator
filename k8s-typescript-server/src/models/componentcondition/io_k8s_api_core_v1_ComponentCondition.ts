@@ -5,11 +5,6 @@
 */
 export interface io_k8s_api_core_v1_ComponentCondition {
 /**
-* Status of the condition for a component. Valid values for "Healthy": "True", "False", or "Unknown".
-* @required
-*/
-status: string;
-/**
 * Type of condition for a component. Valid value: "Healthy"
 * @required
 */
@@ -22,6 +17,11 @@ error?: string;
 * Message about the condition for a component. For example, information about a health check.
 */
 message?: string;
+/**
+* Status of the condition for a component. Valid values for "Healthy": "True", "False", or "Unknown".
+* @required
+*/
+status: string;
 }
 
 /**
@@ -31,9 +31,9 @@ message?: string;
 */
 export function createio_k8s_api_core_v1_ComponentCondition(data?: Partial<io_k8s_api_core_v1_ComponentCondition>): io_k8s_api_core_v1_ComponentCondition {
  return {
-   status: data?.status !== undefined ? data.status : '',
    type: data?.type !== undefined ? data.type : '',
    error: data?.error !== undefined ? data.error : '',
    message: data?.message !== undefined ? data.message : '',
+   status: data?.status !== undefined ? data.status : '',
  };
 }

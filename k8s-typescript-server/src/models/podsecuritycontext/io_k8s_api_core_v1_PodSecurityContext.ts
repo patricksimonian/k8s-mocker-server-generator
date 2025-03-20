@@ -5,23 +5,10 @@
 */
 export interface io_k8s_api_core_v1_PodSecurityContext {
 /**
-* AppArmorProfile defines a pod or container's AppArmor settings.
-* @isObject
+* A list of groups applied to the first process run in each container, in addition to the container's primary GID and fsGroup (if specified).  If the SupplementalGroupsPolicy feature is enabled, the supplementalGroupsPolicy field determines whether these are in addition to or instead of any group memberships defined in the container image. If unspecified, no additional groups are added, though group memberships defined in the container image may still be used, depending on the supplementalGroupsPolicy field. Note that this field cannot be set when spec.os.name is windows.
+* @isArray
 */
-appArmorProfile?: { localhostProfile?: string; type: 'Localhost' | 'RuntimeDefault' | 'Unconfined' };
-/**
-* The GID to run the entrypoint of the container process. Uses runtime default if unset. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container. Note that this field cannot be set when spec.os.name is windows.
-*/
-runAsGroup?: number;
-/**
-* The UID to run the entrypoint of the container process. Defaults to user specified in image metadata if unspecified. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container. Note that this field cannot be set when spec.os.name is windows.
-*/
-runAsUser?: number;
-/**
-* SELinuxOptions are the labels to be applied to the container
-* @isObject
-*/
-seLinuxOptions?: { role?: string; type?: string; user?: string; level?: string };
+supplementalGroups?: number[];
 /**
 * Defines how supplemental groups of the first container processes are calculated. Valid values are "Merge" and "Strict". If not specified, "Merge" is used. (Alpha) Using the field requires the SupplementalGroupsPolicy feature gate to be enabled and the container runtime must implement support for this feature. Note that this field cannot be set when spec.os.name is windows.
 
@@ -31,10 +18,15 @@ Possible enum values:
 */
 supplementalGroupsPolicy?: 'Merge' | 'Strict';
 /**
-* Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported sysctls (by the container runtime) might fail to launch. Note that this field cannot be set when spec.os.name is windows.
-* @isArray
+* WindowsSecurityContextOptions contain Windows-specific options and credentials.
+* @isObject
 */
-sysctls?: Array<{ name: string; value: string }>;
+windowsOptions?: { gmsaCredentialSpecName?: string; hostProcess?: boolean; runAsUserName?: string; gmsaCredentialSpec?: string };
+/**
+* AppArmorProfile defines a pod or container's AppArmor settings.
+* @isObject
+*/
+appArmorProfile?: { localhostProfile?: string; type: 'Localhost' | 'RuntimeDefault' | 'Unconfined' };
 /**
 * A special supplemental group that applies to all containers in a pod. Some volume types allow the Kubelet to change the ownership of that volume to be owned by the pod:
 
@@ -52,9 +44,22 @@ Possible enum values:
 */
 fsGroupChangePolicy?: 'Always' | 'OnRootMismatch';
 /**
+* The GID to run the entrypoint of the container process. Uses runtime default if unset. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container. Note that this field cannot be set when spec.os.name is windows.
+*/
+runAsGroup?: number;
+/**
+* SELinuxOptions are the labels to be applied to the container
+* @isObject
+*/
+seLinuxOptions?: { level?: string; role?: string; type?: string; user?: string };
+/**
 * Indicates that the container must run as a non-root user. If true, the Kubelet will validate the image at runtime to ensure that it does not run as UID 0 (root) and fail to start the container if it does. If unset or false, no such validation will be performed. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
 */
 runAsNonRoot?: boolean;
+/**
+* The UID to run the entrypoint of the container process. Defaults to user specified in image metadata if unspecified. May also be set in SecurityContext.  If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence for that container. Note that this field cannot be set when spec.os.name is windows.
+*/
+runAsUser?: number;
 /**
 * seLinuxChangePolicy defines how the container's SELinux label is applied to all volumes used by the Pod. It has no effect on nodes that do not support SELinux or to volumes does not support SELinux. Valid values are "MountOption" and "Recursive".
 
@@ -73,17 +78,12 @@ seLinuxChangePolicy?: string;
 * SeccompProfile defines a pod/container's seccomp profile settings. Only one profile source may be set.
 * @isObject
 */
-seccompProfile?: { localhostProfile?: string; type: 'Localhost' | 'RuntimeDefault' | 'Unconfined' };
+seccompProfile?: { type: 'Localhost' | 'RuntimeDefault' | 'Unconfined'; localhostProfile?: string };
 /**
-* A list of groups applied to the first process run in each container, in addition to the container's primary GID and fsGroup (if specified).  If the SupplementalGroupsPolicy feature is enabled, the supplementalGroupsPolicy field determines whether these are in addition to or instead of any group memberships defined in the container image. If unspecified, no additional groups are added, though group memberships defined in the container image may still be used, depending on the supplementalGroupsPolicy field. Note that this field cannot be set when spec.os.name is windows.
+* Sysctls hold a list of namespaced sysctls used for the pod. Pods with unsupported sysctls (by the container runtime) might fail to launch. Note that this field cannot be set when spec.os.name is windows.
 * @isArray
 */
-supplementalGroups?: number[];
-/**
-* WindowsSecurityContextOptions contain Windows-specific options and credentials.
-* @isObject
-*/
-windowsOptions?: { gmsaCredentialSpec?: string; gmsaCredentialSpecName?: string; hostProcess?: boolean; runAsUserName?: string };
+sysctls?: Array<{ name: string; value: string }>;
 }
 
 /**
@@ -93,18 +93,18 @@ windowsOptions?: { gmsaCredentialSpec?: string; gmsaCredentialSpecName?: string;
 */
 export function createio_k8s_api_core_v1_PodSecurityContext(data?: Partial<io_k8s_api_core_v1_PodSecurityContext>): io_k8s_api_core_v1_PodSecurityContext {
  return {
-   appArmorProfile: data?.appArmorProfile !== undefined ? data.appArmorProfile : { type: '' },
-   runAsGroup: data?.runAsGroup !== undefined ? data.runAsGroup : 0,
-   runAsUser: data?.runAsUser !== undefined ? data.runAsUser : 0,
-   seLinuxOptions: data?.seLinuxOptions !== undefined ? data.seLinuxOptions : {},
+   supplementalGroups: data?.supplementalGroups !== undefined ? data.supplementalGroups : [],
    supplementalGroupsPolicy: data?.supplementalGroupsPolicy !== undefined ? data.supplementalGroupsPolicy : '',
-   sysctls: data?.sysctls !== undefined ? data.sysctls : [],
+   windowsOptions: data?.windowsOptions !== undefined ? data.windowsOptions : {},
+   appArmorProfile: data?.appArmorProfile !== undefined ? data.appArmorProfile : { type: '' },
    fsGroup: data?.fsGroup !== undefined ? data.fsGroup : 0,
    fsGroupChangePolicy: data?.fsGroupChangePolicy !== undefined ? data.fsGroupChangePolicy : '',
+   runAsGroup: data?.runAsGroup !== undefined ? data.runAsGroup : 0,
+   seLinuxOptions: data?.seLinuxOptions !== undefined ? data.seLinuxOptions : {},
    runAsNonRoot: data?.runAsNonRoot !== undefined ? data.runAsNonRoot : false,
+   runAsUser: data?.runAsUser !== undefined ? data.runAsUser : 0,
    seLinuxChangePolicy: data?.seLinuxChangePolicy !== undefined ? data.seLinuxChangePolicy : '',
    seccompProfile: data?.seccompProfile !== undefined ? data.seccompProfile : { type: '' },
-   supplementalGroups: data?.supplementalGroups !== undefined ? data.supplementalGroups : [],
-   windowsOptions: data?.windowsOptions !== undefined ? data.windowsOptions : {},
+   sysctls: data?.sysctls !== undefined ? data.sysctls : [],
  };
 }

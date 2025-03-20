@@ -6,10 +6,8 @@ import { handleResourceError } from '../utils';
 
 export function createcustomresourcedefinitionRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // Get specific customresourcedefinition
+
+//read the specified CustomResourceDefinition
   router.get('/apis/apiextensions.k8s.io/v1/customresourcedefinitions/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -26,7 +24,8 @@ export function createcustomresourcedefinitionRoutes(storage: Storage): express.
       next(error);
     }
   });
-  // Update customresourcedefinition
+
+//replace the specified CustomResourceDefinition
   router.put('/apis/apiextensions.k8s.io/v1/customresourcedefinitions/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -42,14 +41,15 @@ export function createcustomresourcedefinitionRoutes(storage: Storage): express.
       // Set name in metadata
       resource.metadata.name = name;
       
-      const updatedResource = await storage.createOrUpdateResource('customresourcedefinition', resource);
+      const updatedResource = await storage.updateResource('customresourcedefinition', name, resource);
       
       res.json(updatedResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete customresourcedefinition
+
+//delete a CustomResourceDefinition
   router.delete('/apis/apiextensions.k8s.io/v1/customresourcedefinitions/:name', async (req, res, next) => {
     try {
       const name = req.params.name;
@@ -63,7 +63,7 @@ export function createcustomresourcedefinitionRoutes(storage: Storage): express.
           return handleResourceError(new Error(`customresourcedefinition ${name} not found}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`customresourcedefinition ${name} not deleted. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`customresourcedefinition ${name} not deleted. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -80,11 +80,33 @@ export function createcustomresourcedefinitionRoutes(storage: Storage): express.
       next(error);
     }
   });
-    
-  
-  
-  // List customresourcedefinition
-  router.get('/apis/apiextensions.k8s.io/v1/watch/customresourcedefinitions', async (req, res, next) => {
+
+//replace status of the specified CustomResourceDefinition
+  router.put('/apis/apiextensions.k8s.io/v1/customresourcedefinitions/:name/status', async (req, res, next) => {
+    try {
+      const name = req.params.name;
+      logger.info(`Updating customresourcedefinition ${name}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set name in metadata
+      resource.metadata.name = name;
+      
+      const updatedResource = await storage.updateResource('customresourcedefinition', name, resource);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//read status of the specified CustomResourceDefinition
+  router.get('/apis/apiextensions.k8s.io/v1/customresourcedefinitions/:name/status', async (req, res, next) => {
     try {
       logger.info(`Listing customresourcedefinition`);
       
@@ -104,10 +126,8 @@ export function createcustomresourcedefinitionRoutes(storage: Storage): express.
       next(error);
     }
   });
-    
-  
-  
-  // List customresourcedefinition
+
+//list or watch objects of kind CustomResourceDefinition
   router.get('/apis/apiextensions.k8s.io/v1/customresourcedefinitions', async (req, res, next) => {
     try {
       logger.info(`Listing customresourcedefinition`);
@@ -128,7 +148,8 @@ export function createcustomresourcedefinitionRoutes(storage: Storage): express.
       next(error);
     }
   });
-  // Create customresourcedefinition
+
+//create a CustomResourceDefinition
   router.post('/apis/apiextensions.k8s.io/v1/customresourcedefinitions', async (req, res, next) => {
     try {
       logger.info(`Creating customresourcedefinition`);
@@ -140,28 +161,28 @@ export function createcustomresourcedefinitionRoutes(storage: Storage): express.
         resource.metadata = {};
       }
       
-      const createdResource = await storage.createOrUpdateResource('customresourcedefinition', resource);
+      const createdResource = await storage.createResource('customresourcedefinition', resource);
       
       res.status(201).json(createdResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete customresourcedefinition
+
+//delete collection of CustomResourceDefinition
   router.delete('/apis/apiextensions.k8s.io/v1/customresourcedefinitions', async (req, res, next) => {
     try {
-      const name = req.params.name;
-      logger.info(`Deleting customresourcedefinition ${name}`);
+
       
       try {
 
-        const deleted = await storage.deleteResource('customresourcedefinition', name);
+        const deleted = await storage.deleteAllResources('customresourcedefinition');
         
         if (!deleted) {
-          return handleResourceError(new Error(`customresourcedefinition ${name} not found}`), res);
+          return handleResourceError(new Error(`customresourcedefinition not found}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`customresourcedefinition ${name} not deleted. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`customresourcedefinition not deleted. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -170,7 +191,6 @@ export function createcustomresourcedefinitionRoutes(storage: Storage): express.
         metadata: {},
         status: 'Success',
         details: {
-          name: name,
           kind: 'customresourcedefinition'
         }
       });
@@ -178,10 +198,30 @@ export function createcustomresourcedefinitionRoutes(storage: Storage): express.
       next(error);
     }
   });
-    
-  
-  
-  // Get specific customresourcedefinition
+
+//watch individual changes to a list of CustomResourceDefinition. deprecated: use the 'watch' parameter with a list operation instead.
+  router.get('/apis/apiextensions.k8s.io/v1/watch/customresourcedefinitions', async (req, res, next) => {
+    try {
+      logger.info(`Listing customresourcedefinition`);
+      
+      const resources = await storage.listResources('customresourcedefinition');
+      
+      const response = {
+        kind: 'CustomresourcedefinitionList',
+        apiVersion: 'apiextensions.k8s.io/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//watch changes to an object of kind CustomResourceDefinition. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
   router.get('/apis/apiextensions.k8s.io/v1/watch/customresourcedefinitions/:name', async (req, res, next) => {
     try {
       const name = req.params.name;

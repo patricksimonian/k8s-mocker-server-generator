@@ -5,11 +5,16 @@
 */
 export interface io_k8s_api_apps_v1_DeploymentSpec {
 /**
+* DeploymentStrategy describes how to replace existing pods with new ones.
+* @isObject
+*/
+strategy?: { type?: 'Recreate' | 'RollingUpdate'; rollingUpdate?: { maxSurge?: string; maxUnavailable?: string } };
+/**
 * PodTemplateSpec describes the data a pod should have when created from a template
 * @required
 * @isObject
 */
-template: { spec?: Record<string, any>; metadata?: { deletionTimestamp?: Date; finalizers?: string[]; generation?: number; managedFields?: Array<{ operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string }>; name?: string; deletionGracePeriodSeconds?: number; namespace?: string; ownerReferences?: Array<{ kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean }>; resourceVersion?: string; selfLink?: string; creationTimestamp?: Date; labels?: Record<string, any>; uid?: string; annotations?: Record<string, any>; generateName?: string } };
+template: { metadata?: { creationTimestamp?: Date; deletionGracePeriodSeconds?: number; namespace?: string; uid?: string; annotations?: Record<string, any>; deletionTimestamp?: Date; finalizers?: string[]; generation?: number; labels?: Record<string, any>; name?: string; generateName?: string; managedFields?: Array<{ fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string }>; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; resourceVersion?: string; selfLink?: string }; spec?: Record<string, any> };
 /**
 * Minimum number of seconds for which a newly created pod should be ready without any of its container crashing, for it to be considered available. Defaults to 0 (pod will be considered available as soon as it is ready)
 */
@@ -36,11 +41,6 @@ revisionHistoryLimit?: number;
 * @isObject
 */
 selector: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> };
-/**
-* DeploymentStrategy describes how to replace existing pods with new ones.
-* @isObject
-*/
-strategy?: { rollingUpdate?: { maxSurge?: string; maxUnavailable?: string }; type?: 'Recreate' | 'RollingUpdate' };
 }
 
 /**
@@ -50,6 +50,7 @@ strategy?: { rollingUpdate?: { maxSurge?: string; maxUnavailable?: string }; typ
 */
 export function createio_k8s_api_apps_v1_DeploymentSpec(data?: Partial<io_k8s_api_apps_v1_DeploymentSpec>): io_k8s_api_apps_v1_DeploymentSpec {
  return {
+   strategy: data?.strategy !== undefined ? data.strategy : {},
    template: data?.template !== undefined ? data.template : {},
    minReadySeconds: data?.minReadySeconds !== undefined ? data.minReadySeconds : 0,
    paused: data?.paused !== undefined ? data.paused : false,
@@ -57,6 +58,5 @@ export function createio_k8s_api_apps_v1_DeploymentSpec(data?: Partial<io_k8s_ap
    replicas: data?.replicas !== undefined ? data.replicas : 0,
    revisionHistoryLimit: data?.revisionHistoryLimit !== undefined ? data.revisionHistoryLimit : 0,
    selector: data?.selector !== undefined ? data.selector : {},
-   strategy: data?.strategy !== undefined ? data.strategy : {},
  };
 }

@@ -353,6 +353,7 @@ func (g *Generator) loadTemplates() error {
 		"storage/index.ts.tmpl",
 		"middleware/auth.ts.tmpl",
 		"middleware/error-handler.ts.tmpl",
+		"middleware/cluster-handler.ts.tmpl",
 		"middleware/index.ts.tmpl",
 		"utils/index.ts.tmpl",
 		"utils/watch.ts.tmpl",
@@ -496,28 +497,6 @@ func (g *Generator) Generate() error {
 	// Generate tsconfig.json
 	if err := g.generateTSConfig(); err != nil {
 		return fmt.Errorf("failed to generate tsconfig.json: %w", err)
-	}
-
-	return nil
-}
-
-// createDirectoryStructure creates the directory structure for the generated code.
-func (g *Generator) createDirectoryStructure() error {
-	// Create directories
-	dirs := []string{
-		"src",
-		"src/models",
-		"src/routes",
-		"src/storage",
-		"src/middleware",
-		"src/utils",
-	}
-
-	for _, dir := range dirs {
-		path := filepath.Join(g.OutputDir, dir)
-		if err := os.MkdirAll(path, 0755); err != nil {
-			return fmt.Errorf("failed to create directory %s: %w", path, err)
-		}
 	}
 
 	return nil
@@ -1470,6 +1449,11 @@ func (g *Generator) generateMiddleware() error {
 	// Generate error handler middleware
 	if err := g.executeTemplate("middleware/error-handler.ts.tmpl", filepath.Join(g.OutputDir, "src", "middleware", "error-handler.ts"), nil); err != nil {
 		return fmt.Errorf("failed to generate error handler middleware: %w", err)
+	}
+
+	// Generate cluster handler middleware
+	if err := g.executeTemplate("middleware/cluster-handler.ts.tmpl", filepath.Join(g.OutputDir, "src", "middleware", "cluster-handler.ts"), nil); err != nil {
+		return fmt.Errorf("failed to generate cluster handler middleware: %w", err)
 	}
 
 	// Generate middleware index

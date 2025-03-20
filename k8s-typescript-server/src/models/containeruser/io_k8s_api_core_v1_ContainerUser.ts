@@ -8,7 +8,7 @@ export interface io_k8s_api_core_v1_ContainerUser {
 * LinuxContainerUser represents user identity information in Linux containers
 * @isObject
 */
-linux?: { gid: number; supplementalGroups?: number[]; uid: number };
+linux?: { supplementalGroups?: number[]; uid: number; gid: number };
 }
 
 /**

@@ -6,83 +6,38 @@ import { handleResourceError } from '../utils';
 
 export function createjobRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // List job
-  router.get('/apis/batch/v1/watch/jobs', async (req, res, next) => {
-    try {
-      logger.info(`Listing job`);
-      
-      const resources = await storage.listResources('job');
-      
-      const response = {
-        kind: 'JobList',
-        apiVersion: 'batch/v1',
-        metadata: {
-          resourceVersion: '1'
-        },
-        items: resources || []
-      };
-      
-      res.json(response);
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // List job
-  router.get('/apis/batch/v1/watch/namespaces/:namespace/jobs', async (req, res, next) => {
+
+//delete collection of Job
+  router.delete('/apis/batch/v1/namespaces/:namespace/jobs', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
-      logger.info(`Listing job in namespace ${namespace}`);
+      logger.info(`Deleting all job in namespace ${namespace}`);
+      try {
+
+        const deleted = await storage.deleteAllResources('job', namespace);
+        
+        if (!deleted) {
+          return handleResourceError(new Error(`job not found in namespace ${namespace}`), res);
+        }
+      } catch(e) {
+          return handleResourceError(new Error(`job not deleted in namespace ${namespace}. Error: ${(e as Error).message}`), res);
+      }
       
-      const resources = await storage.listResources('job', namespace);
-      
-      const response = {
-        kind: 'JobList',
-        apiVersion: 'batch/v1',
-        metadata: {
-          resourceVersion: '1'
-        },
-        items: resources || []
-      };
-      
-      res.json(response);
+      res.status(200).json({
+        kind: 'Status',
+        apiVersion: 'v1',
+        metadata: {},
+        status: 'Success',
+        details: {
+          kind: 'job'
+        }
+      });
     } catch (error) {
       next(error);
     }
   });
-    
-  
-  
-  // List job
-  router.get('/apis/batch/v1/jobs', async (req, res, next) => {
-    try {
-      logger.info(`Listing job`);
-      
-      const resources = await storage.listResources('job');
-      
-      const response = {
-        kind: 'JobList',
-        apiVersion: 'batch/v1',
-        metadata: {
-          resourceVersion: '1'
-        },
-        items: resources || []
-      };
-      
-      res.json(response);
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // List job
+
+//list or watch objects of kind Job
   router.get('/apis/batch/v1/namespaces/:namespace/jobs', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -104,7 +59,8 @@ export function createjobRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Create job
+
+//create a Job
   router.post('/apis/batch/v1/namespaces/:namespace/jobs', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -120,48 +76,37 @@ export function createjobRoutes(storage: Storage): express.Router {
       // Set namespace in metadata
       resource.metadata.namespace = namespace;
       
-      const createdResource = await storage.createOrUpdateResource('job', resource);
+      const createdResource = await storage.createResource('job', resource);
       
       res.status(201).json(createdResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete job
-  router.delete('/apis/batch/v1/namespaces/:namespace/jobs', async (req, res, next) => {
-    try {
-      const namespace = req.params.namespace;
-      const name = req.params.name;
-      logger.info(`Deleting job ${name} in namespace ${namespace}`);
-      try {
 
-        const deleted = await storage.deleteResource('job', name, namespace);
-        
-        if (!deleted) {
-          return handleResourceError(new Error(`job ${name} not found in namespace ${namespace}`), res);
-        }
-      } catch(e) {
-          return handleResourceError(new Error(`job ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message)}`), res);
-      }
+//list or watch objects of kind Job
+  router.get('/apis/batch/v1/jobs', async (req, res, next) => {
+    try {
+      logger.info(`Listing job`);
       
-      res.status(200).json({
-        kind: 'Status',
-        apiVersion: 'v1',
-        metadata: {},
-        status: 'Success',
-        details: {
-          name: name,
-          kind: 'job'
-        }
-      });
+      const resources = await storage.listResources('job');
+      
+      const response = {
+        kind: 'JobList',
+        apiVersion: 'batch/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
     } catch (error) {
       next(error);
     }
   });
-    
-  
-  
-  // Get specific job
+
+//watch changes to an object of kind Job. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
   router.get('/apis/batch/v1/watch/namespaces/:namespace/jobs/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -179,10 +124,79 @@ export function createjobRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // Get specific job
+
+//watch individual changes to a list of Job. deprecated: use the 'watch' parameter with a list operation instead.
+  router.get('/apis/batch/v1/watch/jobs', async (req, res, next) => {
+    try {
+      logger.info(`Listing job`);
+      
+      const resources = await storage.listResources('job');
+      
+      const response = {
+        kind: 'JobList',
+        apiVersion: 'batch/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//replace status of the specified Job
+  router.put('/apis/batch/v1/namespaces/:namespace/jobs/:name/status', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Updating job ${name} in namespace ${namespace}`);
+      
+      const resource = req.body;
+      
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
+      }
+      
+      // Set name and namespace in metadata
+      resource.metadata.name = name;
+      resource.metadata.namespace = namespace;
+      
+      const updatedResource = await storage.updateResource('job', name, resource);
+      
+      res.json(updatedResource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//read status of the specified Job
+  router.get('/apis/batch/v1/namespaces/:namespace/jobs/:name/status', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      logger.info(`Listing job in namespace ${namespace}`);
+      
+      const resources = await storage.listResources('job', namespace);
+      
+      const response = {
+        kind: 'JobList',
+        apiVersion: 'batch/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//read the specified Job
   router.get('/apis/batch/v1/namespaces/:namespace/jobs/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -200,7 +214,8 @@ export function createjobRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Update job
+
+//replace the specified Job
   router.put('/apis/batch/v1/namespaces/:namespace/jobs/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -218,14 +233,15 @@ export function createjobRoutes(storage: Storage): express.Router {
       resource.metadata.name = name;
       resource.metadata.namespace = namespace;
       
-      const updatedResource = await storage.createOrUpdateResource('job', resource);
+      const updatedResource = await storage.updateResource('job', name, resource);
       
       res.json(updatedResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete job
+
+//delete a Job
   router.delete('/apis/batch/v1/namespaces/:namespace/jobs/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -239,7 +255,7 @@ export function createjobRoutes(storage: Storage): express.Router {
           return handleResourceError(new Error(`job ${name} not found in namespace ${namespace}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`job ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`job ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -252,6 +268,29 @@ export function createjobRoutes(storage: Storage): express.Router {
           kind: 'job'
         }
       });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//watch individual changes to a list of Job. deprecated: use the 'watch' parameter with a list operation instead.
+  router.get('/apis/batch/v1/watch/namespaces/:namespace/jobs', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      logger.info(`Listing job in namespace ${namespace}`);
+      
+      const resources = await storage.listResources('job', namespace);
+      
+      const response = {
+        kind: 'JobList',
+        apiVersion: 'batch/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
     } catch (error) {
       next(error);
     }

@@ -15,20 +15,20 @@ The resulting set of endpoints can be viewed as:
 */
 export interface io_k8s_api_core_v1_EndpointSubset {
 /**
-* IP addresses which offer the related ports that are marked as ready. These endpoints should be considered safe for load balancers and clients to utilize.
-* @isArray
-*/
-addresses?: Array<{ hostname?: string; ip: string; nodeName?: string; targetRef?: { fieldPath?: string; kind?: string; name?: string; namespace?: string; resourceVersion?: string; uid?: string; apiVersion?: string } }>;
-/**
 * IP addresses which offer the related ports but are not currently marked as ready because they have not yet finished starting, have recently failed a readiness check, or have recently failed a liveness check.
 * @isArray
 */
-notReadyAddresses?: Array<{ hostname?: string; ip: string; nodeName?: string; targetRef?: { kind?: string; name?: string; namespace?: string; resourceVersion?: string; uid?: string; apiVersion?: string; fieldPath?: string } }>;
+notReadyAddresses?: Array<{ targetRef?: { namespace?: string; resourceVersion?: string; uid?: string; apiVersion?: string; fieldPath?: string; kind?: string; name?: string }; hostname?: string; ip: string; nodeName?: string }>;
 /**
 * Port numbers available on the related IP addresses.
 * @isArray
 */
 ports?: Array<{ appProtocol?: string; name?: string; port: number; protocol?: 'SCTP' | 'TCP' | 'UDP' }>;
+/**
+* IP addresses which offer the related ports that are marked as ready. These endpoints should be considered safe for load balancers and clients to utilize.
+* @isArray
+*/
+addresses?: Array<{ ip: string; nodeName?: string; targetRef?: { apiVersion?: string; fieldPath?: string; kind?: string; name?: string; namespace?: string; resourceVersion?: string; uid?: string }; hostname?: string }>;
 }
 
 /**
@@ -38,8 +38,8 @@ ports?: Array<{ appProtocol?: string; name?: string; port: number; protocol?: 'S
 */
 export function createio_k8s_api_core_v1_EndpointSubset(data?: Partial<io_k8s_api_core_v1_EndpointSubset>): io_k8s_api_core_v1_EndpointSubset {
  return {
-   addresses: data?.addresses !== undefined ? data.addresses : [],
    notReadyAddresses: data?.notReadyAddresses !== undefined ? data.notReadyAddresses : [],
    ports: data?.ports !== undefined ? data.ports : [],
+   addresses: data?.addresses !== undefined ? data.addresses : [],
  };
 }

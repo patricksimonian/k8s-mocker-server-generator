@@ -5,6 +5,18 @@
 */
 export interface io_k8s_api_admissionregistration_v1_ValidatingAdmissionPolicySpec {
 /**
+* Validations contain CEL expressions which is used to apply the validation. Validations and AuditAnnotations may not both be empty; a minimum of one Validations or AuditAnnotations is required.
+* @isArray
+*/
+validations?: Array<{ expression: string; message?: string; messageExpression?: string; reason?: string }>;
+/**
+* Variables contain definitions of variables that can be used in composition of other expressions. Each variable is defined as a named CEL expression. The variables defined here will be available under `variables` in other expressions of the policy except MatchConditions because MatchConditions are evaluated before the rest of the policy.
+
+The expression of a variable can refer to other variables defined earlier in the list but not those after. Thus, Variables must be sorted by the order of first appearance and acyclic.
+* @isArray
+*/
+variables?: Array<{ expression: string; name: string }>;
+/**
 * auditAnnotations contains CEL expressions which are used to produce audit annotations for the audit event of the API request. validations and auditAnnotations may not both be empty; a least one of validations or auditAnnotations is required.
 * @isArray
 */
@@ -43,24 +55,12 @@ matchConditions?: Array<{ name: string; expression: string }>;
 * MatchResources decides whether to run the admission control policy on an object based on whether it meets the match criteria. The exclude rules take precedence over include rules (if a resource matches both, it is excluded)
 * @isObject
 */
-matchConstraints?: { excludeResourceRules?: Array<{ operations?: '*' | 'CONNECT' | 'CREATE' | 'DELETE' | 'UPDATE'[]; resourceNames?: string[]; resources?: string[]; scope?: string; apiGroups?: string[]; apiVersions?: string[] }>; matchPolicy?: 'Equivalent' | 'Exact'; namespaceSelector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> }; objectSelector?: { matchExpressions?: Array<{ operator: string; values?: string[]; key: string }>; matchLabels?: Record<string, any> }; resourceRules?: Array<{ scope?: string; apiGroups?: string[]; apiVersions?: string[]; operations?: '*' | 'CONNECT' | 'CREATE' | 'DELETE' | 'UPDATE'[]; resourceNames?: string[]; resources?: string[] }> };
+matchConstraints?: { objectSelector?: { matchExpressions?: Array<{ operator: string; values?: string[]; key: string }>; matchLabels?: Record<string, any> }; resourceRules?: Array<{ operations?: '*' | 'CONNECT' | 'CREATE' | 'DELETE' | 'UPDATE'[]; resourceNames?: string[]; resources?: string[]; scope?: string; apiGroups?: string[]; apiVersions?: string[] }>; excludeResourceRules?: Array<{ resourceNames?: string[]; resources?: string[]; scope?: string; apiGroups?: string[]; apiVersions?: string[]; operations?: '*' | 'CONNECT' | 'CREATE' | 'DELETE' | 'UPDATE'[] }>; matchPolicy?: 'Equivalent' | 'Exact'; namespaceSelector?: { matchExpressions?: Array<{ operator: string; values?: string[]; key: string }>; matchLabels?: Record<string, any> } };
 /**
 * ParamKind is a tuple of Group Kind and Version.
 * @isObject
 */
-paramKind?: { apiVersion?: string; kind?: string };
-/**
-* Validations contain CEL expressions which is used to apply the validation. Validations and AuditAnnotations may not both be empty; a minimum of one Validations or AuditAnnotations is required.
-* @isArray
-*/
-validations?: Array<{ expression: string; message?: string; messageExpression?: string; reason?: string }>;
-/**
-* Variables contain definitions of variables that can be used in composition of other expressions. Each variable is defined as a named CEL expression. The variables defined here will be available under `variables` in other expressions of the policy except MatchConditions because MatchConditions are evaluated before the rest of the policy.
-
-The expression of a variable can refer to other variables defined earlier in the list but not those after. Thus, Variables must be sorted by the order of first appearance and acyclic.
-* @isArray
-*/
-variables?: Array<{ expression: string; name: string }>;
+paramKind?: { kind?: string; apiVersion?: string };
 }
 
 /**
@@ -70,12 +70,12 @@ variables?: Array<{ expression: string; name: string }>;
 */
 export function createio_k8s_api_admissionregistration_v1_ValidatingAdmissionPolicySpec(data?: Partial<io_k8s_api_admissionregistration_v1_ValidatingAdmissionPolicySpec>): io_k8s_api_admissionregistration_v1_ValidatingAdmissionPolicySpec {
  return {
+   validations: data?.validations !== undefined ? data.validations : [],
+   variables: data?.variables !== undefined ? data.variables : [],
    auditAnnotations: data?.auditAnnotations !== undefined ? data.auditAnnotations : [],
    failurePolicy: data?.failurePolicy !== undefined ? data.failurePolicy : '',
    matchConditions: data?.matchConditions !== undefined ? data.matchConditions : [],
    matchConstraints: data?.matchConstraints !== undefined ? data.matchConstraints : {},
    paramKind: data?.paramKind !== undefined ? data.paramKind : {},
-   validations: data?.validations !== undefined ? data.validations : [],
-   variables: data?.variables !== undefined ? data.variables : [],
  };
 }

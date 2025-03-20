@@ -5,16 +5,6 @@
 */
 export interface io_k8s_api_admissionregistration_v1_RuleWithOperations {
 /**
-* APIVersions is the API versions the resources belong to. '*' is all versions. If '*' is present, the length of the slice must be one. Required.
-* @isArray
-*/
-apiVersions?: string[];
-/**
-* Operations is the operations the admission hook cares about - CREATE, UPDATE, DELETE, CONNECT or * for all of those operations and any future admission operations that are added. If '*' is present, the length of the slice must be one. Required.
-* @isArray
-*/
-operations?: '*' | 'CONNECT' | 'CREATE' | 'DELETE' | 'UPDATE'[];
-/**
 * Resources is a list of resources this rule applies to.
 
 For example: 'pods' means pods. 'pods/log' means the log subresource of pods. '*' means all resources, but not subresources. 'pods/*' means all subresources of pods. '*\/scale' means all scale subresources. '*\/*' means all resources and their subresources.
@@ -34,6 +24,16 @@ scope?: string;
 * @isArray
 */
 apiGroups?: string[];
+/**
+* APIVersions is the API versions the resources belong to. '*' is all versions. If '*' is present, the length of the slice must be one. Required.
+* @isArray
+*/
+apiVersions?: string[];
+/**
+* Operations is the operations the admission hook cares about - CREATE, UPDATE, DELETE, CONNECT or * for all of those operations and any future admission operations that are added. If '*' is present, the length of the slice must be one. Required.
+* @isArray
+*/
+operations?: '*' | 'CONNECT' | 'CREATE' | 'DELETE' | 'UPDATE'[];
 }
 
 /**
@@ -43,10 +43,10 @@ apiGroups?: string[];
 */
 export function createio_k8s_api_admissionregistration_v1_RuleWithOperations(data?: Partial<io_k8s_api_admissionregistration_v1_RuleWithOperations>): io_k8s_api_admissionregistration_v1_RuleWithOperations {
  return {
-   apiVersions: data?.apiVersions !== undefined ? data.apiVersions : [],
-   operations: data?.operations !== undefined ? data.operations : [],
    resources: data?.resources !== undefined ? data.resources : [],
    scope: data?.scope !== undefined ? data.scope : '',
    apiGroups: data?.apiGroups !== undefined ? data.apiGroups : [],
+   apiVersions: data?.apiVersions !== undefined ? data.apiVersions : [],
+   operations: data?.operations !== undefined ? data.operations : [],
  };
 }

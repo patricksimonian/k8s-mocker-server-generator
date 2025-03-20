@@ -6,7 +6,8 @@ import { handleResourceError } from '../utils';
 
 export function createlocalsubjectaccessreviewRoutes(storage: Storage): express.Router {
   const router = express.Router();
-  // Create localsubjectaccessreview
+
+//create a LocalSubjectAccessReview
   router.post('/apis/authorization.k8s.io/v1/namespaces/:namespace/localsubjectaccessreviews', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -22,7 +23,7 @@ export function createlocalsubjectaccessreviewRoutes(storage: Storage): express.
       // Set namespace in metadata
       resource.metadata.namespace = namespace;
       
-      const createdResource = await storage.createOrUpdateResource('localsubjectaccessreview', resource);
+      const createdResource = await storage.createResource('localsubjectaccessreview', resource);
       
       res.status(201).json(createdResource);
     } catch (error) {

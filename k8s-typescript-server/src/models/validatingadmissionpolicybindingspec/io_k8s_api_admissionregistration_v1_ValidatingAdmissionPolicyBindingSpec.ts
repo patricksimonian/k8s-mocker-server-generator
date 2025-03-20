@@ -5,15 +5,10 @@
 */
 export interface io_k8s_api_admissionregistration_v1_ValidatingAdmissionPolicyBindingSpec {
 /**
-* MatchResources decides whether to run the admission control policy on an object based on whether it meets the match criteria. The exclude rules take precedence over include rules (if a resource matches both, it is excluded)
-* @isObject
-*/
-matchResources?: { excludeResourceRules?: Array<{ operations?: '*' | 'CONNECT' | 'CREATE' | 'DELETE' | 'UPDATE'[]; resourceNames?: string[]; resources?: string[]; scope?: string; apiGroups?: string[]; apiVersions?: string[] }>; matchPolicy?: 'Equivalent' | 'Exact'; namespaceSelector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> }; objectSelector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> }; resourceRules?: Array<{ operations?: '*' | 'CONNECT' | 'CREATE' | 'DELETE' | 'UPDATE'[]; resourceNames?: string[]; resources?: string[]; scope?: string; apiGroups?: string[]; apiVersions?: string[] }> };
-/**
 * ParamRef describes how to locate the params to be used as input to expressions of rules applied by a policy binding.
 * @isObject
 */
-paramRef?: { name?: string; namespace?: string; parameterNotFoundAction?: string; selector?: { matchLabels?: Record<string, any>; matchExpressions?: Array<{ key: string; operator: string; values?: string[] }> } };
+paramRef?: { selector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> }; name?: string; namespace?: string; parameterNotFoundAction?: string };
 /**
 * PolicyName references a ValidatingAdmissionPolicy name which the ValidatingAdmissionPolicyBinding binds to. If the referenced resource does not exist, this binding is considered invalid and will be ignored Required.
 */
@@ -41,6 +36,11 @@ Required.
 * @isArray
 */
 validationActions?: 'Audit' | 'Deny' | 'Warn'[];
+/**
+* MatchResources decides whether to run the admission control policy on an object based on whether it meets the match criteria. The exclude rules take precedence over include rules (if a resource matches both, it is excluded)
+* @isObject
+*/
+matchResources?: { matchPolicy?: 'Equivalent' | 'Exact'; namespaceSelector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> }; objectSelector?: { matchExpressions?: Array<{ key: string; operator: string; values?: string[] }>; matchLabels?: Record<string, any> }; resourceRules?: Array<{ operations?: '*' | 'CONNECT' | 'CREATE' | 'DELETE' | 'UPDATE'[]; resourceNames?: string[]; resources?: string[]; scope?: string; apiGroups?: string[]; apiVersions?: string[] }>; excludeResourceRules?: Array<{ apiVersions?: string[]; operations?: '*' | 'CONNECT' | 'CREATE' | 'DELETE' | 'UPDATE'[]; resourceNames?: string[]; resources?: string[]; scope?: string; apiGroups?: string[] }> };
 }
 
 /**
@@ -50,9 +50,9 @@ validationActions?: 'Audit' | 'Deny' | 'Warn'[];
 */
 export function createio_k8s_api_admissionregistration_v1_ValidatingAdmissionPolicyBindingSpec(data?: Partial<io_k8s_api_admissionregistration_v1_ValidatingAdmissionPolicyBindingSpec>): io_k8s_api_admissionregistration_v1_ValidatingAdmissionPolicyBindingSpec {
  return {
-   matchResources: data?.matchResources !== undefined ? data.matchResources : {},
    paramRef: data?.paramRef !== undefined ? data.paramRef : {},
    policyName: data?.policyName !== undefined ? data.policyName : '',
    validationActions: data?.validationActions !== undefined ? data.validationActions : [],
+   matchResources: data?.matchResources !== undefined ? data.matchResources : {},
  };
 }

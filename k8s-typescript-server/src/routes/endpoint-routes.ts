@@ -6,10 +6,8 @@ import { handleResourceError } from '../utils';
 
 export function createendpointRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // List endpoint
+
+//watch individual changes to a list of Endpoints. deprecated: use the 'watch' parameter with a list operation instead.
   router.get('/api/v1/watch/namespaces/:namespace/endpoints', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -31,10 +29,8 @@ export function createendpointRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // Get specific endpoint
+
+//read the specified Endpoints
   router.get('/api/v1/namespaces/:namespace/endpoints/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -52,7 +48,8 @@ export function createendpointRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Update endpoint
+
+//replace the specified Endpoints
   router.put('/api/v1/namespaces/:namespace/endpoints/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -70,14 +67,15 @@ export function createendpointRoutes(storage: Storage): express.Router {
       resource.metadata.name = name;
       resource.metadata.namespace = namespace;
       
-      const updatedResource = await storage.createOrUpdateResource('endpoint', resource);
+      const updatedResource = await storage.updateResource('endpoint', name, resource);
       
       res.json(updatedResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete endpoint
+
+//delete Endpoints
   router.delete('/api/v1/namespaces/:namespace/endpoints/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -91,7 +89,7 @@ export function createendpointRoutes(storage: Storage): express.Router {
           return handleResourceError(new Error(`endpoint ${name} not found in namespace ${namespace}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`endpoint ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`endpoint ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -108,10 +106,8 @@ export function createendpointRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // List endpoint
+
+//watch individual changes to a list of Endpoints. deprecated: use the 'watch' parameter with a list operation instead.
   router.get('/api/v1/watch/endpoints', async (req, res, next) => {
     try {
       logger.info(`Listing endpoint`);
@@ -132,55 +128,8 @@ export function createendpointRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-    
-  
-  
-  // List endpoint
-  router.get('/api/v1/endpoints', async (req, res, next) => {
-    try {
-      logger.info(`Listing endpoint`);
-      
-      const resources = await storage.listResources('endpoint');
-      
-      const response = {
-        kind: 'EndpointList',
-        apiVersion: 'v1',
-        metadata: {
-          resourceVersion: '1'
-        },
-        items: resources || []
-      };
-      
-      res.json(response);
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // Get specific endpoint
-  router.get('/api/v1/watch/namespaces/:namespace/endpoints/:name', async (req, res, next) => {
-    try {
-      const namespace = req.params.namespace;
-      const name = req.params.name;
-      logger.info(`Getting endpoint ${name} in namespace ${namespace}`);
-      
-      const resource = await storage.getResource('endpoint', name, namespace);
-      
-      if (!resource) {
-        return handleResourceError(new Error(`endpoint ${name} not found in namespace ${namespace}`), res);
-      }
-      
-      res.json(resource);
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // List endpoint
+
+//list or watch objects of kind Endpoints
   router.get('/api/v1/namespaces/:namespace/endpoints', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -202,7 +151,8 @@ export function createendpointRoutes(storage: Storage): express.Router {
       next(error);
     }
   });
-  // Create endpoint
+
+//create Endpoints
   router.post('/api/v1/namespaces/:namespace/endpoints', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -218,28 +168,28 @@ export function createendpointRoutes(storage: Storage): express.Router {
       // Set namespace in metadata
       resource.metadata.namespace = namespace;
       
-      const createdResource = await storage.createOrUpdateResource('endpoint', resource);
+      const createdResource = await storage.createResource('endpoint', resource);
       
       res.status(201).json(createdResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete endpoint
+
+//delete collection of Endpoints
   router.delete('/api/v1/namespaces/:namespace/endpoints', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
-      const name = req.params.name;
-      logger.info(`Deleting endpoint ${name} in namespace ${namespace}`);
+      logger.info(`Deleting all endpoint in namespace ${namespace}`);
       try {
 
-        const deleted = await storage.deleteResource('endpoint', name, namespace);
+        const deleted = await storage.deleteAllResources('endpoint', namespace);
         
         if (!deleted) {
-          return handleResourceError(new Error(`endpoint ${name} not found in namespace ${namespace}`), res);
+          return handleResourceError(new Error(`endpoint not found in namespace ${namespace}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`endpoint ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`endpoint not deleted in namespace ${namespace}. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -248,10 +198,50 @@ export function createendpointRoutes(storage: Storage): express.Router {
         metadata: {},
         status: 'Success',
         details: {
-          name: name,
           kind: 'endpoint'
         }
       });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//watch changes to an object of kind Endpoints. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
+  router.get('/api/v1/watch/namespaces/:namespace/endpoints/:name', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Getting endpoint ${name} in namespace ${namespace}`);
+      
+      const resource = await storage.getResource('endpoint', name, namespace);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`endpoint ${name} not found in namespace ${namespace}`), res);
+      }
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//list or watch objects of kind Endpoints
+  router.get('/api/v1/endpoints', async (req, res, next) => {
+    try {
+      logger.info(`Listing endpoint`);
+      
+      const resources = await storage.listResources('endpoint');
+      
+      const response = {
+        kind: 'EndpointList',
+        apiVersion: 'v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
     } catch (error) {
       next(error);
     }

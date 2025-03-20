@@ -16,17 +16,17 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { resourceVersion?: string; deletionGracePeriodSeconds?: number; managedFields?: Array<{ subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string }>; generation?: number; deletionTimestamp?: Date; finalizers?: string[]; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; selfLink?: string; labels?: Record<string, any>; namespace?: string; generateName?: string; name?: string; uid?: string; annotations?: Record<string, any>; creationTimestamp?: Date };
+metadata?: { deletionTimestamp?: Date; finalizers?: string[]; generation?: number; annotations?: Record<string, any>; creationTimestamp?: Date; generateName?: string; labels?: Record<string, any>; managedFields?: Array<{ fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string }>; namespace?: string; deletionGracePeriodSeconds?: number; name?: string; ownerReferences?: Array<{ blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string; apiVersion: string }>; resourceVersion?: string; selfLink?: string; uid?: string };
 /**
 * ReplicaSetSpec is the specification of a ReplicaSet.
 * @isObject
 */
-spec?: { minReadySeconds?: number; replicas?: number; selector: { matchExpressions?: Array<{ operator: string; values?: string[]; key: string }>; matchLabels?: Record<string, any> }; template?: { metadata?: { selfLink?: string; finalizers?: string[]; generation?: number; uid?: string; deletionGracePeriodSeconds?: number; name?: string; ownerReferences?: Array<{ kind: string; name: string; uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean }>; creationTimestamp?: Date; generateName?: string; labels?: Record<string, any>; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; namespace?: string; resourceVersion?: string; annotations?: Record<string, any>; deletionTimestamp?: Date }; spec?: Record<string, any> } };
+spec?: { selector: { matchExpressions?: Array<{ operator: string; values?: string[]; key: string }>; matchLabels?: Record<string, any> }; template?: { metadata?: { deletionTimestamp?: Date; uid?: string; annotations?: Record<string, any>; finalizers?: string[]; namespace?: string; ownerReferences?: Array<{ blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string; apiVersion: string }>; name?: string; creationTimestamp?: Date; deletionGracePeriodSeconds?: number; generateName?: string; generation?: number; labels?: Record<string, any>; managedFields?: Array<{ time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string }>; resourceVersion?: string; selfLink?: string }; spec?: Record<string, any> }; minReadySeconds?: number; replicas?: number };
 /**
 * ReplicaSetStatus represents the current status of a ReplicaSet.
 * @isObject
 */
-status?: { observedGeneration?: number; readyReplicas?: number; replicas: number; availableReplicas?: number; conditions?: Array<{ message?: string; reason?: string; status: string; type: string; lastTransitionTime?: Date }>; fullyLabeledReplicas?: number };
+status?: { availableReplicas?: number; conditions?: Array<{ lastTransitionTime?: Date; message?: string; reason?: string; status: string; type: string }>; fullyLabeledReplicas?: number; observedGeneration?: number; readyReplicas?: number; replicas: number };
 }
 
 /**

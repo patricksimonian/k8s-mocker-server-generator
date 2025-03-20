@@ -6,10 +6,52 @@ import { handleResourceError } from '../utils';
 
 export function createcontrollerrevisionRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // Get specific controllerrevision
+
+//list or watch objects of kind ControllerRevision
+  router.get('/apis/apps/v1/controllerrevisions', async (req, res, next) => {
+    try {
+      logger.info(`Listing controllerrevision`);
+      
+      const resources = await storage.listResources('controllerrevision');
+      
+      const response = {
+        kind: 'ControllerrevisionList',
+        apiVersion: 'apps/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//watch individual changes to a list of ControllerRevision. deprecated: use the 'watch' parameter with a list operation instead.
+  router.get('/apis/apps/v1/watch/controllerrevisions', async (req, res, next) => {
+    try {
+      logger.info(`Listing controllerrevision`);
+      
+      const resources = await storage.listResources('controllerrevision');
+      
+      const response = {
+        kind: 'ControllerrevisionList',
+        apiVersion: 'apps/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
+      
+      res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//read the specified ControllerRevision
   router.get('/apis/apps/v1/namespaces/:namespace/controllerrevisions/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -27,7 +69,8 @@ export function createcontrollerrevisionRoutes(storage: Storage): express.Router
       next(error);
     }
   });
-  // Update controllerrevision
+
+//replace the specified ControllerRevision
   router.put('/apis/apps/v1/namespaces/:namespace/controllerrevisions/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -45,14 +88,15 @@ export function createcontrollerrevisionRoutes(storage: Storage): express.Router
       resource.metadata.name = name;
       resource.metadata.namespace = namespace;
       
-      const updatedResource = await storage.createOrUpdateResource('controllerrevision', resource);
+      const updatedResource = await storage.updateResource('controllerrevision', name, resource);
       
       res.json(updatedResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete controllerrevision
+
+//delete a ControllerRevision
   router.delete('/apis/apps/v1/namespaces/:namespace/controllerrevisions/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -66,7 +110,7 @@ export function createcontrollerrevisionRoutes(storage: Storage): express.Router
           return handleResourceError(new Error(`controllerrevision ${name} not found in namespace ${namespace}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`controllerrevision ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`controllerrevision ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -83,89 +127,27 @@ export function createcontrollerrevisionRoutes(storage: Storage): express.Router
       next(error);
     }
   });
-    
-  
-  
-  // List controllerrevision
-  router.get('/apis/apps/v1/namespaces/:namespace/controllerrevisions', async (req, res, next) => {
-    try {
-      const namespace = req.params.namespace;
-      logger.info(`Listing controllerrevision in namespace ${namespace}`);
-      
-      const resources = await storage.listResources('controllerrevision', namespace);
-      
-      const response = {
-        kind: 'ControllerrevisionList',
-        apiVersion: 'apps/v1',
-        metadata: {
-          resourceVersion: '1'
-        },
-        items: resources || []
-      };
-      
-      res.json(response);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Create controllerrevision
-  router.post('/apis/apps/v1/namespaces/:namespace/controllerrevisions', async (req, res, next) => {
-    try {
-      const namespace = req.params.namespace;
-      logger.info(`Creating controllerrevision in namespace ${namespace}`);
-      
-      const resource = req.body;
-      
-      // Ensure resource has metadata
-      if (!resource.metadata) {
-        resource.metadata = {};
-      }
-      
-      // Set namespace in metadata
-      resource.metadata.namespace = namespace;
-      
-      const createdResource = await storage.createOrUpdateResource('controllerrevision', resource);
-      
-      res.status(201).json(createdResource);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Delete controllerrevision
-  router.delete('/apis/apps/v1/namespaces/:namespace/controllerrevisions', async (req, res, next) => {
+
+//watch changes to an object of kind ControllerRevision. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
+  router.get('/apis/apps/v1/watch/namespaces/:namespace/controllerrevisions/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
       const name = req.params.name;
-      logger.info(`Deleting controllerrevision ${name} in namespace ${namespace}`);
-      try {
-
-        const deleted = await storage.deleteResource('controllerrevision', name, namespace);
-        
-        if (!deleted) {
-          return handleResourceError(new Error(`controllerrevision ${name} not found in namespace ${namespace}`), res);
-        }
-      } catch(e) {
-          return handleResourceError(new Error(`controllerrevision ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message)}`), res);
+      logger.info(`Getting controllerrevision ${name} in namespace ${namespace}`);
+      
+      const resource = await storage.getResource('controllerrevision', name, namespace);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`controllerrevision ${name} not found in namespace ${namespace}`), res);
       }
       
-      res.status(200).json({
-        kind: 'Status',
-        apiVersion: 'v1',
-        metadata: {},
-        status: 'Success',
-        details: {
-          name: name,
-          kind: 'controllerrevision'
-        }
-      });
+      res.json(resource);
     } catch (error) {
       next(error);
     }
   });
-    
-  
-  
-  // List controllerrevision
+
+//watch individual changes to a list of ControllerRevision. deprecated: use the 'watch' parameter with a list operation instead.
   router.get('/apis/apps/v1/watch/namespaces/:namespace/controllerrevisions', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -187,60 +169,68 @@ export function createcontrollerrevisionRoutes(storage: Storage): express.Router
       next(error);
     }
   });
-    
-  
-  
-  // List controllerrevision
-  router.get('/apis/apps/v1/controllerrevisions', async (req, res, next) => {
-    try {
-      logger.info(`Listing controllerrevision`);
-      
-      const resources = await storage.listResources('controllerrevision');
-      
-      const response = {
-        kind: 'ControllerrevisionList',
-        apiVersion: 'apps/v1',
-        metadata: {
-          resourceVersion: '1'
-        },
-        items: resources || []
-      };
-      
-      res.json(response);
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // Get specific controllerrevision
-  router.get('/apis/apps/v1/watch/namespaces/:namespace/controllerrevisions/:name', async (req, res, next) => {
+
+//create a ControllerRevision
+  router.post('/apis/apps/v1/namespaces/:namespace/controllerrevisions', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
-      const name = req.params.name;
-      logger.info(`Getting controllerrevision ${name} in namespace ${namespace}`);
+      logger.info(`Creating controllerrevision in namespace ${namespace}`);
       
-      const resource = await storage.getResource('controllerrevision', name, namespace);
+      const resource = req.body;
       
-      if (!resource) {
-        return handleResourceError(new Error(`controllerrevision ${name} not found in namespace ${namespace}`), res);
+      // Ensure resource has metadata
+      if (!resource.metadata) {
+        resource.metadata = {};
       }
       
-      res.json(resource);
+      // Set namespace in metadata
+      resource.metadata.namespace = namespace;
+      
+      const createdResource = await storage.createResource('controllerrevision', resource);
+      
+      res.status(201).json(createdResource);
     } catch (error) {
       next(error);
     }
   });
-    
-  
-  
-  // List controllerrevision
-  router.get('/apis/apps/v1/watch/controllerrevisions', async (req, res, next) => {
+
+//delete collection of ControllerRevision
+  router.delete('/apis/apps/v1/namespaces/:namespace/controllerrevisions', async (req, res, next) => {
     try {
-      logger.info(`Listing controllerrevision`);
+      const namespace = req.params.namespace;
+      logger.info(`Deleting all controllerrevision in namespace ${namespace}`);
+      try {
+
+        const deleted = await storage.deleteAllResources('controllerrevision', namespace);
+        
+        if (!deleted) {
+          return handleResourceError(new Error(`controllerrevision not found in namespace ${namespace}`), res);
+        }
+      } catch(e) {
+          return handleResourceError(new Error(`controllerrevision not deleted in namespace ${namespace}. Error: ${(e as Error).message}`), res);
+      }
       
-      const resources = await storage.listResources('controllerrevision');
+      res.status(200).json({
+        kind: 'Status',
+        apiVersion: 'v1',
+        metadata: {},
+        status: 'Success',
+        details: {
+          kind: 'controllerrevision'
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//list or watch objects of kind ControllerRevision
+  router.get('/apis/apps/v1/namespaces/:namespace/controllerrevisions', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      logger.info(`Listing controllerrevision in namespace ${namespace}`);
+      
+      const resources = await storage.listResources('controllerrevision', namespace);
       
       const response = {
         kind: 'ControllerrevisionList',

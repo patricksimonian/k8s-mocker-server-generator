@@ -16,7 +16,7 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { namespace?: string; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; deletionTimestamp?: Date; name?: string; selfLink?: string; finalizers?: string[]; deletionGracePeriodSeconds?: number; labels?: Record<string, any>; uid?: string; annotations?: Record<string, any>; generateName?: string; generation?: number; managedFields?: Array<{ operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string }>; resourceVersion?: string; creationTimestamp?: Date };
+metadata?: { deletionGracePeriodSeconds?: number; deletionTimestamp?: Date; generateName?: string; namespace?: string; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; creationTimestamp?: Date; labels?: Record<string, any>; managedFields?: Array<{ apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date }>; name?: string; resourceVersion?: string; annotations?: Record<string, any>; generation?: number; selfLink?: string; finalizers?: string[]; uid?: string };
 /**
 * PriorityLevelConfigurationSpec specifies the configuration of a priority level.
 * @isObject
@@ -26,7 +26,7 @@ spec?: { exempt?: { lendablePercent?: number; nominalConcurrencyShares?: number 
 * PriorityLevelConfigurationStatus represents the current state of a "request-priority".
 * @isObject
 */
-status?: { conditions?: Array<{ type?: string; lastTransitionTime?: Date; message?: string; reason?: string; status?: string }> };
+status?: { conditions?: Array<{ message?: string; reason?: string; status?: string; type?: string; lastTransitionTime?: Date }> };
 }
 
 /**

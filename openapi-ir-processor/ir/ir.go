@@ -9,6 +9,12 @@ import (
 	"github.com/jinzhu/inflection"
 )
 
+var operationalVerbs = []string{
+	"/finalize", "/binding", "/eviction", "/scale", "/status", "/token", "/approval", "/log",
+	"/exec", "/attach", "/portforward", "/proxy", "/redirect", "/watch", "/connect", "/bind",
+	"/metrics", "/metrics/proxy", "/metrics/portforward",
+}
+
 // isVersion checks if a segment matches a version pattern like "v1" or "v1beta1".
 func isVersion(segment string) bool {
 	re := regexp.MustCompile(`^v\d+((alpha|beta)\d+)?$`)
@@ -173,14 +179,27 @@ func GenerateIR(spec SwaggerSpec) IR {
 			}
 
 			convertedPath := convertPath(path)
-			resourceType := deriveResourceTypeForEndpointFromPath(convertedPath)
+			isOperational := isOperationalEndpoint(convertedPath)
+			resourceTypePath := convertedPath
+			if isOperational != "" {
+				fmt.Printf("Operational endpoint: %v\n", resourceTypePath)
+				resourceTypePath = isOperational
+			}
+
+			resourceType := deriveResourceTypeForEndpointFromPath(resourceTypePath)
+			if isOperational != "" {
+				fmt.Printf("Operational endpoint rt: %v\n", resourceType)
+			}
 			// If resourceType is empty or looks like a version, set as "discovery".
 			if resourceType == "" || isVersion(resourceType) {
 				resourceType = "discovery"
 			}
 
+			// check if its an operational endpoint
+
 			// Determine if the endpoint is namespaced by checking if the path contains "namespaces".
-			namespaced := strings.Contains(convertedPath, "namespaces")
+			// unless it is the endpoint for namespaces themselves ie .
+			namespaced := strings.Contains(convertedPath, "namespaces") && !isNamespaceEndpoint(resourceTypePath)
 
 			endpoint := Endpoint{
 				OperationID:  op.OperationID,
@@ -191,6 +210,7 @@ func GenerateIR(spec SwaggerSpec) IR {
 				Tags:         op.Tags,
 				ResourceType: resourceType,
 				Namespaced:   namespaced,
+				Operational:  isOperational != "",
 				Parameters:   convertToIRParameters(mergedParams),
 				Responses:    convertToIRResponses(op.Responses, ir.Models),
 			}
@@ -200,4 +220,24 @@ func GenerateIR(spec SwaggerSpec) IR {
 	}
 
 	return ir
+}
+
+// Checks if endpoint ends with the operational verbs
+//
+//	"/finalize", "/binding", "/eviction", "/scale", "/status", "/token",
+//
+// "/approval", "/log", "/eec", "/attach", "/portforward", "/proxy", "/redirect", "/watch", "/connect", "/bind", "/metrics", "/metrics/proxy", "/metrics/portforward
+// if operational endpoint return the endpoint minus the verbs otherwise return ""
+func isOperationalEndpoint(endpoint string) string {
+
+	for _, verb := range operationalVerbs {
+		if strings.HasSuffix(endpoint, verb) {
+			return strings.TrimSuffix(endpoint, verb)
+		}
+	}
+	return ""
+}
+
+func isNamespaceEndpoint(endpoint string) bool {
+	return strings.HasSuffix(endpoint, "namespaces") || strings.HasSuffix(endpoint, "namespaces/:name")
 }

@@ -6,36 +6,13 @@ import { handleResourceError } from '../utils';
 
 export function createcsistoragecapacityRoutes(storage: Storage): express.Router {
   const router = express.Router();
-    
-  
-  
-  // List csistoragecapacity
-  router.get('/apis/storage.k8s.io/v1/namespaces/:namespace/csistoragecapacities', async (req, res, next) => {
+
+//replace the specified CSIStorageCapacity
+  router.put('/apis/storage.k8s.io/v1/namespaces/:namespace/csistoragecapacities/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
-      logger.info(`Listing csistoragecapacity in namespace ${namespace}`);
-      
-      const resources = await storage.listResources('csistoragecapacity', namespace);
-      
-      const response = {
-        kind: 'CsistoragecapacityList',
-        apiVersion: 'storage.k8s.io/v1',
-        metadata: {
-          resourceVersion: '1'
-        },
-        items: resources || []
-      };
-      
-      res.json(response);
-    } catch (error) {
-      next(error);
-    }
-  });
-  // Create csistoragecapacity
-  router.post('/apis/storage.k8s.io/v1/namespaces/:namespace/csistoragecapacities', async (req, res, next) => {
-    try {
-      const namespace = req.params.namespace;
-      logger.info(`Creating csistoragecapacity in namespace ${namespace}`);
+      const name = req.params.name;
+      logger.info(`Updating csistoragecapacity ${name} in namespace ${namespace}`);
       
       const resource = req.body;
       
@@ -44,18 +21,20 @@ export function createcsistoragecapacityRoutes(storage: Storage): express.Router
         resource.metadata = {};
       }
       
-      // Set namespace in metadata
+      // Set name and namespace in metadata
+      resource.metadata.name = name;
       resource.metadata.namespace = namespace;
       
-      const createdResource = await storage.createOrUpdateResource('csistoragecapacity', resource);
+      const updatedResource = await storage.updateResource('csistoragecapacity', name, resource);
       
-      res.status(201).json(createdResource);
+      res.json(updatedResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete csistoragecapacity
-  router.delete('/apis/storage.k8s.io/v1/namespaces/:namespace/csistoragecapacities', async (req, res, next) => {
+
+//delete a CSIStorageCapacity
+  router.delete('/apis/storage.k8s.io/v1/namespaces/:namespace/csistoragecapacities/:name', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
       const name = req.params.name;
@@ -68,7 +47,7 @@ export function createcsistoragecapacityRoutes(storage: Storage): express.Router
           return handleResourceError(new Error(`csistoragecapacity ${name} not found in namespace ${namespace}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`csistoragecapacity ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`csistoragecapacity ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -85,10 +64,27 @@ export function createcsistoragecapacityRoutes(storage: Storage): express.Router
       next(error);
     }
   });
-    
-  
-  
-  // List csistoragecapacity
+
+//read the specified CSIStorageCapacity
+  router.get('/apis/storage.k8s.io/v1/namespaces/:namespace/csistoragecapacities/:name', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Getting csistoragecapacity ${name} in namespace ${namespace}`);
+      
+      const resource = await storage.getResource('csistoragecapacity', name, namespace);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`csistoragecapacity ${name} not found in namespace ${namespace}`), res);
+      }
+      
+      res.json(resource);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//list or watch objects of kind CSIStorageCapacity
   router.get('/apis/storage.k8s.io/v1/csistoragecapacities', async (req, res, next) => {
     try {
       logger.info(`Listing csistoragecapacity`);
@@ -109,10 +105,8 @@ export function createcsistoragecapacityRoutes(storage: Storage): express.Router
       next(error);
     }
   });
-    
-  
-  
-  // List csistoragecapacity
+
+//watch individual changes to a list of CSIStorageCapacity. deprecated: use the 'watch' parameter with a list operation instead.
   router.get('/apis/storage.k8s.io/v1/watch/namespaces/:namespace/csistoragecapacities', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
@@ -134,33 +128,35 @@ export function createcsistoragecapacityRoutes(storage: Storage): express.Router
       next(error);
     }
   });
-    
-  
-  
-  // Get specific csistoragecapacity
-  router.get('/apis/storage.k8s.io/v1/namespaces/:namespace/csistoragecapacities/:name', async (req, res, next) => {
+
+//list or watch objects of kind CSIStorageCapacity
+  router.get('/apis/storage.k8s.io/v1/namespaces/:namespace/csistoragecapacities', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
-      const name = req.params.name;
-      logger.info(`Getting csistoragecapacity ${name} in namespace ${namespace}`);
+      logger.info(`Listing csistoragecapacity in namespace ${namespace}`);
       
-      const resource = await storage.getResource('csistoragecapacity', name, namespace);
+      const resources = await storage.listResources('csistoragecapacity', namespace);
       
-      if (!resource) {
-        return handleResourceError(new Error(`csistoragecapacity ${name} not found in namespace ${namespace}`), res);
-      }
+      const response = {
+        kind: 'CsistoragecapacityList',
+        apiVersion: 'storage.k8s.io/v1',
+        metadata: {
+          resourceVersion: '1'
+        },
+        items: resources || []
+      };
       
-      res.json(resource);
+      res.json(response);
     } catch (error) {
       next(error);
     }
   });
-  // Update csistoragecapacity
-  router.put('/apis/storage.k8s.io/v1/namespaces/:namespace/csistoragecapacities/:name', async (req, res, next) => {
+
+//create a CSIStorageCapacity
+  router.post('/apis/storage.k8s.io/v1/namespaces/:namespace/csistoragecapacities', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
-      const name = req.params.name;
-      logger.info(`Updating csistoragecapacity ${name} in namespace ${namespace}`);
+      logger.info(`Creating csistoragecapacity in namespace ${namespace}`);
       
       const resource = req.body;
       
@@ -169,32 +165,31 @@ export function createcsistoragecapacityRoutes(storage: Storage): express.Router
         resource.metadata = {};
       }
       
-      // Set name and namespace in metadata
-      resource.metadata.name = name;
+      // Set namespace in metadata
       resource.metadata.namespace = namespace;
       
-      const updatedResource = await storage.createOrUpdateResource('csistoragecapacity', resource);
+      const createdResource = await storage.createResource('csistoragecapacity', resource);
       
-      res.json(updatedResource);
+      res.status(201).json(createdResource);
     } catch (error) {
       next(error);
     }
   });
-  // Delete csistoragecapacity
-  router.delete('/apis/storage.k8s.io/v1/namespaces/:namespace/csistoragecapacities/:name', async (req, res, next) => {
+
+//delete collection of CSIStorageCapacity
+  router.delete('/apis/storage.k8s.io/v1/namespaces/:namespace/csistoragecapacities', async (req, res, next) => {
     try {
       const namespace = req.params.namespace;
-      const name = req.params.name;
-      logger.info(`Deleting csistoragecapacity ${name} in namespace ${namespace}`);
+      logger.info(`Deleting all csistoragecapacity in namespace ${namespace}`);
       try {
 
-        const deleted = await storage.deleteResource('csistoragecapacity', name, namespace);
+        const deleted = await storage.deleteAllResources('csistoragecapacity', namespace);
         
         if (!deleted) {
-          return handleResourceError(new Error(`csistoragecapacity ${name} not found in namespace ${namespace}`), res);
+          return handleResourceError(new Error(`csistoragecapacity not found in namespace ${namespace}`), res);
         }
       } catch(e) {
-          return handleResourceError(new Error(`csistoragecapacity ${name} not deleted in namespace ${namespace}. Error: ${(e as Error).message)}`), res);
+          return handleResourceError(new Error(`csistoragecapacity not deleted in namespace ${namespace}. Error: ${(e as Error).message}`), res);
       }
       
       res.status(200).json({
@@ -203,7 +198,6 @@ export function createcsistoragecapacityRoutes(storage: Storage): express.Router
         metadata: {},
         status: 'Success',
         details: {
-          name: name,
           kind: 'csistoragecapacity'
         }
       });
@@ -211,31 +205,8 @@ export function createcsistoragecapacityRoutes(storage: Storage): express.Router
       next(error);
     }
   });
-    
-  
-  
-  // Get specific csistoragecapacity
-  router.get('/apis/storage.k8s.io/v1/watch/namespaces/:namespace/csistoragecapacities/:name', async (req, res, next) => {
-    try {
-      const namespace = req.params.namespace;
-      const name = req.params.name;
-      logger.info(`Getting csistoragecapacity ${name} in namespace ${namespace}`);
-      
-      const resource = await storage.getResource('csistoragecapacity', name, namespace);
-      
-      if (!resource) {
-        return handleResourceError(new Error(`csistoragecapacity ${name} not found in namespace ${namespace}`), res);
-      }
-      
-      res.json(resource);
-    } catch (error) {
-      next(error);
-    }
-  });
-    
-  
-  
-  // List csistoragecapacity
+
+//watch individual changes to a list of CSIStorageCapacity. deprecated: use the 'watch' parameter with a list operation instead.
   router.get('/apis/storage.k8s.io/v1/watch/csistoragecapacities', async (req, res, next) => {
     try {
       logger.info(`Listing csistoragecapacity`);
@@ -252,6 +223,25 @@ export function createcsistoragecapacityRoutes(storage: Storage): express.Router
       };
       
       res.json(response);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+//watch changes to an object of kind CSIStorageCapacity. deprecated: use the 'watch' parameter with a list operation instead, filtered to a single item with the 'fieldSelector' parameter.
+  router.get('/apis/storage.k8s.io/v1/watch/namespaces/:namespace/csistoragecapacities/:name', async (req, res, next) => {
+    try {
+      const namespace = req.params.namespace;
+      const name = req.params.name;
+      logger.info(`Getting csistoragecapacity ${name} in namespace ${namespace}`);
+      
+      const resource = await storage.getResource('csistoragecapacity', name, namespace);
+      
+      if (!resource) {
+        return handleResourceError(new Error(`csistoragecapacity ${name} not found in namespace ${namespace}`), res);
+      }
+      
+      res.json(resource);
     } catch (error) {
       next(error);
     }

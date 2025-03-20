@@ -16,13 +16,13 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { finalizers?: string[]; generateName?: string; labels?: Record<string, any>; managedFields?: Array<{ fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string }>; uid?: string; deletionTimestamp?: Date; name?: string; deletionGracePeriodSeconds?: number; selfLink?: string; creationTimestamp?: Date; generation?: number; namespace?: string; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; resourceVersion?: string; annotations?: Record<string, any> };
+metadata?: { namespace?: string; deletionGracePeriodSeconds?: number; finalizers?: string[]; generateName?: string; creationTimestamp?: Date; deletionTimestamp?: Date; generation?: number; labels?: Record<string, any>; name?: string; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; selfLink?: string; annotations?: Record<string, any>; resourceVersion?: string; uid?: string; managedFields?: Array<{ fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string }> };
 /**
 * CSIDriverSpec is the specification of a CSIDriver.
 * @required
 * @isObject
 */
-spec: { fsGroupPolicy?: string; podInfoOnMount?: boolean; requiresRepublish?: boolean; seLinuxMount?: boolean; storageCapacity?: boolean; tokenRequests?: Array<{ expirationSeconds?: number; audience: string }>; volumeLifecycleModes?: string[]; attachRequired?: boolean };
+spec: { seLinuxMount?: boolean; storageCapacity?: boolean; tokenRequests?: Array<{ audience: string; expirationSeconds?: number }>; volumeLifecycleModes?: string[]; attachRequired?: boolean; fsGroupPolicy?: string; podInfoOnMount?: boolean; requiresRepublish?: boolean };
 }
 
 /**

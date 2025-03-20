@@ -4,3 +4,4 @@ TODO
 - i need to update the endpoint generation to properly generate calls for each method within an endpoint and also handle namespcaed vs non namespaced resources 
 - this means i need to update the storage interfaces to take a boolean to save to a namespaced or non-namespaced state
 - i also need to settle on schema storage for each interface. For firestore specifically i need to make sure we're grabbing config to point to which collection/subcollection to store the state. 
+- watch is no longer implemented take a look at https://v0.dev/chat/fork-of-kubernetes-mock-server-RvmbglgRVU0 version 42 for reference on its implementation. 

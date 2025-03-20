@@ -23,7 +23,7 @@ apiVersion?: string;
 * @required
 * @isArray
 */
-endpoints: Array<{ deprecatedTopology?: Record<string, any>; hints?: { forZones?: Array<{ name: string }> }; hostname?: string; nodeName?: string; targetRef?: { name?: string; namespace?: string; resourceVersion?: string; uid?: string; apiVersion?: string; fieldPath?: string; kind?: string }; zone?: string; addresses: string[]; conditions?: { ready?: boolean; serving?: boolean; terminating?: boolean } }>;
+endpoints: Array<{ addresses: string[]; conditions?: { serving?: boolean; terminating?: boolean; ready?: boolean }; deprecatedTopology?: Record<string, any>; hints?: { forZones?: Array<{ name: string }> }; hostname?: string; nodeName?: string; targetRef?: { apiVersion?: string; fieldPath?: string; kind?: string; name?: string; namespace?: string; resourceVersion?: string; uid?: string }; zone?: string }>;
 /**
 * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 */
@@ -32,7 +32,7 @@ kind?: string;
 * ObjectMeta is metadata that all persisted resources must have, which includes all objects users must create.
 * @isObject
 */
-metadata?: { resourceVersion?: string; creationTimestamp?: Date; deletionTimestamp?: Date; managedFields?: Array<{ time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string; operation?: string; subresource?: string }>; namespace?: string; ownerReferences?: Array<{ uid: string; apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string }>; uid?: string; deletionGracePeriodSeconds?: number; finalizers?: string[]; generation?: number; name?: string; selfLink?: string; annotations?: Record<string, any>; generateName?: string; labels?: Record<string, any> };
+metadata?: { labels?: Record<string, any>; selfLink?: string; managedFields?: Array<{ operation?: string; subresource?: string; time?: Date; apiVersion?: string; fieldsType?: string; fieldsV1?: Record<string, any>; manager?: string }>; namespace?: string; ownerReferences?: Array<{ apiVersion: string; blockOwnerDeletion?: boolean; controller?: boolean; kind: string; name: string; uid: string }>; uid?: string; creationTimestamp?: Date; generateName?: string; annotations?: Record<string, any>; name?: string; finalizers?: string[]; generation?: number; resourceVersion?: string; deletionGracePeriodSeconds?: number; deletionTimestamp?: Date };
 /**
 * ports specifies the list of network ports exposed by each endpoint in this slice. Each port must have a unique name. When ports is empty, it indicates that there are no defined ports. When a port is defined with a nil port value, it indicates "all ports". Each slice may include a maximum of 100 ports.
 * @isArray
